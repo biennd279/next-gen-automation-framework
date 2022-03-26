@@ -2,7 +2,7 @@ package me.d3s34.feature.nuclei
 
 import java.io.File
 
-open class NucleiTemplate(
+sealed class NucleiTemplate(
     open val path: String
 ) {}
 

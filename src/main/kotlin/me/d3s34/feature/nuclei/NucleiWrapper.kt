@@ -1,7 +1,10 @@
 package me.d3s34.feature.nuclei
 
 abstract class NucleiWrapper(
-    var templateDir: String
+    engine: NucleiEngine
 ) {
-    abstract fun scan()
+    suspend fun scan(template: NucleiTemplate) {
+
+    }
+
 }
