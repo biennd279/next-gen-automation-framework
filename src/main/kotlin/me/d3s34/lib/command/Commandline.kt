@@ -1,6 +1,6 @@
 package me.d3s34.lib.command
 
-class Command (
+class Commandline (
     val path: String,
     args: List<String> = listOf(),
     shortFlag: Map<String, String?> = mapOf(),
@@ -63,7 +63,7 @@ class Command (
         var shortFlag: Map<String, String?> = mapOf()
         var longFlag: Map<String, String?> = mapOf()
 
-        fun build() = Command(this)
+        fun build() = Commandline(this)
     }
 
     companion object {
@@ -71,4 +71,4 @@ class Command (
     }
 }
 
-inline fun buildCommand(block: Command.Builder.() -> Unit) = Command.buildCommand(block)
+inline fun buildCommand(block: Commandline.Builder.() -> Unit) = Commandline.buildCommand(block)

@@ -4,13 +4,13 @@ import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 import kotlin.test.BeforeTest
 
-internal class CommandTest {
+internal class CommandlineTest {
 
-    private lateinit var command: Command
+    private lateinit var commandline: Commandline
 
     @BeforeTest
     fun init() {
-        command = buildCommand {
+        commandline = buildCommand {
             path = "echo"
             args = listOf("hello", "world")
             shortFlag = mapOf("n" to null)
@@ -19,22 +19,22 @@ internal class CommandTest {
 
     @Test
     fun getEscapedArgs() {
-        assertEquals(listOf( "-n", "hello", "world"), command.escapedArgs)
+        assertEquals(listOf( "-n", "hello", "world"), commandline.escapedArgs)
     }
 
     @Test
     fun toCommandline() {
-        assertEquals("echo -n hello world", command.toCommandline())
+        assertEquals("echo -n hello world", commandline.toCommandline())
     }
 
     @Test
     fun testToString() {
-        assertEquals("echo -n hello world", command.toString())
+        assertEquals("echo -n hello world", commandline.toString())
 
     }
 
     @Test
     fun getPath() {
-        assertEquals("echo", command.path)
+        assertEquals("echo", commandline.path)
     }
 }
