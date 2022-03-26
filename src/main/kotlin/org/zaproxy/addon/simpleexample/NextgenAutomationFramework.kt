@@ -29,9 +29,7 @@ import org.zaproxy.zap.utils.FontUtils
 import org.zaproxy.zap.view.ZapMenuItem
 import java.awt.CardLayout
 import java.awt.Font
-import java.awt.event.ActionEvent
 import javax.swing.JTextPane
-import java.awt.event.ActionListener
 import java.io.File
 import java.lang.Exception
 import java.nio.file.Files
@@ -46,19 +44,46 @@ import javax.swing.ImageIcon
  *
  * @see .hook
  */
-class ExtensionSimpleExample : ExtensionAdaptor(NAME) {
-    private var menuExample: ZapMenuItem? = null
-    private var popupMsgMenuExample: RightClickMsgMenu? = null
-        get() {
-            if (field == null) {
-                field = RightClickMsgMenu(
-                    this, Constant.messages.getString("$PREFIX.popup.title")
+class NextgenAutomationFramework : ExtensionAdaptor(NAME) {
+    private val menuExample: ZapMenuItem by lazy {
+        val menu = ZapMenuItem("$PREFIX.topmenu.tools.title")
+        menu.addActionListener {
+            // This is where you do what you want to do.
+            // In this case we'll just show a popup message.
+            View.getSingleton()
+                .showMessageDialog(
+                    Constant.messages.getString("$PREFIX.topmenu.tools.msg")
                 )
-            }
-            return field
+            // And display a file included with the add-on in the Output tab
+            displayFile(EXAMPLE_FILE)
         }
-    private var statusPanel: AbstractPanel? = null
-    private var api: SimpleExampleAPI? = null
+        menu
+    }
+
+    private val popupMsgMenuExample: RightClickMsgMenu by lazy {
+        RightClickMsgMenu(this, Constant.messages.getString("$PREFIX.popup.title"))
+    }
+
+    private val statusPanel by lazy {
+        val panel = AbstractPanel()
+        panel.layout = CardLayout()
+        panel.name =
+            Constant.messages.getString("$PREFIX.panel.title")
+        panel.icon = ICON
+
+        val pane = JTextPane()
+        pane.isEditable = false
+        // Obtain (and set) a font with the size defined in the options
+        pane.font = FontUtils.getFont("Dialog", Font.PLAIN)
+        pane.contentType = "text/html"
+        pane.text =
+            Constant.messages.getString("$PREFIX.panel.msg")
+        panel.add(pane)
+
+        panel
+    }
+
+    private lateinit var api: NextgenAutomationApi
 
     init {
         i18nPrefix = PREFIX
@@ -66,14 +91,14 @@ class ExtensionSimpleExample : ExtensionAdaptor(NAME) {
 
     override fun hook(extensionHook: ExtensionHook) {
         super.hook(extensionHook)
-        api = SimpleExampleAPI()
+        api = NextgenAutomationApi()
         extensionHook.addApiImplementor(api)
 
         // As long as we're not running as a daemon
         if (view != null) {
-            extensionHook.hookMenu.addToolsMenuItem(getMenuExample())
+            extensionHook.hookMenu.addToolsMenuItem(menuExample)
             extensionHook.hookMenu.addPopupMenuItem(popupMsgMenuExample)
-            extensionHook.hookView.addStatusPanel(getStatusPanel())
+            extensionHook.hookView.addStatusPanel(statusPanel)
         }
     }
 
@@ -91,42 +116,6 @@ class ExtensionSimpleExample : ExtensionAdaptor(NAME) {
         // are automatically removed by the base unload() method.
         // If you use/add other components through other methods you might need to free/remove them
         // here (if the extension declares that can be unloaded, see above method).
-    }
-
-    private fun getStatusPanel(): AbstractPanel {
-        if (statusPanel == null) {
-            statusPanel = AbstractPanel()
-            statusPanel!!.layout = CardLayout()
-            statusPanel!!.name =
-                Constant.messages.getString("$PREFIX.panel.title")
-            statusPanel!!.icon = ICON
-            val pane = JTextPane()
-            pane.isEditable = false
-            // Obtain (and set) a font with the size defined in the options
-            pane.font = FontUtils.getFont("Dialog", Font.PLAIN)
-            pane.contentType = "text/html"
-            pane.text =
-                Constant.messages.getString("$PREFIX.panel.msg")
-            statusPanel!!.add(pane)
-        }
-        return statusPanel as AbstractPanel
-    }
-
-    private fun getMenuExample(): ZapMenuItem {
-        if (menuExample == null) {
-            menuExample = ZapMenuItem("$PREFIX.topmenu.tools.title")
-            menuExample!!.addActionListener {
-                // This is where you do what you want to do.
-                // In this case we'll just show a popup message.
-                View.getSingleton()
-                    .showMessageDialog(
-                        Constant.messages.getString("$PREFIX.topmenu.tools.msg")
-                    )
-                // And display a file included with the add-on in the Output tab
-                displayFile(EXAMPLE_FILE)
-            }
-        }
-        return menuExample!!
     }
 
     private fun displayFile(file: String) {
@@ -177,8 +166,8 @@ class ExtensionSimpleExample : ExtensionAdaptor(NAME) {
          * @see Class.getResource
          */
         private const val RESOURCES = "resources"
-        private val ICON = ImageIcon(ExtensionSimpleExample::class.java.getResource("$RESOURCES/cake.png"))
+        private val ICON = ImageIcon(NextgenAutomationFramework::class.java.getResource("$RESOURCES/cake.png"))
         private const val EXAMPLE_FILE = "example/ExampleFile.txt"
-        private val LOGGER = LogManager.getLogger(ExtensionSimpleExample::class.java)
+        private val LOGGER = LogManager.getLogger(NextgenAutomationFramework::class.java)
     }
 }

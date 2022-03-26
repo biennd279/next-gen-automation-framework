@@ -23,7 +23,7 @@ import net.sf.json.JSONObject
 import org.apache.logging.log4j.LogManager
 import org.zaproxy.zap.extension.api.*
 
-class SimpleExampleAPI : ApiImplementor() {
+class NextgenAutomationApi : ApiImplementor() {
     init {
         addApiAction(ApiAction(ACTION_HELLO_WORLD))
     }
@@ -44,6 +44,6 @@ class SimpleExampleAPI : ApiImplementor() {
     companion object {
         private const val PREFIX = "naf"
         private const val ACTION_HELLO_WORLD = "helloWorld"
-        private val LOGGER = LogManager.getLogger(SimpleExampleAPI::class.java)
+        private val LOGGER = LogManager.getLogger(NextgenAutomationApi::class.java)
     }
 }
