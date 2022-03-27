@@ -1,6 +1,9 @@
 package me.d3s34.lib.command
 
-class Command (
+import eu.jrie.jetbrains.kotlinshell.shell.Shell
+import eu.jrie.jetbrains.kotlinshell.shell.shell
+
+class Commandline (
     val path: String,
     args: List<String> = listOf(),
     shortFlag: Map<String, String?> = mapOf(),
@@ -25,11 +28,13 @@ class Command (
 
     init {
         longFlag.forEach{ (flag, value) ->
-            _escapedArgs.add("--${escapeCommand(flag)} ${escapeArg(value ?: "")}".trim())
+            _escapedArgs.add("--${escapeCommand(flag)}")
+            value?.let { _escapedArgs.add(it) }
         }
 
         shortFlag.forEach { (flag, value) ->
-            _escapedArgs.add("-${escapeCommand(flag)} ${escapeArg(value ?: "")}".trim())
+            _escapedArgs.add("-${escapeCommand(flag)}")
+            value?.let { _escapedArgs.add(it) }
         }
 
         args.forEach { arg ->
@@ -63,7 +68,7 @@ class Command (
         var shortFlag: Map<String, String?> = mapOf()
         var longFlag: Map<String, String?> = mapOf()
 
-        fun build() = Command(this)
+        fun build() = Commandline(this)
     }
 
     companion object {
@@ -71,4 +76,4 @@ class Command (
     }
 }
 
-inline fun buildCommand(block: Command.Builder.() -> Unit) = Command.buildCommand(block)
+inline fun buildCommand(block: Commandline.Builder.() -> Unit) = Commandline.buildCommand(block)

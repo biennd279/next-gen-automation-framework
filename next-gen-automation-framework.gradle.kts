@@ -19,6 +19,7 @@ crowdin {
 
 plugins {
     kotlin("jvm") version "1.6.10"
+    kotlin("plugin.serialization") version "1.6.10"
 }
 
 dependencies {
@@ -31,6 +32,8 @@ dependencies {
     //Classpath
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.0")
     implementation("eu.jrie.jetbrains:kotlin-shell-core:0.2.1")
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.3.2")
+
 
     testImplementation(kotlin("test"))
 }
