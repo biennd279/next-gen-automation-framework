@@ -1,5 +1,8 @@
 package me.d3s34.lib.command
 
+import eu.jrie.jetbrains.kotlinshell.shell.Shell
+import eu.jrie.jetbrains.kotlinshell.shell.shell
+
 class Commandline (
     val path: String,
     args: List<String> = listOf(),
@@ -25,11 +28,13 @@ class Commandline (
 
     init {
         longFlag.forEach{ (flag, value) ->
-            _escapedArgs.add("--${escapeCommand(flag)} ${escapeArg(value ?: "")}".trim())
+            _escapedArgs.add("--${escapeCommand(flag)}")
+            value?.let { _escapedArgs.add(it) }
         }
 
         shortFlag.forEach { (flag, value) ->
-            _escapedArgs.add("-${escapeCommand(flag)} ${escapeArg(value ?: "")}".trim())
+            _escapedArgs.add("-${escapeCommand(flag)}")
+            value?.let { _escapedArgs.add(it) }
         }
 
         args.forEach { arg ->
