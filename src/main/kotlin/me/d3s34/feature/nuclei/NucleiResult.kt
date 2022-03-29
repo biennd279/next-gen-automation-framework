@@ -1,7 +1,7 @@
 package me.d3s34.feature.nuclei
-import kotlinx.serialization.Serializable
 
 import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 
 
 @Serializable
@@ -49,7 +49,7 @@ data class Info(
     @SerialName("tags")
     val tags: List<String>,
 
-)
+    )
 
 @Serializable
 data class Classification(

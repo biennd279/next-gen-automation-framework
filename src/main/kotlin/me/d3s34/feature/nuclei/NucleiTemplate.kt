@@ -4,7 +4,7 @@ import java.io.File
 
 sealed class NucleiTemplate(
     open val path: String
-) {}
+)
 
 data class NucleiTemplateFile(
     override val path: String
