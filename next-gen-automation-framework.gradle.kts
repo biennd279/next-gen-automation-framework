@@ -36,6 +36,7 @@ dependencies {
 
 
     testImplementation(kotlin("test"))
+    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.6.0")
 }
 
 //tasks.test {

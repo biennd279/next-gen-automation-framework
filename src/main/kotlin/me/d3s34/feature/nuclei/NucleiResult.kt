@@ -13,9 +13,9 @@ data class NucleiResponse(
     @SerialName("matched-at")
     val matchedAt: String,
     @SerialName("matched-line")
-    val matchedLine: String?,
+    val matchedLine: String? = null,
     @SerialName("matcher-name")
-    val matcherName: String,
+    val matcherName: String? = null,
     @SerialName("matcher-status")
     val matcherStatus: Boolean,
     @SerialName("template")
@@ -27,7 +27,9 @@ data class NucleiResponse(
     @SerialName("timestamp")
     val timestamp: String,
     @SerialName("type")
-    val type: String
+    val type: String,
+    @SerialName("extracted-results")
+    val extractedResults: List<String>,
 )
 
 @Serializable
@@ -41,11 +43,12 @@ data class Info(
     @SerialName("name")
     val name: String,
     @SerialName("reference")
-    val reference: String?,
+    val reference: List<String>?,
     @SerialName("severity")
     val severity: String,
     @SerialName("tags")
-    val tags: List<String>
+    val tags: List<String>,
+
 )
 
 @Serializable
