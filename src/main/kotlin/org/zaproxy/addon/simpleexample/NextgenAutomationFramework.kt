@@ -19,6 +19,8 @@
  */
 package org.zaproxy.addon.simpleexample
 
+import me.d3s34.lib.dsl.abstractPanel
+import me.d3s34.lib.dsl.jTextPanel
 import org.apache.logging.log4j.LogManager
 import org.parosproxy.paros.Constant
 import org.parosproxy.paros.extension.AbstractPanel
@@ -29,7 +31,9 @@ import org.zaproxy.zap.utils.FontUtils
 import org.zaproxy.zap.view.ZapMenuItem
 import java.awt.CardLayout
 import java.awt.Font
+import java.awt.event.ActionEvent
 import javax.swing.JTextPane
+import java.awt.event.ActionListener
 import java.io.File
 import java.lang.Exception
 import java.nio.file.Files
@@ -45,44 +49,32 @@ import javax.swing.ImageIcon
  * @see .hook
  */
 class NextgenAutomationFramework : ExtensionAdaptor(NAME) {
-    private val menuExample: ZapMenuItem by lazy {
-        val menu = ZapMenuItem("$PREFIX.topmenu.tools.title")
-        menu.addActionListener {
-            // This is where you do what you want to do.
-            // In this case we'll just show a popup message.
-            View.getSingleton()
-                .showMessageDialog(
-                    Constant.messages.getString("$PREFIX.topmenu.tools.msg")
+    private var menuExample: ZapMenuItem? = null
+    private var popupMsgMenuExample: RightClickMsgMenu? = null
+        get() {
+            if (field == null) {
+                field = RightClickMsgMenu(
+                    this, Constant.messages.getString("$PREFIX.popup.title")
                 )
-            // And display a file included with the add-on in the Output tab
-            displayFile(EXAMPLE_FILE)
+            }
+            return field
         }
-        menu
+    private val statusPanel: AbstractPanel by lazy {
+        abstractPanel {
+            layout = CardLayout()
+            name = Constant.messages.getString("$PREFIX.panel.title")
+            icon = ICON
+
+            add {
+                jTextPanel {
+                    isEditable = false
+                    font = FontUtils.getFont("Dialog", Font.PLAIN)
+                    contentType = "text/html"
+                    text = Constant.messages.getString("$PREFIX.panel.msg")
+                }
+            }
+        }
     }
-
-    private val popupMsgMenuExample: RightClickMsgMenu by lazy {
-        RightClickMsgMenu(this, Constant.messages.getString("$PREFIX.popup.title"))
-    }
-
-    private val statusPanel by lazy {
-        val panel = AbstractPanel()
-        panel.layout = CardLayout()
-        panel.name =
-            Constant.messages.getString("$PREFIX.panel.title")
-        panel.icon = ICON
-
-        val pane = JTextPane()
-        pane.isEditable = false
-        // Obtain (and set) a font with the size defined in the options
-        pane.font = FontUtils.getFont("Dialog", Font.PLAIN)
-        pane.contentType = "text/html"
-        pane.text =
-            Constant.messages.getString("$PREFIX.panel.msg")
-        panel.add(pane)
-
-        panel
-    }
-
     private lateinit var api: NextgenAutomationApi
 
     init {
@@ -96,7 +88,7 @@ class NextgenAutomationFramework : ExtensionAdaptor(NAME) {
 
         // As long as we're not running as a daemon
         if (view != null) {
-            extensionHook.hookMenu.addToolsMenuItem(menuExample)
+            extensionHook.hookMenu.addToolsMenuItem(getMenuExample())
             extensionHook.hookMenu.addPopupMenuItem(popupMsgMenuExample)
             extensionHook.hookView.addStatusPanel(statusPanel)
         }
@@ -116,6 +108,23 @@ class NextgenAutomationFramework : ExtensionAdaptor(NAME) {
         // are automatically removed by the base unload() method.
         // If you use/add other components through other methods you might need to free/remove them
         // here (if the extension declares that can be unloaded, see above method).
+    }
+
+    private fun getMenuExample(): ZapMenuItem {
+        if (menuExample == null) {
+            menuExample = ZapMenuItem("$PREFIX.topmenu.tools.title")
+            menuExample!!.addActionListener {
+                // This is where you do what you want to do.
+                // In this case we'll just show a popup message.
+                View.getSingleton()
+                    .showMessageDialog(
+                        Constant.messages.getString("$PREFIX.topmenu.tools.msg")
+                    )
+                // And display a file included with the add-on in the Output tab
+                displayFile(EXAMPLE_FILE)
+            }
+        }
+        return menuExample!!
     }
 
     private fun displayFile(file: String) {
