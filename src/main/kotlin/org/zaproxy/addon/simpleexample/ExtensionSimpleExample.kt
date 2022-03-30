@@ -19,6 +19,8 @@
  */
 package org.zaproxy.addon.simpleexample
 
+import me.d3s34.lib.dsl.abstractPanel
+import me.d3s34.lib.dsl.jTextPanel
 import org.apache.logging.log4j.LogManager
 import org.parosproxy.paros.Constant
 import org.parosproxy.paros.extension.AbstractPanel
@@ -57,7 +59,22 @@ class ExtensionSimpleExample : ExtensionAdaptor(NAME) {
             }
             return field
         }
-    private var statusPanel: AbstractPanel? = null
+    private val statusPanel: AbstractPanel by lazy {
+        abstractPanel {
+            layout = CardLayout()
+            name = Constant.messages.getString("$PREFIX.panel.title")
+            icon = ICON
+
+            add {
+                jTextPanel {
+                    isEditable = false
+                    font = FontUtils.getFont("Dialog", Font.PLAIN)
+                    contentType = "text/html"
+                    text = Constant.messages.getString("$PREFIX.panel.msg")
+                }
+            }
+        }
+    }
     private var api: SimpleExampleAPI? = null
 
     init {
@@ -73,7 +90,7 @@ class ExtensionSimpleExample : ExtensionAdaptor(NAME) {
         if (view != null) {
             extensionHook.hookMenu.addToolsMenuItem(getMenuExample())
             extensionHook.hookMenu.addPopupMenuItem(popupMsgMenuExample)
-            extensionHook.hookView.addStatusPanel(getStatusPanel())
+            extensionHook.hookView.addStatusPanel(statusPanel)
         }
     }
 
@@ -91,25 +108,6 @@ class ExtensionSimpleExample : ExtensionAdaptor(NAME) {
         // are automatically removed by the base unload() method.
         // If you use/add other components through other methods you might need to free/remove them
         // here (if the extension declares that can be unloaded, see above method).
-    }
-
-    private fun getStatusPanel(): AbstractPanel {
-        if (statusPanel == null) {
-            statusPanel = AbstractPanel()
-            statusPanel!!.layout = CardLayout()
-            statusPanel!!.name =
-                Constant.messages.getString("$PREFIX.panel.title")
-            statusPanel!!.icon = ICON
-            val pane = JTextPane()
-            pane.isEditable = false
-            // Obtain (and set) a font with the size defined in the options
-            pane.font = FontUtils.getFont("Dialog", Font.PLAIN)
-            pane.contentType = "text/html"
-            pane.text =
-                Constant.messages.getString("$PREFIX.panel.msg")
-            statusPanel!!.add(pane)
-        }
-        return statusPanel as AbstractPanel
     }
 
     private fun getMenuExample(): ZapMenuItem {

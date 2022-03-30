@@ -1,9 +1,11 @@
 package me.d3s34.lib.dsl
 
+import java.awt.Component
 import java.awt.Font
 import javax.swing.plaf.TextUI
+import javax.swing.text.JTextComponent
 
-open class ComponentBuilder {
+open class ComponentBuilder<in T: Component> {
     var name: String = ""
     var font: Font? = null
 
@@ -14,9 +16,9 @@ open class ComponentBuilder {
     inline fun font(font: () -> Font) {
         this.font = font()
     }
-    
-}
 
-open class TextComponentBuilder {
-    var textUI: TextUI? = null
+    open fun internalBuild(component: T) {
+        component.name = name
+        font?.let { component.font = it }
+    }
 }

@@ -1,25 +1,25 @@
 package me.d3s34.lib.dsl
 
 import java.awt.Component
+import java.awt.Container
 import java.awt.LayoutManager
-import javax.swing.Icon
 
 
-open class ContainerBuilder: ComponentBuilder() {
+open class ContainerBuilder<in T: Container>: ComponentBuilder<T>() {
     var layout: LayoutManager? = null
-    var icon: Icon? = null
     var components = mutableListOf<Component>()
 
     inline fun layout(layout: () -> LayoutManager) {
         this.layout = layout()
     }
 
-    inline fun icon(icon: () -> Icon) {
-        this.icon = icon()
-    }
-
     inline fun add(component: () -> Component) {
-        this.components.add(component())
+        components.add(component())
     }
 
+    override fun internalBuild(component: T) {
+        super.internalBuild(component)
+        layout?.let { component.layout = it }
+        components.forEach { component.add(it) }
+    }
 }
