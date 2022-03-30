@@ -2,6 +2,7 @@ package me.d3s34.feature.nuclei
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import java.util.*
 
 
 @Serializable
@@ -61,7 +62,7 @@ data class Info(
     @SerialName("reference")
     val reference: List<String>? = null,
     @SerialName("severity")
-    val severity: String? = null,
+    val severity: Severity = Severity.UNKNOWN,
     @SerialName("tags")
     val tags: List<String>? = null,
     @SerialName("metadata")
@@ -82,3 +83,21 @@ data class Classification(
     val cvssScore: Double? = null
 )
 
+@Serializable
+enum class Severity {
+    @SerialName("info") INFO,
+    @SerialName("low") LOW,
+    @SerialName("medium") MEDIUM,
+    @SerialName("high") HIGH,
+    @SerialName("critical") CRITICAL,
+    @SerialName("unknown") UNKNOWN;
+
+    override fun toString(): String {
+        return this.name.lowercase()
+            .replaceFirstChar { if (it.isLowerCase()) it.titlecase(Locale.getDefault()) else it.toString() }
+    }
+}
+
+fun main() {
+    println(Severity.CRITICAL)
+}
