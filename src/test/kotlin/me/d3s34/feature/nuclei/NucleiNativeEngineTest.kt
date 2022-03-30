@@ -1,8 +1,8 @@
 package me.d3s34.feature.nuclei
 
-import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Test
 import java.io.File
+import kotlin.test.assertEquals
 import kotlin.test.assertNotEquals
 
 internal class NucleiNativeEngineTest {
@@ -14,10 +14,11 @@ internal class NucleiNativeEngineTest {
 
         val result = nucleiEngine.scan(
             "d3s34.me",
-            NucleiTemplateDir("${home}/nuclei-templates/dns")
+            NucleiTemplateDir("${home}/nuclei-templates/dns/")
         )
 
         assertNotEquals(0, result.size)
+        assertEquals(4, result.size)
     }
 
     @Test
@@ -25,14 +26,11 @@ internal class NucleiNativeEngineTest {
         val home = System.getProperty("user.home")
         val nucleiEngine = NucleiNativeEngine("${home}/go/bin/nuclei")
 
-        val tempDir = File("/tmp/nucleiTemp")
-
-
-        if (tempDir.exists()) {
-            tempDir.delete()
+        val tempDir = File("/tmp/nucleiTemp").apply {
+            if (exists()) { delete() }
+            mkdirs()
         }
 
-        tempDir.mkdirs()
 
         nucleiEngine.updateTemplate(
             NucleiTemplateDir(tempDir.path)
@@ -44,8 +42,9 @@ internal class NucleiNativeEngineTest {
 
         assertNotEquals(1, templates.size)
 
-        if (tempDir.exists()) {
-            tempDir.delete()
+        tempDir.apply {
+            if (exists()) { delete() }
         }
+
     }
 }
