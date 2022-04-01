@@ -31,11 +31,7 @@ import org.zaproxy.zap.utils.FontUtils
 import org.zaproxy.zap.view.ZapMenuItem
 import java.awt.CardLayout
 import java.awt.Font
-import java.awt.event.ActionEvent
-import javax.swing.JTextPane
-import java.awt.event.ActionListener
 import java.io.File
-import java.lang.Exception
 import java.nio.file.Files
 import javax.swing.ImageIcon
 
@@ -98,16 +94,6 @@ class NextgenAutomationFramework : ExtensionAdaptor(NAME) {
         // The extension can be dynamically unloaded, all resources used/added can be freed/removed
         // from core.
         return true
-    }
-
-    override fun unload() {
-        super.unload()
-
-        // In this example it's not necessary to override the method, as there's nothing to unload
-        // manually, the components added through the class ExtensionHook (in hook(ExtensionHook))
-        // are automatically removed by the base unload() method.
-        // If you use/add other components through other methods you might need to free/remove them
-        // here (if the extension declares that can be unloaded, see above method).
     }
 
     private fun getMenuExample(): ZapMenuItem {

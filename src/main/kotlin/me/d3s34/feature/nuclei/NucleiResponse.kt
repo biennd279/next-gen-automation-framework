@@ -85,12 +85,18 @@ data class Classification(
 
 @Serializable
 enum class Severity {
-    @SerialName("info") INFO,
-    @SerialName("low") LOW,
-    @SerialName("medium") MEDIUM,
-    @SerialName("high") HIGH,
-    @SerialName("critical") CRITICAL,
-    @SerialName("unknown") UNKNOWN;
+    @SerialName("info")
+    INFO,
+    @SerialName("low")
+    LOW,
+    @SerialName("medium")
+    MEDIUM,
+    @SerialName("high")
+    HIGH,
+    @SerialName("critical")
+    CRITICAL,
+    @SerialName("unknown")
+    UNKNOWN;
 
     override fun toString(): String {
         return this.name.lowercase()
