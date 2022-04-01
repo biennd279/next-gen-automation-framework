@@ -9,67 +9,61 @@ import kotlin.test.assertNotEquals
 internal class NucleiNativeEngineTest {
 
     @Test
-    fun scan() {
-        val exceptionHandler = CoroutineExceptionHandler { _, t ->
-            println("Handler catch")
-        }
-        val home = System.getProperty("user.home")
-        val nucleiEngine = NucleiNativeEngine(
-            "${home}/go/bin/nuclei",
-            Dispatchers.Default + exceptionHandler
-        )
+    fun scan(): Unit = runBlocking {
+        launch(Dispatchers.Default) {
+            val home = System.getProperty("user.home")
+            val nucleiEngine = NucleiNativeEngine(
+                "${home}/go/bin/nuclei",
+                coroutineContext
+            )
 
-        val result = nucleiEngine.scan(
-            "d3s34.me",
-            NucleiTemplateDir("${home}/nuclei-templates/dns/")
-        ) {
-            delay(100)
-            it.cancel()
-        }
+            val result = nucleiEngine.scan(
+                "d3s34.me",
+                NucleiTemplateDir("${home}/nuclei-templates/dns/")
+            ) {
+                this.cancel()
+            }
 
-        assertNotEquals(0, result.size)
-        assertEquals(4, result.size)
+            assertNotEquals(0, result.size)
+            assertEquals(4, result.size)
+        }
     }
 
     @Test
     fun updateTemplate() {
+        runBlocking {
+            val home = System.getProperty("user.home")
+            val nucleiEngine = NucleiNativeEngine(
+                "${home}/go/bin/nuclei",
+                Dispatchers.Default
+            )
 
-        val exceptionHandler = CoroutineExceptionHandler { _, t ->
-            println("Handler catch")
-        }
-
-        val home = System.getProperty("user.home")
-        val nucleiEngine = NucleiNativeEngine(
-            "${home}/go/bin/nuclei",
-            Dispatchers.Default + exceptionHandler
-        )
-
-        val tempDir = File("/tmp/nucleiTemp").apply {
-            if (exists()) {
-                delete()
+            val tempDir = File("/tmp/nucleiTemp").apply {
+                if (exists()) {
+                    delete()
+                }
+                mkdirs()
             }
-            mkdirs()
-        }
 
 
-        nucleiEngine.updateTemplate(
-            NucleiTemplateDir(tempDir.path)
-        ) {
+            nucleiEngine.updateTemplate(
+                NucleiTemplateDir(tempDir.path)
+            ) {
 //            delay(100)
-            it.cancel()
-        }
+                it.cancel()
+            }
 
-        val templates = tempDir.walk()
-            .maxDepth(1)
-            .toList()
+            val templates = tempDir.walk()
+                .maxDepth(1)
+                .toList()
 
-        assertNotEquals(1, templates.size)
+            assertNotEquals(1, templates.size)
 
-        tempDir.apply {
-            if (exists()) {
-                delete()
+            tempDir.apply {
+                if (exists()) {
+                    delete()
+                }
             }
         }
-
     }
 }

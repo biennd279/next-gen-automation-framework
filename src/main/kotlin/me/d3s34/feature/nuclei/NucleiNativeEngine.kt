@@ -11,6 +11,8 @@ import kotlinx.coroutines.channels.actor
 import kotlinx.io.core.readBytes
 import kotlinx.serialization.json.Json
 import me.d3s34.lib.command.buildCommand
+import me.d3s34.lib.process.buildSystemExecutor
+import me.d3s34.lib.process.throwOnError
 import org.slf4j.LoggerFactory
 import java.nio.charset.Charset
 import kotlin.coroutines.CoroutineContext
@@ -36,6 +38,7 @@ class NucleiNativeEngine(
         template: NucleiTemplate,
         responseChannel: ProcessSendChannel
     ) = shell {
+
         val nucleiCommand = buildCommand {
             path = fullPath
             shortFlag = mapOf(
@@ -46,20 +49,20 @@ class NucleiNativeEngine(
             )
         }
 
-        val executor = systemProcess {
-            nucleiCommand.path withArgs nucleiCommand.escapedArgs
-        }
+        val executor = buildSystemExecutor(nucleiCommand)
 
         pipeline { executor pipe responseChannel }
 
         responseChannel.close()
         executor.process.throwOnError()
+
     }
 
     private suspend fun resultProcess(
         responseChannel: ProcessReceiveChannel,
         resultChannel: SendChannel<NucleiResponse>
     ) {
+
         for (response in responseChannel) {
             try {
                 val result = Json.decodeFromString(
@@ -67,80 +70,63 @@ class NucleiNativeEngine(
                     response.readBytes().toString(Charset.defaultCharset())
                 )
                 resultChannel.send(result)
-            } catch (t: Throwable) {
-                logger.warn(
-                    "Receive response but can not parsing them ${
-                        response.readBytes().toString(Charset.defaultCharset())
-                    }"
-                )
-//                logger.warn(t.message)
-            }
+            } catch (_: Throwable) { }
         }
-
         resultChannel.close()
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    override fun updateTemplate(
+    override suspend fun updateTemplate(
         templateDir: NucleiTemplateDir,
         hook: suspend (CoroutineScope) -> Unit
-    ): Unit = runBlocking {
-        withContext(coroutineContext) {
+    ): Unit = withContext(coroutineContext) {
+        launch {
+            val nucleiCommand = buildCommand {
+                path = fullPath
+                shortFlag = mapOf(
+                    "ud" to templateDir.path,
+                )
+            }
 
-            launch {
-                shell {
-                    val nucleiCommand = buildCommand {
-                        path = fullPath
-                        shortFlag = mapOf(
-                            "ud" to templateDir.path,
-                        )
-                    }
-
-                    val executor = systemProcess {
-                        nucleiCommand.path withArgs nucleiCommand.escapedArgs
-                    }
-
-                    pipeline { executor forkErr nullout pipe nullout }
-
-                    executor.process.throwOnError()
-                }
-
-                hook(this)
+            shell {
+                val executor = buildSystemExecutor(nucleiCommand)
+                pipeline { executor forkErr nullout pipe nullout }
+                executor.process.throwOnError()
             }
         }
+
+        hook.invoke(this)
     }
 
 
-    @OptIn(ObsoleteCoroutinesApi::class)
-    override fun scan(
+    @OptIn(ObsoleteCoroutinesApi::class, ExperimentalCoroutinesApi::class)
+    override suspend fun scan(
         url: String,
         template: NucleiTemplate,
         hook: suspend (CoroutineScope) -> Unit
-    ): List<NucleiResponse> = runBlocking {
+    ): List<NucleiResponse> = withContext(coroutineContext) {
         val results = mutableListOf<NucleiResponse>()
+        val responseChannel: ProcessChannel = Channel()
 
-        withContext(coroutineContext) {
-            val responseChannel: ProcessChannel = Channel()
-
-            val actors = actor<NucleiResponse> {
-                for (result in channel) {
-                    results.add(result)
-                }
-            }
-
-            launch {
-                exec(url, template, responseChannel)
-            }
-
-            launch {
-                resultProcess(responseChannel, actors)
-            }
-
-            launch {
-                hook(this)
+        val actors = actor<NucleiResponse> {
+            for (result in channel) {
+                results.add(result)
             }
         }
 
-        return@runBlocking results
+        launch {
+            exec(url, template, responseChannel)
+        }
+
+        // Required response process is supervisorJob() or run in supervisor scope
+
+        launch(coroutineContext + SupervisorJob()) {
+            resultProcess(responseChannel, actors)
+        }
+
+        hook.invoke(this)
+
+        return@withContext results
     }
+
 }

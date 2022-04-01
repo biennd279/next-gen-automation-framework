@@ -1,4 +1,4 @@
-package me.d3s34.feature.nuclei
+package me.d3s34.lib.process
 
 import eu.jrie.jetbrains.kotlinshell.processes.process.Process
 import kotlinx.coroutines.ExperimentalCoroutinesApi
