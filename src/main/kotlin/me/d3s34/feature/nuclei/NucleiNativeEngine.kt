@@ -49,12 +49,9 @@ class NucleiNativeEngine(
             nucleiCommand.path withArgs nucleiCommand.escapedArgs
         }
 
-        val job = coroutineScope {
-                pipeline { executor pipe responseChannel }
-        }
+        pipeline { executor pipe responseChannel }
 
         responseChannel.close()
-        job.join()
         executor.process.throwOnError()
     }
 
