@@ -34,7 +34,8 @@ import org.zaproxy.zap.view.popup.PopupMenuItemHttpMessageContainer
 class RightClickMsgMenu     /*
          * This is how you can pass in your extension, which you may well need to use
          * when you actually do anything of use.
-         */(private val extension: NextgenAutomationFramework, label: String?) : PopupMenuItemHttpMessageContainer(label) {
+         */(private val extension: NextgenAutomationFramework, label: String?) :
+    PopupMenuItemHttpMessageContainer(label) {
     public override fun performAction(msg: HttpMessage) {
         // This is where you do what you want to do.
         // In this case we'll just show a popup message.

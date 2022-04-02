@@ -1,5 +1,14 @@
 package me.d3s34.feature.nuclei
 
-abstract class NucleiEngine {
+import kotlinx.coroutines.CoroutineScope
 
+abstract class NucleiEngine : CoroutineScope {
+    abstract suspend fun updateTemplate(
+        templateDir: NucleiTemplateDir
+    )
+
+    abstract suspend fun scan(
+        url: String,
+        template: NucleiTemplate
+    ): List<NucleiResponse>
 }

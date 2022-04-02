@@ -1,16 +1,13 @@
 package me.d3s34.lib.command
 
-import eu.jrie.jetbrains.kotlinshell.shell.Shell
-import eu.jrie.jetbrains.kotlinshell.shell.shell
-
-class Commandline (
+class Commandline(
     val path: String,
     args: List<String> = listOf(),
     shortFlag: Map<String, String?> = mapOf(),
     longFlag: Map<String, String?> = mapOf(),
 ) {
 
-    private constructor(builder: Builder): this(builder.path!!, builder.args, builder.shortFlag, builder.longFlag)
+    private constructor(builder: Builder) : this(builder.path!!, builder.args, builder.shortFlag, builder.longFlag)
 
     private var _escapedArgs = mutableListOf<String>()
 
@@ -27,7 +24,7 @@ class Commandline (
     }
 
     init {
-        longFlag.forEach{ (flag, value) ->
+        longFlag.forEach { (flag, value) ->
             _escapedArgs.add("--${escapeCommand(flag)}")
             value?.let { _escapedArgs.add(it) }
         }

@@ -5,7 +5,7 @@ import java.awt.Container
 import java.awt.LayoutManager
 
 
-open class ContainerBuilder<in T: Container>: ComponentBuilder<T>() {
+open class ContainerBuilder<in T : Container> : ComponentBuilder<T>() {
     var layout: LayoutManager? = null
     var components = mutableListOf<Component>()
 

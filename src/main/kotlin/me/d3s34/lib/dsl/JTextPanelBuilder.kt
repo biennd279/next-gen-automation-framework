@@ -3,7 +3,7 @@ package me.d3s34.lib.dsl
 import javax.swing.JTextPane
 import javax.swing.text.JTextComponent
 
-open class JTextComponentBuilder<in T: JTextComponent>: ComponentBuilder<T>() {
+open class JTextComponentBuilder<in T : JTextComponent> : ComponentBuilder<T>() {
     var isEditable: Boolean? = null
 
     inline fun isEditable(isEditable: () -> Boolean) {
@@ -16,7 +16,7 @@ open class JTextComponentBuilder<in T: JTextComponent>: ComponentBuilder<T>() {
     }
 }
 
-class JTextPanelBuilder: JTextComponentBuilder<JTextPane>() {
+class JTextPanelBuilder : JTextComponentBuilder<JTextPane>() {
     var contentType: String? = null
     var text: String? = null
 
