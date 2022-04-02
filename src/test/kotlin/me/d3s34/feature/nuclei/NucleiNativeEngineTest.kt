@@ -1,9 +1,6 @@
 package me.d3s34.feature.nuclei
 
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.*
 import org.junit.jupiter.api.Test
 import java.io.File
 import kotlin.test.assertEquals
@@ -19,7 +16,7 @@ internal class NucleiNativeEngineTest {
             Dispatchers.Default
         )
 
-        launch {
+        val p = launch {
             val result = nucleiEngine.scan(
                 "d3s34.me",
                 NucleiTemplateDir("${home}/nuclei-templates/dns/")
@@ -28,6 +25,9 @@ internal class NucleiNativeEngineTest {
             assertEquals(4, result.size)
 //            assertEquals(2, result.size)
         }
+
+//        p.cancel()
+        p.join()
     }
 
     @Test

@@ -138,7 +138,8 @@ class NucleiNativeEngine(
             }
         }
 
-        val execJob = launch {
+        //coroutine only process io stream from process thread
+        val execJob = launch(Dispatchers.IO) {
             exec(url, template, responseChannel)
         }
 
