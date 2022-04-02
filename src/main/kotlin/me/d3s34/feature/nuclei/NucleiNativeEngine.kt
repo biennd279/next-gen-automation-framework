@@ -70,15 +70,15 @@ class NucleiNativeEngine(
                     response.readBytes().toString(Charset.defaultCharset())
                 )
                 resultChannel.send(result)
-            } catch (_: Throwable) { }
+            } catch (_: Throwable) {
+            }
         }
         resultChannel.close()
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
     override suspend fun updateTemplate(
-        templateDir: NucleiTemplateDir,
-        hook: suspend (CoroutineScope) -> Unit
+        templateDir: NucleiTemplateDir
     ): Unit = withContext(coroutineContext) {
         launch {
             val nucleiCommand = buildCommand {
@@ -94,8 +94,6 @@ class NucleiNativeEngine(
                 executor.process.throwOnError()
             }
         }
-
-        hook.invoke(this)
     }
 
 
@@ -103,7 +101,6 @@ class NucleiNativeEngine(
     override suspend fun scan(
         url: String,
         template: NucleiTemplate,
-        hook: suspend (CoroutineScope) -> Unit
     ): List<NucleiResponse> = withContext(coroutineContext) {
         val results = mutableListOf<NucleiResponse>()
         val responseChannel: ProcessChannel = Channel()
@@ -114,17 +111,15 @@ class NucleiNativeEngine(
             }
         }
 
-        launch {
+        val execJob = launch {
             exec(url, template, responseChannel)
         }
 
-        // Required response process is supervisorJob() or run in supervisor scope
-
-        launch(coroutineContext + SupervisorJob()) {
+        val processJob = launch {
             resultProcess(responseChannel, actors)
         }
 
-        hook.invoke(this)
+        joinAll(execJob, processJob)
 
         return@withContext results
     }

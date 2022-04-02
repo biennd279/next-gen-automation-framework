@@ -87,14 +87,19 @@ data class Classification(
 enum class Severity {
     @SerialName("info")
     INFO,
+
     @SerialName("low")
     LOW,
+
     @SerialName("medium")
     MEDIUM,
+
     @SerialName("high")
     HIGH,
+
     @SerialName("critical")
     CRITICAL,
+
     @SerialName("unknown")
     UNKNOWN;
 

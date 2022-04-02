@@ -4,15 +4,11 @@ import kotlinx.coroutines.CoroutineScope
 
 abstract class NucleiEngine : CoroutineScope {
     abstract suspend fun updateTemplate(
-        templateDir: NucleiTemplateDir,
-        hook: suspend (CoroutineScope) -> Unit = {}
+        templateDir: NucleiTemplateDir
     )
 
     abstract suspend fun scan(
         url: String,
-        template: NucleiTemplate,
-        hook: suspend (
-            CoroutineScope
-        ) -> Unit = {}
+        template: NucleiTemplate
     ): List<NucleiResponse>
 }
