@@ -124,4 +124,29 @@ class NucleiNativeEngine(
         return@withContext results
     }
 
+    @OptIn(ObsoleteCoroutinesApi::class)
+    override suspend fun scan(
+        url: String,
+        template: NucleiTemplate,
+        onReceive: suspend (NucleiResponse) -> Unit
+    ) {
+        val responseChannel: ProcessChannel = Channel()
+
+        val actors = actor<NucleiResponse> {
+            for (result in channel) {
+                onReceive(result)
+            }
+        }
+
+        val execJob = launch {
+            exec(url, template, responseChannel)
+        }
+
+        val processJob = launch {
+            resultProcess(responseChannel, actors)
+        }
+
+        joinAll(execJob, processJob)
+    }
+
 }

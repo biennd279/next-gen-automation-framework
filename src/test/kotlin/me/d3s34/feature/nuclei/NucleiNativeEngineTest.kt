@@ -1,6 +1,7 @@
 package me.d3s34.feature.nuclei
 
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Test
@@ -61,4 +62,29 @@ internal class NucleiNativeEngineTest {
             }
         }
     }
+
+//    @Test
+//    fun scanAsync(): Unit = runBlocking {
+//        val home = System.getProperty("user.home")
+//        val nucleiEngine = NucleiNativeEngine(
+//            "${home}/go/bin/nuclei",
+//            Dispatchers.Default
+//        )
+//
+//        val job = launch {
+//            delay(100)
+//            val result = nucleiEngine.scan(
+//                "d3s34.me",
+//                NucleiTemplateDir("${home}/nuclei-templates/")
+//            ) {
+//                println(it)
+//            }
+//        }
+//
+//        println("print this first")
+//        delay(5000)
+//        println("Some task do")
+//        delay(5000)
+//        job.cancel()
+//    }
 }

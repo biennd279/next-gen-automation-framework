@@ -11,4 +11,10 @@ abstract class NucleiEngine : CoroutineScope {
         url: String,
         template: NucleiTemplate
     ): List<NucleiResponse>
+
+    abstract suspend fun scan(
+        url: String,
+        template: NucleiTemplate,
+        onReceive: suspend (NucleiResponse) -> Unit
+    )
 }
