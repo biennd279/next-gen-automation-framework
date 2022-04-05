@@ -1,5 +1,7 @@
-package me.d3s34.feature.nuclei
+package me.d3s34.nuclei
 
+import me.d3s34.nuclei.NucleiTemplateDir
+import me.d3s34.nuclei.NucleiTemplateFile
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test

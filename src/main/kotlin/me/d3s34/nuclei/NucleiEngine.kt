@@ -1,4 +1,4 @@
-package me.d3s34.feature.nuclei
+package me.d3s34.nuclei
 
 import kotlinx.coroutines.CoroutineScope
 

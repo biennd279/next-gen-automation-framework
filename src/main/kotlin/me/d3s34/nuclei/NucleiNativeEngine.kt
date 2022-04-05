@@ -1,4 +1,4 @@
-package me.d3s34.feature.nuclei
+package me.d3s34.nuclei
 
 import eu.jrie.jetbrains.kotlinshell.processes.process.ProcessChannel
 import eu.jrie.jetbrains.kotlinshell.processes.process.ProcessReceiveChannel

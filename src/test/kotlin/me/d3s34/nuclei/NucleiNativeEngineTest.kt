@@ -1,6 +1,8 @@
-package me.d3s34.feature.nuclei
+package me.d3s34.nuclei
 
 import kotlinx.coroutines.*
+import me.d3s34.nuclei.NucleiNativeEngine
+import me.d3s34.nuclei.NucleiTemplateDir
 import org.junit.jupiter.api.Test
 import java.io.File
 import kotlin.test.assertEquals
