@@ -5,7 +5,7 @@ import me.d3s34.sqlmap.restapi.data.DumpTableData
 import me.d3s34.sqlmap.restapi.data.TargetData
 import me.d3s34.sqlmap.restapi.data.TechniqueData
 import me.d3s34.sqlmap.restapi.model.ContentType
-import me.d3s34.sqlmap.restapi.serializer.DataSerializer
+import me.d3s34.sqlmap.restapi.serializer.ContentSerializer
 import me.d3s34.sqlmap.restapi.serializer.InjectionSerializer
 import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
@@ -19,7 +19,7 @@ internal class ContentTest {
         "user=test&password=test&s=OK" } }
         """.trimIndent()
 
-        val content = Json.decodeFromString(DataSerializer, rawJson)
+        val content = Json.decodeFromString(ContentSerializer, rawJson)
 
         assertEquals(ContentType.TARGET.id, content.type)
         assertEquals(1, content.status)
@@ -44,7 +44,7 @@ internal class ContentTest {
           "0nlyL0g!c", "hesDEADjim!", "StarShine", "ScottyDoesntKnow", "parking-break-on", "99victorvictor2" ] } } }
         """.trimIndent()
 
-        val content = Json.decodeFromString(DataSerializer, rawJson)
+        val content = Json.decodeFromString(ContentSerializer, rawJson)
 
         assertEquals(ContentType.DUMP_TABLE.id, content.type)
         assertEquals(1, content.status)
@@ -88,7 +88,7 @@ internal class ContentTest {
         val rawJson = """
             { "status": 1, "type": 1, "value": [ $rawInjectionJson ] }
         """.trimIndent()
-        val data = format.decodeFromString(DataSerializer, rawJson)
+        val data = format.decodeFromString(ContentSerializer, rawJson)
 
         assertEquals(listOf(injection), data.value as TechniqueData)
     }

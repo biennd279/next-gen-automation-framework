@@ -9,7 +9,7 @@ import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonDecoder
 import me.d3s34.sqlmap.restapi.data.TechniqueData
 
-object TechniqueDataSerializer: KSerializer<TechniqueData> {
+object TechniqueContentSerializer: KSerializer<TechniqueData> {
     override val descriptor: SerialDescriptor
         get() = TechniqueData.serializer().descriptor
 
