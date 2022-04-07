@@ -3,7 +3,7 @@ package me.d3s34.sqlmap.restapi.serializer
 import kotlinx.serialization.json.*
 import me.d3s34.sqlmap.restapi.data.DumpTableData
 
-object DumpTableSerializer: JsonTransformingSerializer<DumpTableData>(DumpTableData.serializer()) {
+object DumpTableDataSerializer: JsonTransformingSerializer<DumpTableData>(DumpTableData.serializer()) {
     override fun transformDeserialize(element: JsonElement): JsonElement {
         val elements =  element
             .jsonObject

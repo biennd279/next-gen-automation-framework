@@ -7,11 +7,12 @@ import me.d3s34.sqlmap.restapi.data.TargetData
 import me.d3s34.sqlmap.restapi.model.ContentType
 
 
-object ContentSerializer: JsonContentPolymorphicSerializer<Content<*>>(Content::class) {
+object DataSerializer: JsonContentPolymorphicSerializer<Content<*>>(Content::class) {
     override fun selectDeserializer(element: JsonElement): DeserializationStrategy<out Content<*>> {
         return when(element.jsonObject["type"]!!.jsonPrimitive.intOrNull) {
             ContentType.TARGET.id -> Content.serializer(TargetData.serializer())
-            ContentType.DUMP_TABLE.id -> Content.serializer(DumpTableSerializer)
+            ContentType.DUMP_TABLE.id -> Content.serializer(DumpTableDataSerializer)
+            ContentType.TECHNIQUES.id -> Content.serializer(TechniqueDataSerializer)
             null -> error("Not found type data")
             else -> error("Not supported this type")
         }

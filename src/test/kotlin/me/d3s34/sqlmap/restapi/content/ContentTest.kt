@@ -3,8 +3,10 @@ package me.d3s34.sqlmap.restapi.content
 import kotlinx.serialization.json.Json
 import me.d3s34.sqlmap.restapi.data.DumpTableData
 import me.d3s34.sqlmap.restapi.data.TargetData
+import me.d3s34.sqlmap.restapi.data.TechniqueData
 import me.d3s34.sqlmap.restapi.model.ContentType
-import me.d3s34.sqlmap.restapi.serializer.ContentSerializer
+import me.d3s34.sqlmap.restapi.serializer.DataSerializer
+import me.d3s34.sqlmap.restapi.serializer.InjectionSerializer
 import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
 
@@ -17,7 +19,7 @@ internal class ContentTest {
         "user=test&password=test&s=OK" } }
         """.trimIndent()
 
-        val content = Json.decodeFromString(ContentSerializer, rawJson)
+        val content = Json.decodeFromString(DataSerializer, rawJson)
 
         assertEquals(ContentType.TARGET.id, content.type)
         assertEquals(1, content.status)
@@ -42,7 +44,7 @@ internal class ContentTest {
           "0nlyL0g!c", "hesDEADjim!", "StarShine", "ScottyDoesntKnow", "parking-break-on", "99victorvictor2" ] } } }
         """.trimIndent()
 
-        val content = Json.decodeFromString(ContentSerializer, rawJson)
+        val content = Json.decodeFromString(DataSerializer, rawJson)
 
         assertEquals(ContentType.DUMP_TABLE.id, content.type)
         assertEquals(1, content.status)
@@ -52,5 +54,42 @@ internal class ContentTest {
             assertEquals("vuln", this.db)
             assertEquals(5, this.data.size)
         }
+    }
+
+    private val format = Json { ignoreUnknownKeys = true }
+
+    @Test
+    fun testTechnique() {
+        val rawInjectionJson = """
+            { "dbms": "MySQL", "suffix": " AND '[RANDSTR]'='[RANDSTR]",
+             "clause": [ 1, 2, 3, 8, 9 ], "notes": [], "ptype": 2, "dbms_version": [ ">= 5.0.12" ], "prefix": "'", 
+             "place": "POST", "os": null, "conf": { "code": null, "string": null, "notString": null, "titles": null, 
+             "regexp": null, "textOnly": null, "optimize": null }, "parameter": "user", "data": { "5": 
+             { "comment": "", "matchRatio": 0.023, "trueCode": 200, 
+             "title": "MySQL >= 5.0.12 AND time-based blind (query SLEEP)", 
+             "templatePayload": null, 
+             "vector": "AND (SELECT [RANDNUM] FROM (SELECT(SLEEP([SLEEPTIME]-(IF([INFERENCE],0,[SLEEPTIME])))))[RANDSTR])",
+              "falseCode": null, "where": 1,
+               "payload": "user=test' AND (SELECT 5338 FROM (SELECT(SLEEP([SLEEPTIME])))oEOQ) AND 'bgWC'='bgWC&password=test&s=OK" }, 
+               "6": { "comment": "[GENERIC_SQL_COMMENT]", "matchRatio": 0.023, "trueCode": null, "title": "Generic UNION query (NULL) - 1 to 20 columns", "templatePayload": null, 
+               "vector": [ 0, 2, "[GENERIC_SQL_COMMENT]", "'", " AND '[RANDSTR]'='[RANDSTR]", "NULL", 1, false, null, null, null ], "falseCode": null,
+                "where": 1, "payload": "user=test' UNION ALL SELECT CONCAT(0x71716a7171,0x4b6e694947614f774a50555a444b4c4567747261527a664c46504b6d516149677559427171504f61,0x716a6b6a71),NULL-- -&password=test&s=OK" } } }
+        """.trimIndent()
+
+
+
+        val injection = format.decodeFromString(InjectionSerializer, rawInjectionJson)
+
+        assertEquals("MySQL", injection.dbms)
+        assertEquals("user", injection.parameter)
+        assertEquals("POST", injection.place)
+        assertEquals(2, injection.size)
+
+        val rawJson = """
+            { "status": 1, "type": 1, "value": [ $rawInjectionJson ] }
+        """.trimIndent()
+        val data = format.decodeFromString(DataSerializer, rawJson)
+
+        assertEquals(listOf(injection), data.value as TechniqueData)
     }
 }
