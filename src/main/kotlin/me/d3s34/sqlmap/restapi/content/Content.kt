@@ -9,4 +9,4 @@ data class Content<out T : AbstractData>(
     val value: T
 )
 
-//Format Json wrap Content wrap Data
+//Format Response wrap Content wrap Data
