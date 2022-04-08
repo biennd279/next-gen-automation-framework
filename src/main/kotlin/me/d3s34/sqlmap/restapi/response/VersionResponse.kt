@@ -9,5 +9,7 @@ data class VersionResponse(
     @SerialName("success")
     val success: Boolean,
     @SerialName("version")
-    val version: String
+    val version: String? = null,
+    @SerialName("message")
+    val message: String? = null
 )

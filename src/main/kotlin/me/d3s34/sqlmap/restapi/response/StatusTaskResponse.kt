@@ -7,9 +7,11 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class StatusTaskResponse(
     @SerialName("returncode")
-    val returnCode: Int,
+    val returnCode: Int? = null,
     @SerialName("status")
-    val status: String,
+    val status: String? = null,
     @SerialName("success")
-    val success: Boolean
+    val success: Boolean,
+    @SerialName("message")
+    val message: String? = null
 )

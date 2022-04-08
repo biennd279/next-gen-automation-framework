@@ -9,5 +9,5 @@ data class KillTaskResponse(
     @SerialName("message")
     val message: String,
     @SerialName("success")
-    val success: Boolean
+    val success: Boolean,
 )

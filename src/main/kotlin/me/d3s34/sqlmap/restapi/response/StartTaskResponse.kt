@@ -7,7 +7,9 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class StartTaskResponse(
     @SerialName("engineid")
-    val engineId: Int,
+    val engineId: Int? = null,
     @SerialName("success")
-    val success: Boolean
+    val success: Boolean,
+    @SerialName("message")
+    val message: String? = null
 )

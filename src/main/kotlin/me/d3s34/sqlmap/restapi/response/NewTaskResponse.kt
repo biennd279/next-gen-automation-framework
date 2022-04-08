@@ -9,5 +9,7 @@ data class NewTaskResponse(
     @SerialName("success")
     val success: Boolean,
     @SerialName("taskid")
-    val taskId: String
+    val taskId: String? = null,
+    @SerialName("message")
+    val message: String? = null
 )

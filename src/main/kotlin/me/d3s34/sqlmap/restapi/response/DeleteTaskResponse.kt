@@ -7,5 +7,7 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class DeleteTaskResponse(
     @SerialName("success")
-    val success: Boolean
+    val success: Boolean,
+    @SerialName("message")
+    val message: String? = null
 )

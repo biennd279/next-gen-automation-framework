@@ -1,9 +1,9 @@
 package me.d3s34.sqlmap
 
-import kotlinx.coroutines.runBlocking
+import me.d3s34.sqlmap.restapi.ApiService
 
-class SqlmapApiEngine: SqlmapEngine() {
-}
-
-fun main() = runBlocking {
+class SqlmapApiEngine(
+    private val baseUrl: String
+): SqlmapEngine() {
+    val apiService by lazy { ApiService(baseUrl) }
 }
