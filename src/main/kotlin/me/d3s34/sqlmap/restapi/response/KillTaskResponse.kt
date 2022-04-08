@@ -7,7 +7,7 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class KillTaskResponse(
     @SerialName("message")
-    val message: String,
+    val message: String? = null,
     @SerialName("success")
     val success: Boolean,
 )

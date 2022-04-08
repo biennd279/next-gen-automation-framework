@@ -14,5 +14,5 @@ class ApiRoutes(
     fun routeDataTask(taskId: String) = "${baseUrl}/scan/${taskId}/data"
     fun routeLogTask(taskId: String) = "${baseUrl}/scan/${taskId}/log"
     fun routeKillTask(taskId: String) = "${baseUrl}/scan/${taskId}/kill"
-    fun routeDeleteTask(taskId: String) = "${baseUrl}/scan/${taskId}/delete"
+    fun routeDeleteTask(taskId: String) = "${baseUrl}/task/${taskId}/delete"
 }
