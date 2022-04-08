@@ -42,7 +42,7 @@ internal class ApiServiceTest {
         val request = StartTaskRequest(
             url = "http://localhost/",
             data = "user=test&password=test&s=OK",
-            dumpAll = ""
+            dumpAll = true
         )
 
         apiService.startTask(taskId, request)
@@ -57,7 +57,6 @@ internal class ApiServiceTest {
         val request = StartTaskRequest(
             url = "http://localhost/",
             data = "user=test&password=test&s=OK",
-            dumpAll = ""
         )
 
         apiService.startTask(taskId, request)
@@ -91,7 +90,6 @@ internal class ApiServiceTest {
         val request = StartTaskRequest(
             url = "http://localhost/",
             data = "user=test&password=test&s=OK",
-            dumpAll = ""
         )
 
         apiService.startTask(taskId, request)
@@ -106,7 +104,6 @@ internal class ApiServiceTest {
         val request = StartTaskRequest(
             url = "http://localhost/",
             data = "user=test&password=test&s=OK",
-            dumpAll = ""
         )
 
         apiService.startTask(taskId, request)
