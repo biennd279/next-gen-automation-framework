@@ -4,7 +4,7 @@ package me.d3s34.sqlmap.restapi.request
 @kotlinx.serialization.Serializable
 data class StartTaskRequest(
     //Data request
-    val url: String,
+    val url: String? = null,
     val data: String? = null,
     //Get current information
     val getHostname: Boolean = false,
@@ -31,12 +31,13 @@ data class StartTaskRequest(
     //Flag attack
     val level: Int = 1,
     val risk: Int = 1,
-    val technique: String = "BEUSTQ",
+    val technique: String? = null,
+    val freshQueries: Boolean = false,
 
     //Exec query
     val sqlQuery: String? = null,
     //Sqlmap option
-    val cleanup: Boolean = false,
+    val purge: Boolean = false,
     val updateAll: Boolean = false
 ) {
     init {

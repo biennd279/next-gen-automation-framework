@@ -32,7 +32,7 @@ object TaskDataResponseSerializer: KSerializer<TaskDataResponse> {
             try {
                 json.decodeFromJsonElement(ContentSerializer, it)
             } catch (t: Throwable) {
-                println("$t")
+//                println("$t")
                 logger.warn("Found content but can not transform to obj: $it")
                 null
             }
