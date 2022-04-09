@@ -1,6 +1,10 @@
 package me.d3s34.sqlmap.restapi.model
 
-@kotlinx.serialization.Serializable
+import me.d3s34.sqlmap.restapi.serializer.InjectionSerializer
+
+@kotlinx.serialization.Serializable(
+    with = InjectionSerializer::class
+)
 data class Injection(
     val dbms: String,
     val parameter: String,

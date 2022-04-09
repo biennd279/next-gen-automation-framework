@@ -54,6 +54,10 @@ class ApiService(
         return client.get(apiRoutes.routeStatusTask(id))
     }
 
+    suspend fun getTaskDataAsString(id: String): String {
+        return client.get(apiRoutes.routeDataTask(id))
+    }
+
     companion object {
 
         private val jsonFormat = Json {

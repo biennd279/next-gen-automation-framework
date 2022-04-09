@@ -1,6 +1,6 @@
-package me.d3s34.sqlmap.restapi.model
+package me.d3s34.sqlmap.restapi
 
-enum class ContentType(val id: Int) {
+enum class TaskDataContentType(val id: Int) {
     TARGET(0),
     TECHNIQUES(1),
     DBMS_FINGERPRINT(2),

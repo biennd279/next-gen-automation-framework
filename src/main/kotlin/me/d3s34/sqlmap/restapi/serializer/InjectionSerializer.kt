@@ -4,6 +4,8 @@ import kotlinx.serialization.KSerializer
 import kotlinx.serialization.builtins.MapSerializer
 import kotlinx.serialization.builtins.serializer
 import kotlinx.serialization.descriptors.SerialDescriptor
+import kotlinx.serialization.descriptors.buildClassSerialDescriptor
+import kotlinx.serialization.descriptors.element
 import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
 import kotlinx.serialization.json.Json
@@ -13,10 +15,16 @@ import kotlinx.serialization.json.jsonPrimitive
 import me.d3s34.sqlmap.restapi.model.Injection
 import me.d3s34.sqlmap.restapi.model.Technique
 
+
 object InjectionSerializer: KSerializer<Injection> {
 
     override val descriptor: SerialDescriptor
-        get() = Injection.serializer().descriptor
+        get() = buildClassSerialDescriptor("Injection") {
+            element<String>("dbms")
+            element<String>("parameter")
+            element<String>("place")
+            element<List<Technique>>("techniques")
+        }
 
     private val format = Json { ignoreUnknownKeys = true }
 
@@ -39,7 +47,7 @@ object InjectionSerializer: KSerializer<Injection> {
     }
 
     override fun serialize(encoder: Encoder, value: Injection) {
-        Injection.serializer().serialize(encoder, value)
+        TODO()
     }
 
 }

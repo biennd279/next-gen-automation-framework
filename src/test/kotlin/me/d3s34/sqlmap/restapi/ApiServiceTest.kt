@@ -124,4 +124,32 @@ internal class ApiServiceTest {
 
         assertNotNull(status.status)
     }
+
+    @Test
+    fun testAll(): Unit = runBlocking {
+        val taskId = apiService.createNewTask().taskId!!
+        val request = StartTaskRequest(
+            url = "http://localhost/",
+            data = "user=test&password=test&s=OK",
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            sqlQuery = "select * from users"
+        )
+
+        apiService.startTask(taskId, request)
+
+        do { delay(1000) } while (apiService.getTaskStatus(taskId).status == "running")
+
+//        println(apiService.getTaskDataAsString(taskId))
+        println(apiService.getTaskData(taskId))
+    }
 }

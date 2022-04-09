@@ -6,12 +6,6 @@ data class StartTaskRequest(
     //Data request
     val url: String,
     val data: String? = null,
-    val cookie: String? = null,
-    val randomAgent: Boolean = false,
-    //Flag attack
-    val level: Int = 1,
-    val risk: Int = 1,
-    val technique: String = "BEUSTQ",
     //Get current information
     val getHostname: Boolean = false,
     val getCurrentDb: Boolean = false,
@@ -30,6 +24,15 @@ data class StartTaskRequest(
     val db: String? = null,
     val tbl: String? = null,
     val col: String? = null,
+
+    //
+    val cookie: String? = null,
+    val randomAgent: Boolean = false,
+    //Flag attack
+    val level: Int = 1,
+    val risk: Int = 1,
+    val technique: String = "BEUSTQ",
+
     //Exec query
     val sqlQuery: String? = null,
     //Sqlmap option

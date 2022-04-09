@@ -1,10 +1,10 @@
 package me.d3s34.sqlmap.restapi.content
 
 import kotlinx.serialization.json.Json
+import me.d3s34.sqlmap.restapi.TaskDataContentType
 import me.d3s34.sqlmap.restapi.data.DumpTableData
 import me.d3s34.sqlmap.restapi.data.TargetData
 import me.d3s34.sqlmap.restapi.data.TechniqueData
-import me.d3s34.sqlmap.restapi.model.ContentType
 import me.d3s34.sqlmap.restapi.serializer.ContentSerializer
 import me.d3s34.sqlmap.restapi.serializer.InjectionSerializer
 import org.junit.jupiter.api.Test
@@ -21,7 +21,7 @@ internal class ContentTest {
 
         val content = Json.decodeFromString(ContentSerializer, rawJson)
 
-        assertEquals(ContentType.TARGET.id, content.type)
+        assertEquals(TaskDataContentType.TARGET.id, content.type)
         assertEquals(1, content.status)
 
         with(content.value as TargetData) {
@@ -46,7 +46,7 @@ internal class ContentTest {
 
         val content = Json.decodeFromString(ContentSerializer, rawJson)
 
-        assertEquals(ContentType.DUMP_TABLE.id, content.type)
+        assertEquals(TaskDataContentType.DUMP_TABLE.id, content.type)
         assertEquals(1, content.status)
 
         with(content.value as DumpTableData) {
@@ -90,6 +90,6 @@ internal class ContentTest {
         """.trimIndent()
         val data = format.decodeFromString(ContentSerializer, rawJson)
 
-        assertEquals(listOf(injection), data.value as TechniqueData)
+        assertEquals(listOf(injection), (data.value as TechniqueData).value)
     }
 }
