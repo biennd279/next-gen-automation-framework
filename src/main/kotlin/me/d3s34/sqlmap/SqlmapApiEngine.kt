@@ -3,7 +3,6 @@ package me.d3s34.sqlmap
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
-import kotlinx.coroutines.withContext
 import me.d3s34.sqlmap.restapi.ApiService
 import me.d3s34.sqlmap.restapi.request.StartTaskRequest
 import me.d3s34.sqlmap.restapi.response.TaskDataResponse
@@ -11,12 +10,12 @@ import kotlin.coroutines.CoroutineContext
 
 class SqlmapApiEngine(
     private val baseUrl: String,
-    private val coroutineContext: CoroutineContext = Dispatchers.IO,
+    override val coroutineContext: CoroutineContext = Dispatchers.IO,
     private val refreshTime: Long = 5000
 ): SqlmapEngine() {
     private val apiService by lazy { ApiService(baseUrl) }
 
-    suspend fun verifySqlInjection(request: StartTaskRequest): Boolean = withContext(coroutineContext) {
+    suspend fun verifySqlInjection(request: StartTaskRequest): Boolean {
         val sqlmapProcess = SqlmapProcess(apiService)
 
         try {
@@ -28,14 +27,14 @@ class SqlmapApiEngine(
 
             val data = sqlmapProcess.getResponse().data
 
-            return@withContext data != null && data.isNotEmpty()
+            return data != null && data.isNotEmpty()
         } catch (_: Throwable) {
             sqlmapProcess.stop()
-            return@withContext false
+            return false
         }
     }
 
-    suspend fun attack(request: StartTaskRequest): TaskDataResponse? = withContext(coroutineContext) {
+    suspend fun attack(request: StartTaskRequest): TaskDataResponse? {
         val sqlmapProcess = SqlmapProcess(apiService)
 
         try {
@@ -45,14 +44,14 @@ class SqlmapApiEngine(
 
             if (!isActive) { sqlmapProcess.stop() }
 
-            return@withContext sqlmapProcess.getResponse()
+            return sqlmapProcess.getResponse()
         } catch (t: Throwable) {
             sqlmapProcess.stop()
-            return@withContext null
+            return null
         }
     }
 
-    suspend fun update(): Boolean = withContext(coroutineContext) {
+    suspend fun update(): Boolean {
         val sqlmapProcess = SqlmapProcess(apiService)
 
         try {
@@ -64,17 +63,17 @@ class SqlmapApiEngine(
 
             if (!isActive) {
                 sqlmapProcess.stop()
-                return@withContext false
+                return false
             }
 
-            return@withContext sqlmapProcess.getResponse().success
+            return sqlmapProcess.getResponse().success
         } catch (_: Throwable) {
             sqlmapProcess.stop()
-            return@withContext false
+            return false
         }
     }
 
-    suspend fun purgeCache(): Boolean = withContext(coroutineContext) {
+    suspend fun purgeCache(): Boolean {
         val sqlmapProcess = SqlmapProcess(apiService)
 
         try {
@@ -86,12 +85,12 @@ class SqlmapApiEngine(
 
             if (!isActive) {
                 sqlmapProcess.stop()
-                return@withContext false
+                return false
             }
-            return@withContext sqlmapProcess.getResponse().success
+            return sqlmapProcess.getResponse().success
         } catch (_: Throwable) {
             sqlmapProcess.stop()
-            return@withContext false
+            return false
         }
     }
 
