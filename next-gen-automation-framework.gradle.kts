@@ -1,3 +1,6 @@
+
+val ktor_version: String = "2.0.0"
+val kotlin_version: String = "1.6.20"
 description = "Next gen automation framework addon for ZAP"
 
 zapAddOn {
@@ -17,9 +20,14 @@ crowdin {
     }
 }
 
+repositories {
+    mavenCentral()
+    maven { url = uri("https://maven.pkg.jetbrains.space/public/p/ktor/eap") }
+}
+
 plugins {
-    kotlin("jvm") version "1.6.10"
-    kotlin("plugin.serialization") version "1.6.10"
+    kotlin("jvm") version "1.6.20"
+    kotlin("plugin.serialization") version "1.6.20"
 }
 
 dependencies {
@@ -33,14 +41,18 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.0")
     implementation("eu.jrie.jetbrains:kotlin-shell-core:0.2.1")
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.3.2")
+    implementation("com.ensarsarajcic.kotlinx:serialization-msgpack:0.5.0")
 
-    implementation("io.ktor:ktor-client-core:1.6.8")
-    implementation("io.ktor:ktor-client-cio:1.6.8")
-    implementation("io.ktor:ktor-client-serialization:1.6.8")
+    implementation("io.ktor:ktor-client-core:$ktor_version")
+    implementation("io.ktor:ktor-client-cio:$ktor_version")
+//    implementation("io.ktor:ktor-client-serialization:$ktor_version")
+    implementation("io.ktor:ktor-client-content-negotiation:$ktor_version")
+    implementation("io.ktor:ktor-serialization-kotlinx-json:$ktor_version")
 
     //Testing
     testImplementation(kotlin("test"))
     testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.6.0")
+
 }
 
 //tasks.test {
