@@ -4,29 +4,45 @@ import io.ktor.client.*
 import io.ktor.client.call.*
 import io.ktor.client.engine.*
 import io.ktor.client.engine.cio.*
+import io.ktor.client.plugins.*
+import io.ktor.client.plugins.contentnegotiation.*
 import io.ktor.client.request.*
 import io.ktor.http.*
 import kotlinx.coroutines.runBlocking
-import kotlinx.serialization.decodeFromByteArray
-import kotlinx.serialization.encodeToByteArray
-import me.d3s34.metasploit.msgpack.MessagePack
-import me.d3s34.metasploit.msgpack.decodeHex
-import kotlin.time.ExperimentalTime
+import me.d3s34.metasploit.msgpack.messagePack
 
 class MsRpcClient {
 
     companion object {
         val client = HttpClient(CIO) {
-//            install(MessagePack)
+            install(ContentNegotiation) {
+                messagePack()
+            }
 
-//            defaultRequest {
-//                accept(MessPackContentType.MessagePack)
-//                contentType(MessPackContentType.MessagePack)
-//            }
+            install(DefaultRequest) {
+                contentType(MPContentType.MessagePack)
+            }
 
             engine {
                 proxy = ProxyBuilder.http("http://127.0.0.1:8080/")
             }
+
         }
     }
+}
+
+
+fun main() {
+    val client = MsRpcClient.client
+
+    val loginRequest = listOf("auth.login", "username", "password")
+
+    val response = runBlocking {
+        client.post("http://localhost:55553/api/") {
+            setBody(loginRequest)
+            contentType(MPContentType.MessagePack)
+        }.body() as Map<String, Any>
+    }
+
+    println(response)
 }
