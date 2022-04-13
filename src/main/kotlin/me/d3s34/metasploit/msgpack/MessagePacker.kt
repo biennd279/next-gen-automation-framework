@@ -100,7 +100,7 @@ class MessagePacker {
             bytes.size <= MessagePackType.String.MAX_STR32_LENGTH -> {
                 byteArrayOf(MessagePackType.String.STR32) + bytes.size.toByteArray()
             }
-            else -> throw MessagePackSerialize()
+            else -> throw MessagePackSerializeException()
         }
         return prefix + bytes
     }
@@ -116,7 +116,7 @@ class MessagePacker {
             value.size <= MessagePackType.Bin.MAX_BIN32_LENGTH -> {
                 byteArrayOf(MessagePackType.Bin.BIN32) + value.size.toByteArray()
             }
-            else -> throw MessagePackSerialize()
+            else -> throw MessagePackSerializeException()
         }
         return prefix + value
     }

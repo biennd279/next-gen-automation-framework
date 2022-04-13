@@ -5,12 +5,12 @@ sealed class MessagePackException(
     override val cause: Throwable? = null
 ): Throwable()
 
-class MessagePackSerialize(
+class MessagePackSerializeException(
     override val message: String? = "",
     override val cause: Throwable? = null
 ): MessagePackException()
 
-class MessagePackDeserialize(
+class MessagePackDeserializeException(
     override val message: String? = "",
     override val cause: Throwable? = null
 ): MessagePackException()

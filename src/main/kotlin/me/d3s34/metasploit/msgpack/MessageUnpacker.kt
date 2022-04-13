@@ -9,14 +9,14 @@ class MessageUnpacker(private val dataBuffer: MsgPackDataInputBuffer) {
 
     fun unpackNull() {
         val next = dataBuffer.requireNextByte()
-        if (next != MessagePackType.NULL) throw MessagePackDeserialize("Invalid null $next")
+        if (next != MessagePackType.NULL) throw MessagePackDeserializeException("Invalid null $next")
     }
 
     fun unpackBoolean(): Boolean {
         return when (val next = dataBuffer.requireNextByte()) {
             MessagePackType.Boolean.TRUE -> true
             MessagePackType.Boolean.FALSE -> false
-            else -> throw MessagePackDeserialize("Invalid boolean $next")
+            else -> throw MessagePackDeserializeException("Invalid boolean $next")
         }
     }
 
@@ -29,7 +29,7 @@ class MessageUnpacker(private val dataBuffer: MsgPackDataInputBuffer) {
                 if (next == MessagePackType.Int.UINT8 && preventOverflow) {
                     val number = (dataBuffer.requireNextByte().toInt() and 0xff).toShort()
                     if (number !in Byte.MIN_VALUE..Byte.MAX_VALUE) {
-                        throw MessagePackDeserialize("overflowError $dataBuffer")
+                        throw MessagePackDeserializeException("overflowError $dataBuffer")
                     } else {
                         number.toByte()
                     }
@@ -37,7 +37,7 @@ class MessageUnpacker(private val dataBuffer: MsgPackDataInputBuffer) {
                     dataBuffer.requireNextByte()
                 }
             }
-            else -> throw MessagePackDeserialize("$dataBuffer: Expected byte type, but found $next")
+            else -> throw MessagePackDeserializeException("$dataBuffer: Expected byte type, but found $next")
         }
     }
 
@@ -49,7 +49,7 @@ class MessageUnpacker(private val dataBuffer: MsgPackDataInputBuffer) {
                 if (next == MessagePackType.Int.UINT16 && preventOverflow) {
                     val number = dataBuffer.takeNext(2).toInt()
                     if (number !in Short.MIN_VALUE..Short.MAX_VALUE) {
-                        throw MessagePackDeserialize("overflowError $dataBuffer")
+                        throw MessagePackDeserializeException("overflowError $dataBuffer")
                     } else {
                         number.toShort()
                     }
@@ -62,7 +62,7 @@ class MessageUnpacker(private val dataBuffer: MsgPackDataInputBuffer) {
                 (dataBuffer.requireNextByte().toInt() and 0xff).toShort()
             }
             else -> if (strict)
-                throw MessagePackDeserialize("strictTypeError($dataBuffer, short, byte)")
+                throw MessagePackDeserializeException("strictTypeError($dataBuffer, short, byte)")
             else unpackByte().toShort()
         }
     }
@@ -75,7 +75,7 @@ class MessageUnpacker(private val dataBuffer: MsgPackDataInputBuffer) {
                 if (next == MessagePackType.Int.UINT32 && preventOverflow) {
                     val number = dataBuffer.takeNext(4).toLong()
                     if (number !in Int.MIN_VALUE..Int.MAX_VALUE) {
-                        throw MessagePackDeserialize("overflowError($dataBuffer)")
+                        throw MessagePackDeserializeException("overflowError($dataBuffer)")
                     } else {
                         number.toInt()
                     }
@@ -88,7 +88,7 @@ class MessageUnpacker(private val dataBuffer: MsgPackDataInputBuffer) {
                 dataBuffer.takeNext(2).toShort().toInt()
             }
             else -> if (strict)
-                throw MessagePackDeserialize("strictTypeError($dataBuffer, int, short")
+                throw MessagePackDeserializeException("strictTypeError($dataBuffer, int, short")
             else unpackShort().toInt()
         }
     }
@@ -101,7 +101,7 @@ class MessageUnpacker(private val dataBuffer: MsgPackDataInputBuffer) {
                 if (next == MessagePackType.Int.UINT64 && preventOverflow) {
                     val number = dataBuffer.takeNext(8).toLong()
                     if (number < 0) {
-                        throw MessagePackDeserialize("overflowError($dataBuffer)")
+                        throw MessagePackDeserializeException("overflowError($dataBuffer)")
                     } else {
                         number
                     }
@@ -114,7 +114,7 @@ class MessageUnpacker(private val dataBuffer: MsgPackDataInputBuffer) {
                 dataBuffer.takeNext(4).toInt().toLong()
             }
             else -> if (strict)
-                throw MessagePackDeserialize("strictTypeError($dataBuffer, long, int")
+                throw MessagePackDeserializeException("strictTypeError($dataBuffer, long, int")
             else unpackInt().toLong()
         }
     }
@@ -125,7 +125,7 @@ class MessageUnpacker(private val dataBuffer: MsgPackDataInputBuffer) {
                 dataBuffer.skip(1)
                 dataBuffer.takeNext(4).toFloat()
             }
-            else -> throw MessagePackDeserialize("($dataBuffer, Expected float type, but found $type)")
+            else -> throw MessagePackDeserializeException("($dataBuffer, Expected float type, but found $type)")
         }
     }
 
@@ -136,10 +136,10 @@ class MessageUnpacker(private val dataBuffer: MsgPackDataInputBuffer) {
                 dataBuffer.takeNext(8).toDouble()
             }
             MessagePackType.Float.FLOAT -> if (strict)
-                throw MessagePackDeserialize("strictTypeError($dataBuffer, double, float) ")
+                throw MessagePackDeserializeException("strictTypeError($dataBuffer, double, float) ")
             else unpackFloat().toDouble()
 
-            else -> throw MessagePackDeserialize("($dataBuffer, Expected double type, but found $type)")
+            else -> throw MessagePackDeserializeException("($dataBuffer, Expected double type, but found $type)")
         }
     }
 
@@ -153,7 +153,7 @@ class MessageUnpacker(private val dataBuffer: MsgPackDataInputBuffer) {
                 if (preventOverflow) {
                     val number = dataBuffer.takeNext(4).toLong()
                     if (number !in Int.MIN_VALUE..Int.MAX_VALUE) {
-                        throw MessagePackDeserialize("overflowError($dataBuffer)")
+                        throw MessagePackDeserializeException("overflowError($dataBuffer)")
                     } else {
                         number.toInt()
                     }
@@ -161,7 +161,7 @@ class MessageUnpacker(private val dataBuffer: MsgPackDataInputBuffer) {
                     dataBuffer.takeNext(4).toInt()
                 }
             }
-            else -> throw MessagePackDeserialize("($dataBuffer, Expected string type, but found $next)")
+            else -> throw MessagePackDeserializeException("($dataBuffer, Expected string type, but found $next)")
 
         }
         if (length == 0) return ""
@@ -177,7 +177,7 @@ class MessageUnpacker(private val dataBuffer: MsgPackDataInputBuffer) {
                 if (preventOverflow) {
                     val number = dataBuffer.takeNext(4).toLong()
                     if (number !in Int.MIN_VALUE..Int.MAX_VALUE) {
-                        throw MessagePackDeserialize("overflowError($dataBuffer)")
+                        throw MessagePackDeserializeException("overflowError($dataBuffer)")
                     } else {
                         number.toInt()
                     }
@@ -185,7 +185,7 @@ class MessageUnpacker(private val dataBuffer: MsgPackDataInputBuffer) {
                     dataBuffer.takeNext(4).toInt()
                 }
             }
-            else -> throw MessagePackDeserialize("($dataBuffer, Expected bytearray type, but found $next)")
+            else -> throw MessagePackDeserializeException("($dataBuffer, Expected bytearray type, but found $next)")
 
         }
         if (length == 0) return byteArrayOf()
