@@ -41,10 +41,10 @@ fun ByteArray.toDouble(): Double {
     return ByteBuffer.wrap(this).double
 }
 
-fun ByteArray.toHex() = this.joinToString(separator = "") { it.toHex() }
-fun Byte.toHex() = toInt().and(0xff).toString(16).padStart(2, '0')
+fun ByteArray.decodeHex() = this.joinToString(separator = "") { it.decodeHex() }
+fun Byte.decodeHex() = toInt().and(0xff).toString(16).padStart(2, '0')
 
-fun isPrimitive(value: Any): Boolean = when(value) {
+fun isPrimitive(value: Any): Boolean = when (value) {
     is Boolean,
     is Byte,
     is Short,
@@ -57,7 +57,7 @@ fun isPrimitive(value: Any): Boolean = when(value) {
     else -> false
 }
 
-fun String.toHex(): ByteArray {
+fun String.decodeHex(): ByteArray {
     require(length % 2 == 0)
 
     return chunked(2)

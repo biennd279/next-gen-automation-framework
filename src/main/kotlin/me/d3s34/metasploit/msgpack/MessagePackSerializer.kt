@@ -10,6 +10,16 @@ import kotlinx.serialization.descriptors.buildSerialDescriptor
 import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
 import kotlinx.serialization.serializer
+import me.d3s34.metasploit.msgpack.MessagePackType.Array.isArray
+import me.d3s34.metasploit.msgpack.MessagePackType.Bin.isBinary
+import me.d3s34.metasploit.msgpack.MessagePackType.Boolean.isBoolean
+import me.d3s34.metasploit.msgpack.MessagePackType.Int.isByte
+import me.d3s34.metasploit.msgpack.MessagePackType.Int.isFixNum
+import me.d3s34.metasploit.msgpack.MessagePackType.Int.isInt
+import me.d3s34.metasploit.msgpack.MessagePackType.Int.isLong
+import me.d3s34.metasploit.msgpack.MessagePackType.Int.isShort
+import me.d3s34.metasploit.msgpack.MessagePackType.Map.isMap
+import me.d3s34.metasploit.msgpack.MessagePackType.String.isString
 
 
 open class MessagePackSerializer(
@@ -46,13 +56,16 @@ open class NullableMessagePackSerializer() : KSerializer<Any?>{
         val typeByte = decoder.peekTypeByte()
         
         return when {
-            MessagePackType.Boolean.isBoolean(typeByte) ||
-            MessagePackType.Int.isNumber(typeByte) ||
-            MessagePackType.String.isString(typeByte) -> decoder.decodeValue()
-            MessagePackType.Bin.isBinary(typeByte) -> decoder.decodeValue() //TODO: cast to string
-            MessagePackType.Array.isArray(typeByte) -> ListSerializer(this).deserialize(decoder)
-            MessagePackType.Map.isMap(typeByte) -> MapSerializer(this, this).deserialize(decoder)
-            else -> throw MessagePackDeserializeException("Missing decoder for type: $typeByte")
+            isBoolean(typeByte) -> decoder.decodeBoolean()
+            isFixNum(typeByte) || isByte(typeByte) -> decoder.decodeByte()
+            isShort(typeByte) -> decoder.decodeShort()
+            isInt(typeByte) -> decoder.decodeInt()
+            isLong(typeByte) -> decoder.decodeLong()
+            isString(typeByte) || isBinary(typeByte) -> decoder.decodeString()
+//            isBinary(typeByte) -> decoder.decodeSerializableValue(ByteArraySerializer())
+            isArray(typeByte) -> ListSerializer(this).deserialize(decoder)
+            isMap(typeByte) -> MapSerializer(this, this).deserialize(decoder)
+            else -> throw MessagePackDeserializeException("Missing decoder for type: ${typeByte.decodeHex()}")
         }
     }
 

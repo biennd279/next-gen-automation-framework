@@ -9,7 +9,8 @@ import kotlinx.serialization.modules.SerializersModule
 class MessagePack(
     override val serializersModule: SerializersModule = SerializersModule {
         contextual(Any::class, MessagePackSerializer)
-    }): BinaryFormat {
+    }
+) : BinaryFormat {
 
     private val messagePacker = MessagePacker()
 

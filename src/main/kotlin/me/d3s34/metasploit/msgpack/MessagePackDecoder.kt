@@ -5,48 +5,30 @@ import kotlinx.serialization.descriptors.SerialDescriptor
 import kotlinx.serialization.descriptors.StructureKind
 import kotlinx.serialization.encoding.AbstractDecoder
 import kotlinx.serialization.encoding.CompositeDecoder
+import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.modules.SerializersModule
-import me.d3s34.metasploit.msgpack.MessagePackType.Bin.isBinary
-import me.d3s34.metasploit.msgpack.MessagePackType.Boolean.isBoolean
-import me.d3s34.metasploit.msgpack.MessagePackType.Float.isDouble
-import me.d3s34.metasploit.msgpack.MessagePackType.Float.isFloat
-import me.d3s34.metasploit.msgpack.MessagePackType.Int.isByte
-import me.d3s34.metasploit.msgpack.MessagePackType.Int.isFixNum
-import me.d3s34.metasploit.msgpack.MessagePackType.Int.isInt
-import me.d3s34.metasploit.msgpack.MessagePackType.Int.isLong
-import me.d3s34.metasploit.msgpack.MessagePackType.Int.isNumber
-import me.d3s34.metasploit.msgpack.MessagePackType.Int.isShort
 import me.d3s34.metasploit.msgpack.MessagePackType.String.isString
+import java.nio.charset.Charset
+
+interface PeekTypeMessagePackDecoder {
+    fun peekTypeByte(): Byte
+}
 
 @ExperimentalSerializationApi
-class MessagePackDecoder(
+open class MessagePackDecoder(
     override val serializersModule: SerializersModule,
     private val buffer: InputMessageDataPacker
-) : AbstractDecoder() {
-    constructor(serializersModule: SerializersModule, byteArray: ByteArray):
+) : AbstractDecoder(), PeekTypeMessagePackDecoder {
+    constructor(serializersModule: SerializersModule, byteArray: ByteArray) :
             this(serializersModule, InputMessageDataPacker(byteArray))
 
     private val messageUnpacker = MessageUnpacker(buffer)
 
-    fun peekTypeByte(): Byte {
+    override fun peekTypeByte(): Byte {
         return buffer.peek()
     }
 
-    override fun decodeElementIndex(descriptor: SerialDescriptor): Int {
-        val next = buffer.peekSafely()
-        if (next == null || !isString(next)) return CompositeDecoder.DECODE_DONE
-
-        val fieldName = kotlin.runCatching { decodeString() }
-            .getOrNull() ?: return CompositeDecoder.UNKNOWN_NAME
-
-        val index = descriptor.getElementIndex(fieldName)
-
-        if (index == CompositeDecoder.UNKNOWN_NAME) {
-            TODO()
-        }
-
-        return index
-    }
+    override fun decodeElementIndex(descriptor: SerialDescriptor): Int = 0
 
     override fun decodeNotNullMark(): Boolean {
         return peekTypeByte() == MessagePackType.NULL
@@ -57,25 +39,49 @@ class MessagePackDecoder(
         return null
     }
 
-    override fun decodeEnum(enumDescriptor: SerialDescriptor): Int {
-        return enumDescriptor.getElementIndex(decodeString())
+    override fun decodeBoolean(): Boolean {
+        return messageUnpacker.unpackBoolean()
     }
 
-    override fun decodeValue(): Any {
-        val typeByte = peekTypeByte()
+    override fun decodeByte(): Byte {
+        return messageUnpacker.unpackInt().toByte()
+    }
 
-        return when {
-            isBoolean(typeByte) -> messageUnpacker.unpackBoolean()
-            isFixNum(typeByte) || isByte(typeByte) -> messageUnpacker.unpackByte()
-            isShort(typeByte) -> messageUnpacker.unpackShort()
-            isInt(typeByte) -> messageUnpacker.unpackInt()
-            isLong(typeByte) -> messageUnpacker.unpackLong()
-            isFloat(typeByte) -> messageUnpacker.unpackFloat()
-            isDouble(typeByte) -> messageUnpacker.unpackDouble()
-            isString(typeByte) -> messageUnpacker.unpackString()
-            isBinary(typeByte) -> messageUnpacker.unpackByteArray()
-            else -> throw MessagePackDeserializeException("Can not decode direct type ${typeByte.toHex()}")
+    override fun decodeChar(): Char {
+        return Char(messageUnpacker.unpackInt().toInt())
+    }
+
+    override fun decodeInt(): Int {
+        return messageUnpacker.unpackInt().toInt()
+    }
+
+    override fun decodeLong(): Long {
+        return messageUnpacker.unpackInt().toLong()
+    }
+
+    override fun decodeShort(): Short {
+        return messageUnpacker.unpackInt().toShort()
+    }
+
+    override fun decodeDouble(): Double {
+        return messageUnpacker.unpackDouble()
+    }
+
+    override fun decodeFloat(): Float {
+        return messageUnpacker.unpackFloat()
+    }
+
+    override fun decodeString(): String {
+        return if (isString(peekTypeByte())) {
+            messageUnpacker.unpackString()
+        } else {
+            //Some time it is bytearray
+            messageUnpacker.unpackByteArray().toString(Charset.defaultCharset())
         }
+    }
+
+    override fun decodeEnum(enumDescriptor: SerialDescriptor): Int {
+        return enumDescriptor.getElementIndex(decodeString())
     }
 
     override fun decodeSequentially(): Boolean = true
@@ -83,14 +89,15 @@ class MessagePackDecoder(
     override fun decodeCollectionSize(descriptor: SerialDescriptor): Int {
         val typeByte = buffer.requireNextByte()
 
-        return when (descriptor.kind) {
+        val size = when (descriptor.kind) {
             StructureKind.LIST -> {
                 when {
                     MessagePackType.Array.FIXARRAY_SIZE_MASK.test(typeByte) ->
                         MessagePackType.Array.FIXARRAY_SIZE_MASK.unMaskValue(typeByte).toInt()
                     MessagePackType.Array.ARRAY16 == typeByte -> buffer.takeNext(2).toInt()
                     MessagePackType.Array.ARRAY32 == typeByte -> buffer.takeNext(4).toInt()
-                    else -> throw MessagePackDeserializeException("Unknown array type: ${typeByte.toHex()}")
+                    else ->
+                        throw MessagePackDeserializeException("Unknown array type: ${typeByte.decodeHex()}")
                 }
             }
 
@@ -100,19 +107,55 @@ class MessagePackDecoder(
                         MessagePackType.Map.FIXMAP_SIZE_MASK.unMaskValue(typeByte).toInt()
                     MessagePackType.Map.MAP16 == typeByte -> buffer.takeNext(2).toInt()
                     MessagePackType.Map.MAP32 == typeByte -> buffer.takeNext(4).toInt()
-                    else -> throw MessagePackDeserializeException("Unknown object type: ${typeByte.toHex()}")
+                    else ->
+                        throw MessagePackDeserializeException("Unknown object type: ${typeByte.decodeHex()}")
                 }
             }
 
-            else -> throw MessagePackDeserializeException("Unsupported collection: ${descriptor.kind}")
+            else ->
+                throw MessagePackDeserializeException("Unsupported collection: ${descriptor.kind}")
         }
+        return size
     }
 
     override fun beginStructure(descriptor: SerialDescriptor): CompositeDecoder {
         if (descriptor.kind in arrayOf(StructureKind.CLASS, StructureKind.OBJECT)) {
-            decodeElementIndex(descriptor)
+            val size = decodeCollectionSize(descriptor)
+            return MessagePackTreeDecoder(this, size)
         }
 
         return this
+    }
+}
+
+@OptIn(ExperimentalSerializationApi::class)
+internal class MessagePackTreeDecoder(
+    private val messagePackDecoder: MessagePackDecoder,
+    private val size: Int
+) : CompositeDecoder by messagePackDecoder, Decoder by messagePackDecoder, PeekTypeMessagePackDecoder by messagePackDecoder {
+    @OptIn(ExperimentalSerializationApi::class)
+    override val serializersModule: SerializersModule
+        get() = messagePackDecoder.serializersModule
+
+    var currentIndex = -1
+
+    override fun decodeSequentially(): Boolean = false
+
+    override fun decodeCollectionSize(descriptor: SerialDescriptor): Int = size
+
+    override fun decodeElementIndex(descriptor: SerialDescriptor): Int {
+        if (currentIndex < size - 1) {
+            currentIndex++
+
+            val next = peekTypeByte()
+            if (!isString(next)) return CompositeDecoder.DECODE_DONE
+
+            val fieldName = kotlin.runCatching {
+                decodeString()
+            }.getOrNull() ?: return CompositeDecoder.UNKNOWN_NAME
+
+            return descriptor.getElementIndex(fieldName)
+        }
+        return CompositeDecoder.DECODE_DONE
     }
 }
