@@ -41,7 +41,9 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.0")
     implementation("eu.jrie.jetbrains:kotlin-shell-core:0.2.1")
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.3.2")
+
     implementation("com.ensarsarajcic.kotlinx:serialization-msgpack:0.5.0")
+    implementation("com.daveanthonythomas.moshipack:moshipack:1.0.1")
 
     implementation("io.ktor:ktor-client-core:$ktor_version")
     implementation("io.ktor:ktor-client-cio:$ktor_version")
