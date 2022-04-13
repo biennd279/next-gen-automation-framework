@@ -101,4 +101,10 @@ class MessagePackEncoder(
     }
 
     //TODO: encode inline element
+    override fun encodeElement(descriptor: SerialDescriptor, index: Int): Boolean {
+        if (descriptor.kind in arrayOf(StructureKind.CLASS, StructureKind.OBJECT)) {
+            encodeString(descriptor.getElementName(index))
+        }
+        return true
+    }
 }
