@@ -2,8 +2,6 @@ package me.d3s34.metasploit.msgpack
 
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.SerializationException
-import kotlinx.serialization.SerializationStrategy
-import kotlinx.serialization.builtins.ByteArraySerializer
 import kotlinx.serialization.descriptors.SerialDescriptor
 import kotlinx.serialization.descriptors.StructureKind
 import kotlinx.serialization.encoding.AbstractEncoder
@@ -17,7 +15,7 @@ class MessagePackEncoder(
     private val messagePacker: MessagePacker
 ): AbstractEncoder() {
 
-    val buffer = MessageDataOutputPacker()
+    val buffer = OutputMessageDataPacker()
 
     //Encode Struct
     override fun beginStructure(descriptor: SerialDescriptor): CompositeEncoder {

@@ -13,14 +13,16 @@ class MessagePack(
 
     private val messagePacker = MessagePacker()
 
+    @OptIn(ExperimentalSerializationApi::class)
     override fun <T> decodeFromByteArray(deserializer: DeserializationStrategy<T>, bytes: ByteArray): T {
-        TODO("Not yet implemented")
+        val decoder = MessagePackDecoder(serializersModule, bytes)
+        return decoder.decodeSerializableValue(deserializer)
     }
 
     @OptIn(ExperimentalSerializationApi::class)
     override fun <T> encodeToByteArray(serializer: SerializationStrategy<T>, value: T): ByteArray {
-        val messagePackEncoder = MessagePackEncoder(serializersModule, messagePacker)
-        messagePackEncoder.encodeSerializableValue(serializer, value)
-        return messagePackEncoder.buffer.toByteArray()
+        val encoder = MessagePackEncoder(serializersModule, messagePacker)
+        encoder.encodeSerializableValue(serializer, value)
+        return encoder.buffer.toByteArray()
     }
 }

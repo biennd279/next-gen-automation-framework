@@ -33,7 +33,7 @@ class InputMessageDataPacker(private val byteArray: ByteArray): MessageDataPacke
     override fun toByteArray() = byteArray
 }
 
-class MessageDataOutputPacker(): MessageDataPacker {
+class OutputMessageDataPacker(): MessageDataPacker {
     private val bytes = mutableListOf<Byte>()
 
     fun add(byte: Byte) = bytes.add(byte)

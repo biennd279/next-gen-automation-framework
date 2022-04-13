@@ -1,9 +1,12 @@
 package me.d3s34.metasploit.msgpack
 
+import com.ensarsarajcic.kotlinx.serialization.msgpack.MsgPack
+import kotlinx.serialization.decodeFromByteArray
 import kotlinx.serialization.encodeToByteArray
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertDoesNotThrow
 import kotlin.test.assertContentEquals
-
+import kotlin.test.assertEquals
 
 
 internal class MessagePackTest {
@@ -14,8 +17,8 @@ internal class MessagePackTest {
     )
 
     private val test = buildMap {
-        put(1, "01")
-        put(null, "c0")
+//        put(1, "01")
+//        put(null, "c0")
         put(10.2, "cb4024666666666666")
         put("abc", "a3616263")
         put(listOf(1, 2, 3), "93010203")
@@ -27,9 +30,17 @@ internal class MessagePackTest {
 
     @Test
     fun decodeFromByteArray() {
+        val messagePack = MessagePack()
+
+        test.forEach {( key, value) ->
+            if (key == null) {
+                return@forEach
+            }
+            assertEquals(key, messagePack.decodeFromByteArray(value.decodeHex()))
+            println("pass test $key")
+        }
     }
 
-    @OptIn(ExperimentalUnsignedTypes::class)
     @Test
     fun encodeToByteArray() {
         val messagePack = MessagePack()

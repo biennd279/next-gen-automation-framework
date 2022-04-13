@@ -6,6 +6,8 @@ internal object MessagePackType {
         operator fun invoke(value: kotlin.Boolean) = if (value) TRUE else FALSE
         const val TRUE = 0xc3.toByte()
         const val FALSE = 0xc2.toByte()
+
+        fun isBoolean(byte: Byte) = byte == TRUE || byte == FALSE
     }
 
     internal interface Mask<T> {
@@ -52,6 +54,9 @@ internal object MessagePackType {
     internal object Float {
         const val FLOAT = 0xca.toByte()
         const val DOUBLE = 0xcb.toByte()
+
+        fun isFloat(byte: Byte) = byte == FLOAT
+        fun isDouble(byte: Byte) = byte == DOUBLE
     }
 
     internal object String {

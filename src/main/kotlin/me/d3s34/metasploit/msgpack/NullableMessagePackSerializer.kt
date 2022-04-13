@@ -23,7 +23,7 @@ open class MessagePackSerializer(
         get() = buildSerialDescriptor("MessagePack", SerialKind.CONTEXTUAL)
 
     override fun deserialize(decoder: Decoder): Any {
-        TODO("Not yet implemented")
+        return nullableMessagePackSerializer.deserialize(decoder)!!
     }
 
     override fun serialize(encoder: Encoder, value: Any) {
@@ -39,8 +39,26 @@ open class NullableMessagePackSerializer() : KSerializer<Any?>{
     override val descriptor: SerialDescriptor
         get() = buildSerialDescriptor("NullableMessagePack", SerialKind.CONTEXTUAL)
 
+    @OptIn(ExperimentalSerializationApi::class)
     override fun deserialize(decoder: Decoder): Any? {
-        TODO("Not yet implemented")
+        require(decoder is MessagePackDecoder)
+
+        val typeByte = decoder.peekTypeByte()
+        
+        return when {
+            MessagePackType.Boolean.isBoolean(typeByte) ||
+            MessagePackType.Int.isByte(typeByte) ||
+            MessagePackType.Int.isShort(typeByte) ||
+            MessagePackType.Int.isInt(typeByte) ||
+            MessagePackType.Int.isLong(typeByte) ||
+            MessagePackType.Float.isFloat(typeByte) ||
+            MessagePackType.Float.isDouble(typeByte) ||
+            MessagePackType.String.isString(typeByte) -> decoder.decodeValue()
+            MessagePackType.Bin.isBinary(typeByte) -> decoder.decodeValue() //TODO: cast to string
+            MessagePackType.Array.isArray(typeByte) -> ListSerializer(this).deserialize(decoder)
+            MessagePackType.Map.isMap(typeByte) -> MapSerializer(this, this).deserialize(decoder)
+            else -> throw MessagePackDeserializeException("Missing decoder for type: $typeByte")
+        }
     }
 
     @OptIn(ExperimentalSerializationApi::class, InternalSerializationApi::class)

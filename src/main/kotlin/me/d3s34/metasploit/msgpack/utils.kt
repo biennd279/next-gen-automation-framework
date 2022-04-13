@@ -9,8 +9,6 @@ fun Long.toByteArray() = ByteArray(8) { ((this shr (7-it) * 8) and 0xFF).toByte(
 
 //TODO: remake to get performance
 fun ByteArray.pad(size: Int): ByteArray {
-    require(this.size <= size)
-
     if (this.size == size)
         return this
 
@@ -57,4 +55,12 @@ fun isPrimitive(value: Any): Boolean = when(value) {
     is String,
     is Char -> true
     else -> false
+}
+
+fun String.decodeHex(): ByteArray {
+    require(length % 2 == 0)
+
+    return chunked(2)
+        .map { it.toInt(16).toByte() }
+        .toByteArray()
 }
