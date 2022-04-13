@@ -57,7 +57,7 @@ fun isPrimitive(value: Any): Boolean = when(value) {
     else -> false
 }
 
-fun String.decodeHex(): ByteArray {
+fun String.toHex(): ByteArray {
     require(length % 2 == 0)
 
     return chunked(2)

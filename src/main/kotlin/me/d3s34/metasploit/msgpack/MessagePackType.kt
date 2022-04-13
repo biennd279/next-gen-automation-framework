@@ -49,12 +49,16 @@ internal object MessagePackType {
         fun isShort(byte: Byte) = byte == INT16 || byte == UINT16
         fun isInt(byte: Byte) = byte == INT32 || byte == UINT32
         fun isLong(byte: Byte) = byte == INT64 || byte == UINT64
+
+        fun isFixNum(byte: Byte) = POSITIVE_FIXNUM_MASK.test(byte) || NEGATIVE_FIXNUM_MASK.test(byte)
+
+        fun isNumber(byte: Byte) = isFixNum(byte) || isByte(byte) || isShort(byte) || isInt(byte) || isLong(byte)
+
     }
 
     internal object Float {
         const val FLOAT = 0xca.toByte()
         const val DOUBLE = 0xcb.toByte()
-
         fun isFloat(byte: Byte) = byte == FLOAT
         fun isDouble(byte: Byte) = byte == DOUBLE
     }

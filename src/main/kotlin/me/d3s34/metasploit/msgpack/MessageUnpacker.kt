@@ -1,5 +1,7 @@
 package me.d3s34.metasploit.msgpack
 
+import com.ensarsarajcic.kotlinx.serialization.msgpack.MsgPack
+
 
 //fork from package com.ensarsarajcic.kotlinx.serialization.msgpack.internal
 

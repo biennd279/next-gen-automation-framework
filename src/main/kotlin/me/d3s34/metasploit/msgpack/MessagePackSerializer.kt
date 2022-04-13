@@ -47,12 +47,7 @@ open class NullableMessagePackSerializer() : KSerializer<Any?>{
         
         return when {
             MessagePackType.Boolean.isBoolean(typeByte) ||
-            MessagePackType.Int.isByte(typeByte) ||
-            MessagePackType.Int.isShort(typeByte) ||
-            MessagePackType.Int.isInt(typeByte) ||
-            MessagePackType.Int.isLong(typeByte) ||
-            MessagePackType.Float.isFloat(typeByte) ||
-            MessagePackType.Float.isDouble(typeByte) ||
+            MessagePackType.Int.isNumber(typeByte) ||
             MessagePackType.String.isString(typeByte) -> decoder.decodeValue()
             MessagePackType.Bin.isBinary(typeByte) -> decoder.decodeValue() //TODO: cast to string
             MessagePackType.Array.isArray(typeByte) -> ListSerializer(this).deserialize(decoder)

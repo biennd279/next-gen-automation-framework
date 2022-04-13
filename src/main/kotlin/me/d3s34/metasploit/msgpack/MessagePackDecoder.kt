@@ -1,26 +1,22 @@
 package me.d3s34.metasploit.msgpack
 
-import com.ensarsarajcic.kotlinx.serialization.msgpack.MsgPack
-import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.ExperimentalSerializationApi
-import kotlinx.serialization.builtins.ByteArraySerializer
-import kotlinx.serialization.builtins.serializer
 import kotlinx.serialization.descriptors.SerialDescriptor
 import kotlinx.serialization.descriptors.StructureKind
 import kotlinx.serialization.encoding.AbstractDecoder
 import kotlinx.serialization.encoding.CompositeDecoder
 import kotlinx.serialization.modules.SerializersModule
-import me.d3s34.metasploit.msgpack.MessagePackType.Array.isArray
 import me.d3s34.metasploit.msgpack.MessagePackType.Bin.isBinary
 import me.d3s34.metasploit.msgpack.MessagePackType.Boolean.isBoolean
 import me.d3s34.metasploit.msgpack.MessagePackType.Float.isDouble
 import me.d3s34.metasploit.msgpack.MessagePackType.Float.isFloat
 import me.d3s34.metasploit.msgpack.MessagePackType.Int.isByte
+import me.d3s34.metasploit.msgpack.MessagePackType.Int.isFixNum
 import me.d3s34.metasploit.msgpack.MessagePackType.Int.isInt
 import me.d3s34.metasploit.msgpack.MessagePackType.Int.isLong
+import me.d3s34.metasploit.msgpack.MessagePackType.Int.isNumber
 import me.d3s34.metasploit.msgpack.MessagePackType.Int.isShort
 import me.d3s34.metasploit.msgpack.MessagePackType.String.isString
-import kotlin.reflect.KClass
 
 @ExperimentalSerializationApi
 class MessagePackDecoder(
@@ -70,7 +66,7 @@ class MessagePackDecoder(
 
         return when {
             isBoolean(typeByte) -> messageUnpacker.unpackBoolean()
-            isByte(typeByte) -> messageUnpacker.unpackByte()
+            isFixNum(typeByte) || isByte(typeByte) -> messageUnpacker.unpackByte()
             isShort(typeByte) -> messageUnpacker.unpackShort()
             isInt(typeByte) -> messageUnpacker.unpackInt()
             isLong(typeByte) -> messageUnpacker.unpackLong()
@@ -78,7 +74,7 @@ class MessagePackDecoder(
             isDouble(typeByte) -> messageUnpacker.unpackDouble()
             isString(typeByte) -> messageUnpacker.unpackString()
             isBinary(typeByte) -> messageUnpacker.unpackByteArray()
-            else -> throw MessagePackDeserializeException()
+            else -> throw MessagePackDeserializeException("Can not decode direct type ${typeByte.toHex()}")
         }
     }
 
@@ -94,17 +90,17 @@ class MessagePackDecoder(
                         MessagePackType.Array.FIXARRAY_SIZE_MASK.unMaskValue(typeByte).toInt()
                     MessagePackType.Array.ARRAY16 == typeByte -> buffer.takeNext(2).toInt()
                     MessagePackType.Array.ARRAY32 == typeByte -> buffer.takeNext(4).toInt()
-                    else -> throw MessagePackDeserializeException("Unknown array type: $typeByte")
+                    else -> throw MessagePackDeserializeException("Unknown array type: ${typeByte.toHex()}")
                 }
             }
 
             StructureKind.CLASS, StructureKind.OBJECT, StructureKind.MAP -> {
                 when {
                     MessagePackType.Map.FIXMAP_SIZE_MASK.test(typeByte) ->
-                        MessagePackType.Array.FIXARRAY_SIZE_MASK.unMaskValue(typeByte).toInt()
+                        MessagePackType.Map.FIXMAP_SIZE_MASK.unMaskValue(typeByte).toInt()
                     MessagePackType.Map.MAP16 == typeByte -> buffer.takeNext(2).toInt()
                     MessagePackType.Map.MAP32 == typeByte -> buffer.takeNext(4).toInt()
-                    else -> throw MessagePackDeserializeException("Unknown object type: $typeByte")
+                    else -> throw MessagePackDeserializeException("Unknown object type: ${typeByte.toHex()}")
                 }
             }
 
