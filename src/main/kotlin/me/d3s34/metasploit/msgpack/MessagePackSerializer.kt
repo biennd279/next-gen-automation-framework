@@ -13,6 +13,8 @@ import kotlinx.serialization.serializer
 import me.d3s34.metasploit.msgpack.MessagePackType.Array.isArray
 import me.d3s34.metasploit.msgpack.MessagePackType.Bin.isBinary
 import me.d3s34.metasploit.msgpack.MessagePackType.Boolean.isBoolean
+import me.d3s34.metasploit.msgpack.MessagePackType.Float.isDouble
+import me.d3s34.metasploit.msgpack.MessagePackType.Float.isFloat
 import me.d3s34.metasploit.msgpack.MessagePackType.Int.isByte
 import me.d3s34.metasploit.msgpack.MessagePackType.Int.isFixNum
 import me.d3s34.metasploit.msgpack.MessagePackType.Int.isInt
@@ -61,11 +63,15 @@ open class NullableMessagePackSerializer() : KSerializer<Any?>{
             isShort(typeByte) -> decoder.decodeShort()
             isInt(typeByte) -> decoder.decodeInt()
             isLong(typeByte) -> decoder.decodeLong()
-            isString(typeByte) || isBinary(typeByte) -> decoder.decodeString()
-//            isBinary(typeByte) -> decoder.decodeSerializableValue(ByteArraySerializer())
+            isFloat(typeByte) -> decoder.decodeFloat()
+            isDouble(typeByte) -> decoder.decodeDouble()
+//            isString(typeByte) || isBinary(typeByte) -> decoder.decodeString()
+            isString(typeByte) -> decoder.decodeString()
+            isBinary(typeByte) -> decoder.decodeSerializableValue(ByteArraySerializer())
             isArray(typeByte) -> ListSerializer(this).deserialize(decoder)
             isMap(typeByte) -> MapSerializer(this, this).deserialize(decoder)
-            else -> throw MessagePackDeserializeException("Missing decoder for type: ${typeByte.decodeHex()}")
+            else ->
+                throw MessagePackDeserializeException("Missing decoder for type: ${typeByte.decodeHex()}")
         }
     }
 

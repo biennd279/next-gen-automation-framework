@@ -13,7 +13,8 @@ class MessageUnpacker(private val dataBuffer: InputMessageDataPacker) {
 
     fun unpackNull() {
         val next = dataBuffer.requireNextByte()
-        if (next != MessagePackType.NULL) throw MessagePackDeserializeException("Invalid null $next")
+        if (next != MessagePackType.NULL)
+            throw MessagePackDeserializeException("Invalid null ${byteArrayOf(next).decodeHex()}")
     }
 
     fun unpackBoolean(): Boolean {
