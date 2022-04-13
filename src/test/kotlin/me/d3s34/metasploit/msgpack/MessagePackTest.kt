@@ -16,6 +16,12 @@ internal class MessagePackTest {
         val name: String
     )
 
+    @kotlinx.serialization.Serializable
+    data class LoginSuccess(
+        val result: String,
+        val token: String
+    )
+
     private val bien = TestClass("bien")
     private val byteArray = byteArrayOf(12, 14)
 
@@ -51,12 +57,19 @@ internal class MessagePackTest {
             byteArray,
             messagePack.decodeFromByteArray(ByteArraySerializer(), test[byteArray]!!.decodeHex())
         )
+
+        val response = ("82c406726573756c74c40773756363657373c405746f6b656ec42054454d507636674b6e53453" +
+                "14d5a4c656c47563659645862726c3332546b6349")
+            .decodeHex()
+
+        val loginSuccess = messagePack.decodeFromByteArray<LoginSuccess>(response)
+
+        assertEquals(LoginSuccess("success", "TEMPv6gKnSE1MZLelGV6YdXbrl32TkcI"), loginSuccess)
     }
 
     @Test
     fun encodeToByteArray() {
         val messagePack = MessagePack()
-
         val encoded = test.keys.map { messagePack.encodeToByteArray(it).decodeHex() }
         assertContentEquals(test.values, encoded)
     }

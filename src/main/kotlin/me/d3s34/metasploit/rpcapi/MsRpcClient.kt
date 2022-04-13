@@ -1,8 +1,16 @@
 package me.d3s34.metasploit.rpcapi
 
 import io.ktor.client.*
+import io.ktor.client.call.*
 import io.ktor.client.engine.*
 import io.ktor.client.engine.cio.*
+import io.ktor.client.request.*
+import io.ktor.http.*
+import kotlinx.coroutines.runBlocking
+import kotlinx.serialization.decodeFromByteArray
+import kotlinx.serialization.encodeToByteArray
+import me.d3s34.metasploit.msgpack.MessagePack
+import me.d3s34.metasploit.msgpack.decodeHex
 import kotlin.time.ExperimentalTime
 
 class MsRpcClient {
@@ -21,20 +29,4 @@ class MsRpcClient {
             }
         }
     }
-}
-@kotlinx.serialization.Serializable
-data class Data(
-    val type: String,
-    val data: List<Long>,
-)
-
-@kotlinx.serialization.Serializable
-data class LoginSuccess(
-    val result: Data,
-    val token: Data
-)
-
-@OptIn(ExperimentalTime::class)
-fun main() {
-
 }

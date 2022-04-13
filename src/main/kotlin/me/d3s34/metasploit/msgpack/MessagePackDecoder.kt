@@ -7,6 +7,7 @@ import kotlinx.serialization.encoding.AbstractDecoder
 import kotlinx.serialization.encoding.CompositeDecoder
 import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.modules.SerializersModule
+import me.d3s34.metasploit.msgpack.MessagePackType.Bin.isBinary
 import me.d3s34.metasploit.msgpack.MessagePackType.String.isString
 import java.nio.charset.Charset
 
@@ -89,7 +90,7 @@ open class MessagePackDecoder(
     override fun decodeCollectionSize(descriptor: SerialDescriptor): Int {
         val typeByte = buffer.requireNextByte()
 
-        val size = when (descriptor.kind) {
+        return when (descriptor.kind) {
             StructureKind.LIST -> {
                 when {
                     MessagePackType.Array.FIXARRAY_SIZE_MASK.test(typeByte) ->
@@ -115,7 +116,6 @@ open class MessagePackDecoder(
             else ->
                 throw MessagePackDeserializeException("Unsupported collection: ${descriptor.kind}")
         }
-        return size
     }
 
     override fun beginStructure(descriptor: SerialDescriptor): CompositeDecoder {
@@ -148,13 +148,16 @@ internal class MessagePackTreeDecoder(
             currentIndex++
 
             val next = peekTypeByte()
-            if (!isString(next)) return CompositeDecoder.DECODE_DONE
+            if (isString(next) || isBinary(next)) {
 
-            val fieldName = kotlin.runCatching {
-                decodeString()
-            }.getOrNull() ?: return CompositeDecoder.UNKNOWN_NAME
+                val fieldName = kotlin.runCatching {
+                    decodeString()
+                }.getOrNull() ?: return CompositeDecoder.UNKNOWN_NAME
 
-            return descriptor.getElementIndex(fieldName)
+                return descriptor.getElementIndex(fieldName)
+            }
+
+            return CompositeDecoder.DECODE_DONE
         }
         return CompositeDecoder.DECODE_DONE
     }
