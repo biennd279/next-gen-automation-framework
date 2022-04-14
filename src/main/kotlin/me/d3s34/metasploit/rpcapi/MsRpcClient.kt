@@ -9,18 +9,18 @@ import io.ktor.client.plugins.contentnegotiation.*
 import io.ktor.client.request.*
 import io.ktor.http.*
 import kotlinx.coroutines.runBlocking
-import me.d3s34.metasploit.msgpack.messagePack
 
 class MsRpcClient {
 
     companion object {
         val client = HttpClient(CIO) {
             install(ContentNegotiation) {
-                messagePack()
+                messagePack {
+                }
             }
 
             install(DefaultRequest) {
-                contentType(MPContentType.MessagePack)
+                contentType(MessagePackContentType)
             }
 
             engine {
@@ -31,6 +31,10 @@ class MsRpcClient {
     }
 }
 
+@kotlinx.serialization.Serializable
+data class ErrorResponse(
+    val error: Boolean
+)
 
 fun main() {
     val client = MsRpcClient.client
@@ -40,8 +44,8 @@ fun main() {
     val response = runBlocking {
         client.post("http://localhost:55553/api/") {
             setBody(loginRequest)
-            contentType(MPContentType.MessagePack)
-        }.body() as Map<String, Any>
+            contentType(MessagePackContentType)
+        }.body() as ErrorResponse
     }
 
     println(response)

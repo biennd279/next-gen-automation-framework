@@ -1,4 +1,4 @@
-package me.d3s34.metasploit.msgpack
+package me.d3s34.metasploit.rpcapi
 
 import io.ktor.http.*
 import io.ktor.http.content.*
@@ -10,7 +10,8 @@ import io.ktor.utils.io.charsets.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.*
-import me.d3s34.metasploit.rpcapi.MPContentType
+import me.d3s34.metasploit.msgpack.MessagePack
+import me.d3s34.metasploit.msgpack.MessagePackException
 
 class MessagePackConverter(
     private val messagePack: MessagePack = MessagePack()
@@ -31,14 +32,18 @@ class MessagePackConverter(
             ?: typeInfo.type.serializer()
 
         @Suppress("UNCHECKED_CAST")
-        return try {
+        return kotlin.runCatching {
             withContext(Dispatchers.IO) {
                 val byteArray = content.toByteArray()
                 messagePack.decodeFromByteArray(serializer, byteArray)
             }
-        } catch (t: MessagePackException) {
-            null
         }
+            .onFailure {
+                if (it is MessagePackException) {
+
+                }
+            }
+            .getOrNull()
     }
 
     override suspend fun serialize(
@@ -48,6 +53,8 @@ class MessagePackConverter(
         value: Any
     ): OutgoingContent {
         return object: OutgoingContent.ByteArrayContent() {
+            override val contentType = MessagePackContentType
+
             override fun bytes(): ByteArray = messagePack.encodeToByteArray(value)
         }
     }
@@ -55,8 +62,9 @@ class MessagePackConverter(
 }
 
 fun Configuration.messagePack(
-    contentType: ContentType = MPContentType.MessagePack,
-    converter: MessagePackConverter = MessagePackConverter()
+    converter: MessagePackConverter = MessagePackConverter(),
+    block: Configuration.() -> Unit
 ) {
-    register(contentType, converter)
+    register(MessagePackContentType, converter)
+    this.apply(block)
 }
