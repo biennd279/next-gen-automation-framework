@@ -44,6 +44,14 @@ fun ByteArray.toDouble(): Double {
 fun ByteArray.decodeHex() = this.joinToString(separator = "") { it.decodeHex() }
 fun Byte.decodeHex() = toInt().and(0xff).toString(16).padStart(2, '0')
 
+fun String.decodeHex(): ByteArray {
+    require(length % 2 == 0)
+
+    return chunked(2)
+        .map { it.toInt(16).toByte() }
+        .toByteArray()
+}
+
 fun isPrimitive(value: Any): Boolean = when (value) {
     is Boolean,
     is Byte,
@@ -56,11 +64,16 @@ fun isPrimitive(value: Any): Boolean = when (value) {
     is Char -> true
     else -> false
 }
-
-fun String.decodeHex(): ByteArray {
-    require(length % 2 == 0)
-
-    return chunked(2)
-        .map { it.toInt(16).toByte() }
-        .toByteArray()
-}
+fun isBoolean(byte: Byte): Boolean = MessagePackType.Boolean.isBoolean(byte)
+fun isInt(byte: Byte): Boolean = MessagePackType.Int.isInt(byte)
+fun isByte(byte: Byte): Boolean = MessagePackType.Int.isByte(byte)
+fun isShort(byte: Byte): Boolean = MessagePackType.Int.isShort(byte)
+fun isLong(byte: Byte): Boolean = MessagePackType.Int.isLong(byte)
+fun isFloat(byte: Byte): Boolean = MessagePackType.Float.isFloat(byte)
+fun isDouble(byte: Byte): Boolean = MessagePackType.Float.isDouble(byte)
+fun isString(byte: Byte): Boolean = MessagePackType.String.isString(byte)
+fun isBinary(byte: Byte): Boolean = MessagePackType.Bin.isBinary(byte)
+fun isFixNum(byte: Byte): Boolean = MessagePackType.Int.isFixNum(byte)
+fun isIntNumber(byte: Byte): Boolean = MessagePackType.Int.isIntNumber(byte)
+fun isMap(byte: Byte): Boolean = MessagePackType.Map.isMap(byte)
+fun isArray(byte: Byte): Boolean = MessagePackType.Array.isArray(byte)

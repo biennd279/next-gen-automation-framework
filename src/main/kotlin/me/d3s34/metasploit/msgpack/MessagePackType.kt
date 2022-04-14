@@ -52,7 +52,7 @@ internal object MessagePackType {
 
         fun isFixNum(byte: Byte) = POSITIVE_FIXNUM_MASK.test(byte) || NEGATIVE_FIXNUM_MASK.test(byte)
 
-        fun isNumber(byte: Byte) = isFixNum(byte) || isByte(byte) || isShort(byte) || isInt(byte) || isLong(byte)
+        fun isIntNumber(byte: Byte) = isFixNum(byte) || isByte(byte) || isShort(byte) || isInt(byte) || isLong(byte)
 
     }
 

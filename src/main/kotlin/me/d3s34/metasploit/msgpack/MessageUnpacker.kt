@@ -1,11 +1,7 @@
 package me.d3s34.metasploit.msgpack
 
-import me.d3s34.metasploit.msgpack.MessagePackType.Int.isByte
-import me.d3s34.metasploit.msgpack.MessagePackType.Int.isFixNum
-import me.d3s34.metasploit.msgpack.MessagePackType.Int.isInt
-import me.d3s34.metasploit.msgpack.MessagePackType.Int.isLong
-import me.d3s34.metasploit.msgpack.MessagePackType.Int.isShort
 
+import me.d3s34.metasploit.msgpack.*
 
 //fork from package com.ensarsarajcic.kotlinx.serialization.msgpack.internal
 

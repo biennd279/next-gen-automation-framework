@@ -1,5 +1,6 @@
 package me.d3s34.metasploit.msgpack
 
+import com.sun.jdi.ByteType
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.descriptors.SerialDescriptor
 import kotlinx.serialization.descriptors.StructureKind
@@ -7,12 +8,11 @@ import kotlinx.serialization.encoding.AbstractDecoder
 import kotlinx.serialization.encoding.CompositeDecoder
 import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.modules.SerializersModule
-import me.d3s34.metasploit.msgpack.MessagePackType.Bin.isBinary
-import me.d3s34.metasploit.msgpack.MessagePackType.String.isString
 import java.nio.charset.Charset
 
 interface PeekTypeMessagePackDecoder {
     fun peekTypeByte(): Byte
+    fun peekTypeByteSafely(): Byte?
 }
 
 @ExperimentalSerializationApi
@@ -29,6 +29,10 @@ open class MessagePackDecoder(
         return buffer.peek()
     }
 
+    override fun peekTypeByteSafely(): Byte? {
+        return buffer.peekSafely()
+    }
+
     override fun decodeElementIndex(descriptor: SerialDescriptor): Int = 0
 
     override fun decodeNotNullMark(): Boolean {
@@ -36,7 +40,9 @@ open class MessagePackDecoder(
     }
 
     override fun decodeNull(): Nothing? {
-        messageUnpacker.unpackNull()
+        if (peekTypeByte() == MessagePackType.NULL) {
+            messageUnpacker.unpackNull()
+        }
         return null
     }
 
@@ -81,38 +87,64 @@ open class MessagePackDecoder(
         }
     }
 
+    fun ignoreNextValue(): Unit {
+        val nextType = buffer.peekSafely() ?: return
+
+        when {
+            nextType == MessagePackType.NULL -> messageUnpacker.unpackNull()
+            isBoolean(nextType) -> messageUnpacker.unpackBoolean()
+            isIntNumber(nextType) -> messageUnpacker.unpackInt()
+            isDouble(nextType) -> messageUnpacker.unpackInt()
+            isFloat(nextType) -> messageUnpacker.unpackFloat()
+            isString(nextType) -> messageUnpacker.unpackString()
+            isBinary(nextType) -> messageUnpacker.unpackByteArray()
+            isArray(nextType) -> {
+                val size = takeArraySize(nextType)
+                repeat(size) { ignoreNextValue() }
+            }
+            isMap(nextType) -> {
+                val size = takeMapSize(nextType)
+                repeat(2 * size) { ignoreNextValue() }
+            }
+            else ->
+                throw MessagePackDeserializeException("Unknown type ${nextType.decodeHex()}")
+        }
+    }
+
     override fun decodeEnum(enumDescriptor: SerialDescriptor): Int {
         return enumDescriptor.getElementIndex(decodeString())
     }
 
     override fun decodeSequentially(): Boolean = true
 
+    private fun takeArraySize(typeByte: Byte): Int {
+        return when {
+            MessagePackType.Array.FIXARRAY_SIZE_MASK.test(typeByte) ->
+                MessagePackType.Array.FIXARRAY_SIZE_MASK.unMaskValue(typeByte).toInt()
+
+            MessagePackType.Array.ARRAY16 == typeByte -> buffer.takeNext(2).toInt()
+
+            MessagePackType.Array.ARRAY32 == typeByte -> buffer.takeNext(4).toInt()
+            else ->
+                throw MessagePackDeserializeException("Unknown array type: ${typeByte.decodeHex()}")
+        }
+    }
+    private fun takeMapSize(typeByte: Byte): Int {
+        return when {
+            MessagePackType.Map.FIXMAP_SIZE_MASK.test(typeByte) ->
+                MessagePackType.Map.FIXMAP_SIZE_MASK.unMaskValue(typeByte).toInt()
+            MessagePackType.Map.MAP16 == typeByte -> buffer.takeNext(2).toInt()
+            MessagePackType.Map.MAP32 == typeByte -> buffer.takeNext(4).toInt()
+            else ->
+                throw MessagePackDeserializeException("Unknown object type: ${typeByte.decodeHex()}")
+        }
+    }
     override fun decodeCollectionSize(descriptor: SerialDescriptor): Int {
         val typeByte = buffer.requireNextByte()
 
         return when (descriptor.kind) {
-            StructureKind.LIST -> {
-                when {
-                    MessagePackType.Array.FIXARRAY_SIZE_MASK.test(typeByte) ->
-                        MessagePackType.Array.FIXARRAY_SIZE_MASK.unMaskValue(typeByte).toInt()
-                    MessagePackType.Array.ARRAY16 == typeByte -> buffer.takeNext(2).toInt()
-                    MessagePackType.Array.ARRAY32 == typeByte -> buffer.takeNext(4).toInt()
-                    else ->
-                        throw MessagePackDeserializeException("Unknown array type: ${typeByte.decodeHex()}")
-                }
-            }
-
-            StructureKind.CLASS, StructureKind.OBJECT, StructureKind.MAP -> {
-                when {
-                    MessagePackType.Map.FIXMAP_SIZE_MASK.test(typeByte) ->
-                        MessagePackType.Map.FIXMAP_SIZE_MASK.unMaskValue(typeByte).toInt()
-                    MessagePackType.Map.MAP16 == typeByte -> buffer.takeNext(2).toInt()
-                    MessagePackType.Map.MAP32 == typeByte -> buffer.takeNext(4).toInt()
-                    else ->
-                        throw MessagePackDeserializeException("Unknown object type: ${typeByte.decodeHex()}")
-                }
-            }
-
+            StructureKind.LIST -> takeArraySize(typeByte)
+            StructureKind.CLASS, StructureKind.OBJECT, StructureKind.MAP -> takeMapSize(typeByte)
             else ->
                 throw MessagePackDeserializeException("Unsupported collection: ${descriptor.kind}")
         }
@@ -137,27 +169,32 @@ internal class MessagePackTreeDecoder(
     override val serializersModule: SerializersModule
         get() = messagePackDecoder.serializersModule
 
-    var currentIndex = -1
+    var countIndex = 0
 
     override fun decodeSequentially(): Boolean = false
 
     override fun decodeCollectionSize(descriptor: SerialDescriptor): Int = size
 
     override fun decodeElementIndex(descriptor: SerialDescriptor): Int {
-        if (currentIndex < size - 1) {
-            currentIndex++
+        while (countIndex < size) {
+            countIndex++
 
-            val next = peekTypeByte()
+            val next = peekTypeByteSafely() ?: return CompositeDecoder.DECODE_DONE
+
             if (isString(next) || isBinary(next)) {
 
                 val fieldName = kotlin.runCatching {
                     decodeString()
                 }.getOrNull() ?: return CompositeDecoder.UNKNOWN_NAME
 
-                return descriptor.getElementIndex(fieldName)
-            }
+                val index = descriptor.getElementIndex(fieldName)
 
-            return CompositeDecoder.DECODE_DONE
+                if (index == CompositeDecoder.UNKNOWN_NAME) {
+                    messagePackDecoder.ignoreNextValue()
+                } else {
+                    return index
+                }
+            }
         }
         return CompositeDecoder.DECODE_DONE
     }
