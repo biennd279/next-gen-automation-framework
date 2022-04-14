@@ -1,6 +1,7 @@
 
 val ktor_version: String = "2.0.0"
 val kotlin_version: String = "1.6.20"
+val kotlinx_serialization_version = "1.3.2"
 description = "Next gen automation framework addon for ZAP"
 
 zapAddOn {
@@ -40,13 +41,18 @@ dependencies {
     // Classpath
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.0")
     implementation("eu.jrie.jetbrains:kotlin-shell-core:0.2.1")
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.3.2")
+
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:$kotlinx_serialization_version")
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-properties:$kotlinx_serialization_version")
+
 
     implementation("io.ktor:ktor-client-core:$ktor_version")
     implementation("io.ktor:ktor-client-cio:$ktor_version")
 //    implementation("io.ktor:ktor-client-serialization:$ktor_version")
     implementation("io.ktor:ktor-client-content-negotiation:$ktor_version")
     implementation("io.ktor:ktor-serialization-kotlinx-json:$ktor_version")
+    implementation("io.ktor:ktor-client-auth:$ktor_version")
+
 
     // Testing
     testImplementation(kotlin("test"))
