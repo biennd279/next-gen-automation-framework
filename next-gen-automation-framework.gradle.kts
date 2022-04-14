@@ -47,7 +47,6 @@ dependencies {
 //    implementation("io.ktor:ktor-client-serialization:$ktor_version")
     implementation("io.ktor:ktor-client-content-negotiation:$ktor_version")
     implementation("io.ktor:ktor-serialization-kotlinx-json:$ktor_version")
-    implementation("io.ktor:ktor-serialization-kotlinx-xml:$ktor_version")
 
     // Testing
     testImplementation(kotlin("test"))

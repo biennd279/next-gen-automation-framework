@@ -94,13 +94,15 @@ class MessagePackEncoder(
             is String -> buffer.addAll(messagePacker.packString(value))
             is Char -> buffer.addAll(messagePacker.packShort(value.code.toShort()))
             is ByteArray -> buffer.addAll(messagePacker.packByteArray(value))
-            else -> throw SerializationException("Non-serializable ${value::class} is not supported by ${this::class} encoder")
+            else ->
+                throw SerializationException("Non-serializable ${value::class} is not supported by ${this::class} encoder")
         }
     }
 
     //TODO: encode inline element
     override fun encodeElement(descriptor: SerialDescriptor, index: Int): Boolean {
         if (descriptor.kind in arrayOf(StructureKind.CLASS, StructureKind.OBJECT)) {
+            //Only add `header`
             encodeString(descriptor.getElementName(index))
         }
         return true
