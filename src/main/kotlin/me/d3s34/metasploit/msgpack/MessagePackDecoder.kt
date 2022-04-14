@@ -99,11 +99,11 @@ open class MessagePackDecoder(
             isString(nextType) -> messageUnpacker.unpackString()
             isBinary(nextType) -> messageUnpacker.unpackByteArray()
             isArray(nextType) -> {
-                val size = takeArraySize(nextType)
+                val size = takeArraySize()
                 repeat(size) { ignoreNextValue() }
             }
             isMap(nextType) -> {
-                val size = takeMapSize(nextType)
+                val size = takeMapSize()
                 repeat(2 * size) { ignoreNextValue() }
             }
             else ->
@@ -117,7 +117,8 @@ open class MessagePackDecoder(
 
     override fun decodeSequentially(): Boolean = true
 
-    private fun takeArraySize(typeByte: Byte): Int {
+    private fun takeArraySize(): Int {
+        val typeByte = buffer.requireNextByte()
         return when {
             MessagePackType.Array.FIXARRAY_SIZE_MASK.test(typeByte) ->
                 MessagePackType.Array.FIXARRAY_SIZE_MASK.unMaskValue(typeByte).toInt()
@@ -129,7 +130,8 @@ open class MessagePackDecoder(
                 throw MessagePackDeserializeException("Unknown array type: ${typeByte.decodeHex()}")
         }
     }
-    private fun takeMapSize(typeByte: Byte): Int {
+    private fun takeMapSize(): Int {
+        val typeByte = buffer.requireNextByte()
         return when {
             MessagePackType.Map.FIXMAP_SIZE_MASK.test(typeByte) ->
                 MessagePackType.Map.FIXMAP_SIZE_MASK.unMaskValue(typeByte).toInt()
@@ -140,11 +142,10 @@ open class MessagePackDecoder(
         }
     }
     override fun decodeCollectionSize(descriptor: SerialDescriptor): Int {
-        val typeByte = buffer.requireNextByte()
 
         return when (descriptor.kind) {
-            StructureKind.LIST -> takeArraySize(typeByte)
-            StructureKind.CLASS, StructureKind.OBJECT, StructureKind.MAP -> takeMapSize(typeByte)
+            StructureKind.LIST -> takeArraySize()
+            StructureKind.CLASS, StructureKind.OBJECT, StructureKind.MAP -> takeMapSize()
             else ->
                 throw MessagePackDeserializeException("Unsupported collection: ${descriptor.kind}")
         }

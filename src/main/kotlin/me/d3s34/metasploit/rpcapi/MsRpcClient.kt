@@ -37,13 +37,15 @@ class MsRpcClient {
 
 @kotlinx.serialization.Serializable
 data class ErrorResponse(
-    val error: Boolean = false,
+    val error: Boolean? = false,
     @SerialName("error_class")
     val errorClass: String = "",
     @SerialName("error_message")
     val errorMessage: String = "",
     @SerialName("error_code")
-    val errorCode: Int
+    val errorCode: Int,
+    @SerialName("error_backtrace")
+    val errorBacktrace: List<String>
 )
 
 @OptIn(ExperimentalTime::class)
