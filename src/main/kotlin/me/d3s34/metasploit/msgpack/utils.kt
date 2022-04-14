@@ -1,5 +1,8 @@
 package me.d3s34.metasploit.msgpack
 
+import kotlinx.serialization.ExperimentalSerializationApi
+import kotlinx.serialization.builtins.serializer
+import kotlinx.serialization.descriptors.SerialDescriptor
 import java.nio.ByteBuffer
 
 
@@ -77,3 +80,16 @@ fun isFixNum(byte: Byte): Boolean = MessagePackType.Int.isFixNum(byte)
 fun isIntNumber(byte: Byte): Boolean = MessagePackType.Int.isIntNumber(byte)
 fun isMap(byte: Byte): Boolean = MessagePackType.Map.isMap(byte)
 fun isArray(byte: Byte): Boolean = MessagePackType.Array.isArray(byte)
+
+@OptIn(ExperimentalSerializationApi::class, ExperimentalUnsignedTypes::class)
+private val unsignedNumberDescriptors = setOf(
+    UInt.serializer().descriptor,
+    ULong.serializer().descriptor,
+    UByte.serializer().descriptor,
+    UShort.serializer().descriptor
+)
+
+@OptIn(ExperimentalSerializationApi::class)
+internal val SerialDescriptor.isUnsignedNumber: Boolean
+    get() = this.isInline && this in unsignedNumberDescriptors
+

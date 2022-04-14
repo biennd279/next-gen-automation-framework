@@ -2,6 +2,7 @@ package me.d3s34.metasploit.msgpack
 
 import com.sun.jdi.ByteType
 import kotlinx.serialization.ExperimentalSerializationApi
+import kotlinx.serialization.builtins.serializer
 import kotlinx.serialization.descriptors.SerialDescriptor
 import kotlinx.serialization.descriptors.StructureKind
 import kotlinx.serialization.encoding.AbstractDecoder
@@ -115,6 +116,10 @@ open class MessagePackDecoder(
         return enumDescriptor.getElementIndex(decodeString())
     }
 
+    override fun decodeInline(inlineDescriptor: SerialDescriptor): Decoder {
+        return super.decodeInline(inlineDescriptor)
+    }
+
     override fun decodeSequentially(): Boolean = true
 
     private fun takeArraySize(): Int {
@@ -199,4 +204,16 @@ internal class MessagePackTreeDecoder(
         }
         return CompositeDecoder.DECODE_DONE
     }
+}
+
+@OptIn(ExperimentalSerializationApi::class)
+internal class MessagePackUnsignedEncoder (
+    private val messagePackDecoder: MessagePackDecoder,
+    private val size: Int
+) : CompositeDecoder by messagePackDecoder, Decoder by messagePackDecoder, PeekTypeMessagePackDecoder by messagePackDecoder {
+    @OptIn(ExperimentalSerializationApi::class)
+    override val serializersModule: SerializersModule
+        get() = messagePackDecoder.serializersModule
+
+
 }
