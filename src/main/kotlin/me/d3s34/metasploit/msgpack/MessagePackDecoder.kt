@@ -36,7 +36,7 @@ open class MessagePackDecoder(
     override fun decodeElementIndex(descriptor: SerialDescriptor): Int = 0
 
     override fun decodeNotNullMark(): Boolean {
-        return peekTypeByte() == MessagePackType.NULL
+        return peekTypeByte() != MessagePackType.NULL
     }
 
     override fun decodeNull(): Nothing? {
