@@ -16,7 +16,7 @@ import me.d3s34.sqlmap.restapi.model.Injection
 import me.d3s34.sqlmap.restapi.model.Technique
 
 
-object InjectionSerializer: KSerializer<Injection> {
+object InjectionSerializer : KSerializer<Injection> {
 
     override val descriptor: SerialDescriptor
         get() = buildClassSerialDescriptor("Injection") {

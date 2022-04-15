@@ -12,7 +12,7 @@ import me.d3s34.sqlmap.restapi.data.AbstractData
 import me.d3s34.sqlmap.restapi.response.TaskDataResponse
 import org.slf4j.LoggerFactory
 
-object TaskDataResponseSerializer: KSerializer<TaskDataResponse> {
+object TaskDataResponseSerializer : KSerializer<TaskDataResponse> {
     private val logger = LoggerFactory.getLogger(this::class.java)
 
     private val json = Json { ignoreUnknownKeys = true }

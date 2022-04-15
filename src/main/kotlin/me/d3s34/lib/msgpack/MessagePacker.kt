@@ -47,7 +47,9 @@ class MessagePacker {
             val type =
                 when {
                     value < 0 -> MessagePackType.Int.INT32
-                    value <= MessagePackType.Int.MAX_USHORT && !strict -> MessagePackType.Int.UINT16.also { uShort = true }
+                    value <= MessagePackType.Int.MAX_USHORT && !strict -> MessagePackType.Int.UINT16.also {
+                        uShort = true
+                    }
                     else -> MessagePackType.Int.UINT32
                 }
             if (uShort) {

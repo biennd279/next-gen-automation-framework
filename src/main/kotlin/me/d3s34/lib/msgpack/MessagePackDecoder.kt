@@ -1,8 +1,6 @@
 package me.d3s34.lib.msgpack
 
-import com.sun.jdi.ByteType
 import kotlinx.serialization.ExperimentalSerializationApi
-import kotlinx.serialization.builtins.serializer
 import kotlinx.serialization.descriptors.SerialDescriptor
 import kotlinx.serialization.descriptors.StructureKind
 import kotlinx.serialization.encoding.AbstractDecoder
@@ -116,10 +114,6 @@ open class MessagePackDecoder(
         return enumDescriptor.getElementIndex(decodeString())
     }
 
-    override fun decodeInline(inlineDescriptor: SerialDescriptor): Decoder {
-        return super.decodeInline(inlineDescriptor)
-    }
-
     override fun decodeSequentially(): Boolean = true
 
     private fun takeArraySize(): Int {
@@ -135,6 +129,7 @@ open class MessagePackDecoder(
                 throw MessagePackDeserializeException("Unknown array type: ${typeByte.decodeHex()}")
         }
     }
+
     private fun takeMapSize(): Int {
         val typeByte = buffer.requireNextByte()
         return when {
@@ -146,6 +141,7 @@ open class MessagePackDecoder(
                 throw MessagePackDeserializeException("Unknown object type: ${typeByte.decodeHex()}")
         }
     }
+
     override fun decodeCollectionSize(descriptor: SerialDescriptor): Int {
 
         return when (descriptor.kind) {
@@ -170,7 +166,8 @@ open class MessagePackDecoder(
 internal class MessagePackTreeDecoder(
     private val messagePackDecoder: MessagePackDecoder,
     private val size: Int
-) : CompositeDecoder by messagePackDecoder, Decoder by messagePackDecoder, PeekTypeMessagePackDecoder by messagePackDecoder {
+) : CompositeDecoder by messagePackDecoder, Decoder by messagePackDecoder,
+    PeekTypeMessagePackDecoder by messagePackDecoder {
     @OptIn(ExperimentalSerializationApi::class)
     override val serializersModule: SerializersModule
         get() = messagePackDecoder.serializersModule
@@ -204,16 +201,4 @@ internal class MessagePackTreeDecoder(
         }
         return CompositeDecoder.DECODE_DONE
     }
-}
-
-@OptIn(ExperimentalSerializationApi::class)
-internal class MessagePackUnsignedEncoder (
-    private val messagePackDecoder: MessagePackDecoder,
-    private val size: Int
-) : CompositeDecoder by messagePackDecoder, Decoder by messagePackDecoder, PeekTypeMessagePackDecoder by messagePackDecoder {
-    @OptIn(ExperimentalSerializationApi::class)
-    override val serializersModule: SerializersModule
-        get() = messagePackDecoder.serializersModule
-
-
 }

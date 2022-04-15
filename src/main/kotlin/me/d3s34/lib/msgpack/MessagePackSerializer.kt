@@ -26,9 +26,9 @@ import me.d3s34.lib.msgpack.MessagePackType.String.isString
 
 open class MessagePackSerializer(
     private val nullableMessagePackSerializer: NullableMessagePackSerializer = NullableMessagePackSerializer()
-    ): KSerializer<Any> {
+) : KSerializer<Any> {
 
-    companion object Default: MessagePackSerializer()
+    companion object Default : MessagePackSerializer()
 
     @OptIn(InternalSerializationApi::class, ExperimentalSerializationApi::class)
     override val descriptor: SerialDescriptor
@@ -43,9 +43,9 @@ open class MessagePackSerializer(
     }
 }
 
-open class NullableMessagePackSerializer() : KSerializer<Any?>{
+open class NullableMessagePackSerializer : KSerializer<Any?> {
 
-    companion object Default: NullableMessagePackSerializer()
+    companion object Default : NullableMessagePackSerializer()
 
     @OptIn(InternalSerializationApi::class, ExperimentalSerializationApi::class)
     override val descriptor: SerialDescriptor
@@ -56,7 +56,7 @@ open class NullableMessagePackSerializer() : KSerializer<Any?>{
         require(decoder is MessagePackDecoder)
 
         val typeByte = decoder.peekTypeByte()
-        
+
         return when {
             isBoolean(typeByte) -> decoder.decodeBoolean()
             isFixNum(typeByte) || isByte(typeByte) -> decoder.decodeByte()

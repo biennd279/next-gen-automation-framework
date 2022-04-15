@@ -1,14 +1,11 @@
 package me.d3s34.lib.msgpack
 
-import kotlinx.serialization.ExperimentalSerializationApi
-import kotlinx.serialization.builtins.serializer
-import kotlinx.serialization.descriptors.SerialDescriptor
 import java.nio.ByteBuffer
 
 
-fun Short.toByteArray() = ByteArray(2) { ((this.toInt() shr (1-it) * 8) and 0xFF).toByte() }
-fun Int.toByteArray() = ByteArray(4) { ((this shr (3-it) * 8) and 0xFF).toByte() }
-fun Long.toByteArray() = ByteArray(8) { ((this shr (7-it) * 8) and 0xFF).toByte() }
+fun Short.toByteArray() = ByteArray(2) { ((this.toInt() shr (1 - it) * 8) and 0xFF).toByte() }
+fun Int.toByteArray() = ByteArray(4) { ((this shr (3 - it) * 8) and 0xFF).toByte() }
+fun Long.toByteArray() = ByteArray(8) { ((this shr (7 - it) * 8) and 0xFF).toByte() }
 
 //TODO: remake to get performance
 fun ByteArray.pad(size: Int): ByteArray {
@@ -67,6 +64,7 @@ fun isPrimitive(value: Any): Boolean = when (value) {
     is Char -> true
     else -> false
 }
+
 fun isBoolean(byte: Byte): Boolean = MessagePackType.Boolean.isBoolean(byte)
 fun isInt(byte: Byte): Boolean = MessagePackType.Int.isInt(byte)
 fun isByte(byte: Byte): Boolean = MessagePackType.Int.isByte(byte)

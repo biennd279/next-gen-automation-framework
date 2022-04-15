@@ -2,12 +2,10 @@ package me.d3s34.lib.msgpack
 
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.SerializationException
-import kotlinx.serialization.builtins.serializer
 import kotlinx.serialization.descriptors.SerialDescriptor
 import kotlinx.serialization.descriptors.StructureKind
 import kotlinx.serialization.encoding.AbstractEncoder
 import kotlinx.serialization.encoding.CompositeEncoder
-import kotlinx.serialization.encoding.Encoder
 import kotlinx.serialization.modules.SerializersModule
 
 //Fork from package com.ensarsarajcic.kotlinx.serialization.msgpack
@@ -15,7 +13,7 @@ import kotlinx.serialization.modules.SerializersModule
 class MessagePackEncoder(
     override val serializersModule: SerializersModule,
     private val messagePacker: MessagePacker
-): AbstractEncoder() {
+) : AbstractEncoder() {
 
     val buffer = OutputMessageDataPacker()
 
@@ -44,7 +42,7 @@ class MessagePackEncoder(
                         buffer.addAll(collectionSize.toByteArray())
                     }
                     else -> throw MessagePackSerializeException(
-                        "Collection too long (max size = ${MessagePackType.Array.MAX_ARRAY32_LENGTH }, size = $collectionSize)!"
+                        "Collection too long (max size = ${MessagePackType.Array.MAX_ARRAY32_LENGTH}, size = $collectionSize)!"
                     )
                 }
             }
@@ -64,7 +62,7 @@ class MessagePackEncoder(
                         buffer.addAll(collectionSize.toByteArray())
                     }
                     else -> throw MessagePackSerializeException(
-                        "Collection too long (max size = ${MessagePackType.Map.MAX_MAP32_LENGTH }, size = $collectionSize)!"
+                        "Collection too long (max size = ${MessagePackType.Map.MAX_MAP32_LENGTH}, size = $collectionSize)!"
                     )
                 }
             }
@@ -85,7 +83,7 @@ class MessagePackEncoder(
     }
 
     override fun encodeValue(value: Any): Unit {
-        when(value) {
+        when (value) {
             is Boolean -> buffer.addAll(messagePacker.packBoolean(value))
             is Byte -> buffer.addAll(messagePacker.packByte(value))
             is Short -> buffer.addAll(messagePacker.packShort(value))

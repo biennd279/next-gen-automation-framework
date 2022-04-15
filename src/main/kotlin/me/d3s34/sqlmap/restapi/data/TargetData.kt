@@ -10,4 +10,4 @@ data class TargetData(
     val query: String? = null,
     @SerialName("data")
     val data: String? = null,
-): AbstractData
+) : AbstractData

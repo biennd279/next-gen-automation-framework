@@ -10,7 +10,7 @@ data class Injection(
     val parameter: String,
     val place: String,
     val techniques: List<Technique> //`data` obj but in list
-): List<Technique> by techniques
+) : List<Technique> by techniques
 
 @kotlinx.serialization.Serializable
 data class Technique(

@@ -5,7 +5,7 @@ interface MessageDataPacker {
     fun toByteArray(): ByteArray
 }
 
-class InputMessageDataPacker(private val byteArray: ByteArray): MessageDataPacker {
+class InputMessageDataPacker(private val byteArray: ByteArray) : MessageDataPacker {
     var index = 0
         private set
 
@@ -33,7 +33,7 @@ class InputMessageDataPacker(private val byteArray: ByteArray): MessageDataPacke
     override fun toByteArray() = byteArray
 }
 
-class OutputMessageDataPacker(): MessageDataPacker {
+class OutputMessageDataPacker : MessageDataPacker {
     private val bytes = mutableListOf<Byte>()
 
     fun add(byte: Byte) = bytes.add(byte)

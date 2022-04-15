@@ -4,6 +4,4 @@ import kotlin.coroutines.CoroutineContext
 
 class MetasploitRpcEngine(
     override val coroutineContext: CoroutineContext
-): MetasploitEngine() {
-
-}
+) : MetasploitEngine()

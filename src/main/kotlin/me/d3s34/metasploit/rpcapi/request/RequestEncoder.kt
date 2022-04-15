@@ -1,23 +1,17 @@
 package me.d3s34.metasploit.rpcapi.request
 
 import kotlinx.serialization.ExperimentalSerializationApi
-import kotlinx.serialization.InternalSerializationApi
 import kotlinx.serialization.SerializationStrategy
 import kotlinx.serialization.descriptors.SerialDescriptor
-import kotlinx.serialization.encoding.AbstractEncoder
 import kotlinx.serialization.encoding.CompositeEncoder
 import kotlinx.serialization.encoding.Encoder
-import kotlinx.serialization.json.Json
 import kotlinx.serialization.modules.EmptySerializersModule
 import kotlinx.serialization.modules.SerializersModule
-import kotlinx.serialization.modules.polymorphic
-import kotlinx.serialization.properties.Properties
-import kotlinx.serialization.serializer
 
 @OptIn(ExperimentalSerializationApi::class)
 class RequestEncoder(
     override val serializersModule: SerializersModule = EmptySerializersModule,
-): Encoder, CompositeEncoder {
+) : Encoder, CompositeEncoder {
     private val mapIndexName: MutableMap<Int, String> = mutableMapOf()
     private val mapNameValue: MutableMap<String, Any?> = mutableMapOf()
 
@@ -106,6 +100,7 @@ class RequestEncoder(
     override fun beginStructure(descriptor: SerialDescriptor): CompositeEncoder {
         return this
     }
+
     override fun endStructure(descriptor: SerialDescriptor) {}
 
     @ExperimentalSerializationApi

@@ -3,15 +3,15 @@ package me.d3s34.lib.msgpack
 sealed class MessagePackException(
     override val message: String? = "",
     override val cause: Throwable? = null
-): Throwable()
+) : Throwable()
 
 class MessagePackSerializeException(
     override val message: String? = "",
     override val cause: Throwable? = null
-): MessagePackException()
+) : MessagePackException()
 
 class MessagePackDeserializeException(
     override val message: String? = "",
     override val cause: Throwable? = null
-): MessagePackException()
+) : MessagePackException()
 

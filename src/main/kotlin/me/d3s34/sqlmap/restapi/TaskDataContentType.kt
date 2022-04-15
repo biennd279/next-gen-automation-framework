@@ -42,18 +42,18 @@ fun TaskDataContentType.getClassType(): KClass<out AbstractData> {
     return when (this.id) {
         TaskDataContentType.TARGET.id -> TargetData::class
         TaskDataContentType.DUMP_TABLE.id -> DumpTableData::class
-        TaskDataContentType.TECHNIQUES.id ->TechniqueData::class
+        TaskDataContentType.TECHNIQUES.id -> TechniqueData::class
         TaskDataContentType.CURRENT_USER.id,
         TaskDataContentType.CURRENT_DB.id,
-        TaskDataContentType.HOSTNAME.id ->StringData::class
-        TaskDataContentType.DBS.id ->ListStringData::class
+        TaskDataContentType.HOSTNAME.id -> StringData::class
+        TaskDataContentType.DBS.id -> ListStringData::class
         TaskDataContentType.PRIVILEGES.id,
         TaskDataContentType.ROLES.id,
-        TaskDataContentType.TABLES.id ->MapStringListStringData::class
+        TaskDataContentType.TABLES.id -> MapStringListStringData::class
         TaskDataContentType.COLUMNS.id,
-        TaskDataContentType.SCHEMA.id ->MapDbToTableToString::class
-        TaskDataContentType.COUNT.id ->MapDbToCountToListTable::class
-        TaskDataContentType.SQL_QUERY.id ->ListToListStringData::class
+        TaskDataContentType.SCHEMA.id -> MapDbToTableToString::class
+        TaskDataContentType.COUNT.id -> MapDbToCountToListTable::class
+        TaskDataContentType.SQL_QUERY.id -> ListToListStringData::class
         else -> AbstractData::class
     }
 }
