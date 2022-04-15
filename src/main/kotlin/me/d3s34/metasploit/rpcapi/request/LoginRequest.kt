@@ -4,7 +4,7 @@ package me.d3s34.metasploit.rpcapi.request
 data class LoginRequest(
     val username: String,
     val password: String,
-) : AbstractRequest() {
+) : MsfRpcRequest() {
     override val group: String = "auth"
     override val method: String = "login"
 }

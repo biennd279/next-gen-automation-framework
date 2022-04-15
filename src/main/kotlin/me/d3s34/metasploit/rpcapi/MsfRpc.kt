@@ -5,7 +5,7 @@ import io.ktor.client.plugins.*
 import io.ktor.client.request.*
 import io.ktor.http.*
 import io.ktor.util.*
-import me.d3s34.metasploit.rpcapi.request.AbstractRequest
+import me.d3s34.metasploit.rpcapi.request.MsfRpcRequest
 
 class MsfRpc {
     companion object Plugin: HttpClientPlugin<MsfRpc, MsfRpc> {
@@ -21,7 +21,7 @@ class MsfRpc {
                 //Only process msfrpc request
                 val contentType = context.contentType() ?: return@intercept
                 if (contentType != MessagePackContentType) return@intercept
-                if (it !is AbstractRequest) return@intercept
+                if (it !is MsfRpcRequest) return@intercept
 
                 val msfRequest = it.toMsfRequest()
                 context.setBody(msfRequest)

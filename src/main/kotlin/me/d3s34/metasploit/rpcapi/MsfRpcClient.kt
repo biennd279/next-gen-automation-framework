@@ -1,6 +1,7 @@
 package me.d3s34.metasploit.rpcapi
 
 import io.ktor.client.*
+import io.ktor.client.engine.*
 import io.ktor.client.engine.cio.*
 import io.ktor.client.plugins.*
 import io.ktor.client.plugins.contentnegotiation.*
@@ -47,6 +48,10 @@ class MsfRpcClient(
 
             install(ContentNegotiation) {
                 messagePack()
+            }
+
+            engine {
+                proxy = ProxyBuilder.http("http://localhost:8080/")
             }
         }
     }
