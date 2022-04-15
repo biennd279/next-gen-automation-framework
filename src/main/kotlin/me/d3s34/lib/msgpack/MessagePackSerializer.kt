@@ -1,4 +1,4 @@
-package me.d3s34.metasploit.msgpack
+package me.d3s34.lib.msgpack
 
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.InternalSerializationApi
@@ -10,18 +10,18 @@ import kotlinx.serialization.descriptors.buildSerialDescriptor
 import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
 import kotlinx.serialization.serializer
-import me.d3s34.metasploit.msgpack.MessagePackType.Array.isArray
-import me.d3s34.metasploit.msgpack.MessagePackType.Bin.isBinary
-import me.d3s34.metasploit.msgpack.MessagePackType.Boolean.isBoolean
-import me.d3s34.metasploit.msgpack.MessagePackType.Float.isDouble
-import me.d3s34.metasploit.msgpack.MessagePackType.Float.isFloat
-import me.d3s34.metasploit.msgpack.MessagePackType.Int.isByte
-import me.d3s34.metasploit.msgpack.MessagePackType.Int.isFixNum
-import me.d3s34.metasploit.msgpack.MessagePackType.Int.isInt
-import me.d3s34.metasploit.msgpack.MessagePackType.Int.isLong
-import me.d3s34.metasploit.msgpack.MessagePackType.Int.isShort
-import me.d3s34.metasploit.msgpack.MessagePackType.Map.isMap
-import me.d3s34.metasploit.msgpack.MessagePackType.String.isString
+import me.d3s34.lib.msgpack.MessagePackType.Array.isArray
+import me.d3s34.lib.msgpack.MessagePackType.Bin.isBinary
+import me.d3s34.lib.msgpack.MessagePackType.Boolean.isBoolean
+import me.d3s34.lib.msgpack.MessagePackType.Float.isDouble
+import me.d3s34.lib.msgpack.MessagePackType.Float.isFloat
+import me.d3s34.lib.msgpack.MessagePackType.Int.isByte
+import me.d3s34.lib.msgpack.MessagePackType.Int.isFixNum
+import me.d3s34.lib.msgpack.MessagePackType.Int.isInt
+import me.d3s34.lib.msgpack.MessagePackType.Int.isLong
+import me.d3s34.lib.msgpack.MessagePackType.Int.isShort
+import me.d3s34.lib.msgpack.MessagePackType.Map.isMap
+import me.d3s34.lib.msgpack.MessagePackType.String.isString
 
 
 open class MessagePackSerializer(

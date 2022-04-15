@@ -4,6 +4,8 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.builtins.ByteArraySerializer
 import kotlinx.serialization.decodeFromByteArray
 import kotlinx.serialization.encodeToByteArray
+import me.d3s34.lib.msgpack.MessagePack
+import me.d3s34.lib.msgpack.decodeHex
 import org.junit.jupiter.api.Test
 import java.nio.charset.Charset
 import kotlin.test.assertContentEquals

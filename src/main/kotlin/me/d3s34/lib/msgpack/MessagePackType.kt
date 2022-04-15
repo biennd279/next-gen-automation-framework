@@ -1,4 +1,4 @@
-package me.d3s34.metasploit.msgpack
+package me.d3s34.lib.msgpack
 
 //fork from package com.ensarsarajcic.kotlinx.serialization.msgpack.types
 internal object MessagePackType {

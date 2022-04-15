@@ -1,4 +1,4 @@
-package me.d3s34.metasploit.msgpack
+package me.d3s34.lib.msgpack
 
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.SerializationException
