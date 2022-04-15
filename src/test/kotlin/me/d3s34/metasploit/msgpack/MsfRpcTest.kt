@@ -12,7 +12,7 @@ import kotlin.test.assertContentEquals
 import kotlin.test.assertEquals
 
 
-internal class MessagePackTest {
+internal class MsfRpcTest {
 
     @kotlinx.serialization.Serializable
     data class TestClass (

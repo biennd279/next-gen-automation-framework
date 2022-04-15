@@ -7,7 +7,6 @@ import kotlinx.serialization.KSerializer
 import kotlinx.serialization.serializer
 import me.d3s34.lib.msgpack.MessagePack
 import me.d3s34.metasploit.rpcapi.request.AbstractRequest
-import me.d3s34.metasploit.rpcapi.request.RequestEncoder
 
 @OptIn(InternalSerializationApi::class)
 fun AbstractRequest.toMsfRequest(): List<Any> {

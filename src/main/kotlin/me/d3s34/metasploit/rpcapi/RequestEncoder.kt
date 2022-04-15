@@ -1,4 +1,4 @@
-package me.d3s34.metasploit.rpcapi.request
+package me.d3s34.metasploit.rpcapi
 
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.SerializationStrategy

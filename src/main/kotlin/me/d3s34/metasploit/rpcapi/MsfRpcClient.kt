@@ -4,7 +4,9 @@ import io.ktor.client.*
 import io.ktor.client.engine.cio.*
 import io.ktor.client.plugins.*
 import io.ktor.client.plugins.contentnegotiation.*
+import io.ktor.client.request.*
 import io.ktor.http.*
+import me.d3s34.metasploit.rpcapi.request.LoginRequest
 
 class MsfRpcClient(
     val host: String,
@@ -25,18 +27,26 @@ class MsfRpcClient(
 
     private val apiUrl = if (host.endsWith("/")) host else host.dropLast(1) + "/"
 
-    fun login() {
+    private val loginRequest = LoginRequest(username, password)
 
+    suspend fun login() {
+        client.post(apiUrl) {
+            setBody(loginRequest)
+        }
+
+        //TODO
     }
 
     companion object {
         val client = HttpClient(CIO) {
-            install(ContentNegotiation) {
-                messagePack()
-            }
-
             install(DefaultRequest) {
                 contentType(MessagePackContentType)
+            }
+
+            install(MsfRpc)
+
+            install(ContentNegotiation) {
+                messagePack()
             }
         }
     }
