@@ -1,6 +1,8 @@
 package me.d3s34.lib.msgpack
 
+import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.ExperimentalSerializationApi
+import kotlinx.serialization.builtins.ByteArraySerializer
 import kotlinx.serialization.descriptors.SerialDescriptor
 import kotlinx.serialization.descriptors.StructureKind
 import kotlinx.serialization.encoding.AbstractDecoder
@@ -86,6 +88,14 @@ open class MessagePackDecoder(
         }
     }
 
+    open fun decodeByteArray(): ByteArray {
+        return if (isString(peekTypeByte())) {
+            messageUnpacker.unpackString().toByteArray()
+        } else {
+            messageUnpacker.unpackByteArray()
+        }
+    }
+
     fun ignoreNextValue(): Unit {
         val nextType = buffer.peekSafely() ?: return
 
@@ -110,6 +120,15 @@ open class MessagePackDecoder(
         }
     }
 
+    override fun <T> decodeSerializableValue(deserializer: DeserializationStrategy<T>): T {
+        return if (deserializer == ByteArraySerializer()) {
+            @Suppress("UNCHECKED_CAST")
+            decodeByteArray() as T
+        } else {
+            super.decodeSerializableValue(deserializer)
+        }
+    }
+
     override fun decodeEnum(enumDescriptor: SerialDescriptor): Int {
         return enumDescriptor.getElementIndex(decodeString())
     }
@@ -122,9 +141,14 @@ open class MessagePackDecoder(
             MessagePackType.Array.FIXARRAY_SIZE_MASK.test(typeByte) ->
                 MessagePackType.Array.FIXARRAY_SIZE_MASK.unMaskValue(typeByte).toInt()
 
-            MessagePackType.Array.ARRAY16 == typeByte -> buffer.takeNext(2).toInt()
+            MessagePackType.Bin.BIN8 == typeByte -> buffer.requireNextByte().toInt() and 0xff
 
-            MessagePackType.Array.ARRAY32 == typeByte -> buffer.takeNext(4).toInt()
+            MessagePackType.Array.ARRAY16 ==  typeByte || MessagePackType.Bin.BIN16 == typeByte ->
+                buffer.takeNext(2).toInt()
+
+            MessagePackType.Array.ARRAY32 == typeByte || MessagePackType.Bin.BIN32 == typeByte ->
+                buffer.takeNext(4).toInt()
+
             else ->
                 throw MessagePackDeserializeException("Unknown array type: ${typeByte.decodeHex()}")
         }
@@ -143,7 +167,6 @@ open class MessagePackDecoder(
     }
 
     override fun decodeCollectionSize(descriptor: SerialDescriptor): Int {
-
         return when (descriptor.kind) {
             StructureKind.LIST -> takeArraySize()
             StructureKind.CLASS, StructureKind.OBJECT, StructureKind.MAP -> takeMapSize()
