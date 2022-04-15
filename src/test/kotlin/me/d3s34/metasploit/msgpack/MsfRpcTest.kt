@@ -39,7 +39,7 @@ internal class MsfRpcTest {
         put("abc", "a3616263")
         put(listOf(1, 2, 3), "93010203")
         put(mapOf("abd" to "a"), "81a3616264a161")
-        put(byteArray, "920c0e")
+        put(byteArray, "c4020c0e")
         put(bien, "81a46e616d65a46269656e")
         put(inlineClass, "01")
     }
@@ -63,7 +63,7 @@ internal class MsfRpcTest {
 
         assertContentEquals(
             byteArray,
-            messagePack.decodeFromByteArray(ByteArraySerializer(), test[byteArray]!!.decodeHex())
+            messagePack.decodeFromByteArray(test[byteArray]!!.decodeHex())
         )
 
         val response = ("82c406726573756c74c40773756363657373c405746f6b656ec42054454d507636674b6e53453" +

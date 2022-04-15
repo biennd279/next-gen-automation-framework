@@ -121,7 +121,8 @@ open class MessagePackDecoder(
     }
 
     override fun <T> decodeSerializableValue(deserializer: DeserializationStrategy<T>): T {
-        return if (deserializer == ByteArraySerializer()) {
+        return if (deserializer == ByteArraySerializer() && isBinary(peekTypeByte())) {
+            //performance better than List<byte>
             @Suppress("UNCHECKED_CAST")
             decodeByteArray() as T
         } else {

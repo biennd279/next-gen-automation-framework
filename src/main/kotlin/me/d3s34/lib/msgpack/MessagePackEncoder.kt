@@ -2,6 +2,8 @@ package me.d3s34.lib.msgpack
 
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.SerializationException
+import kotlinx.serialization.SerializationStrategy
+import kotlinx.serialization.builtins.ByteArraySerializer
 import kotlinx.serialization.descriptors.SerialDescriptor
 import kotlinx.serialization.descriptors.StructureKind
 import kotlinx.serialization.encoding.AbstractEncoder
@@ -10,7 +12,7 @@ import kotlinx.serialization.modules.SerializersModule
 
 //Fork from package com.ensarsarajcic.kotlinx.serialization.msgpack
 @ExperimentalSerializationApi
-class MessagePackEncoder(
+open class MessagePackEncoder(
     override val serializersModule: SerializersModule,
     private val messagePacker: MessagePacker
 ) : AbstractEncoder() {
@@ -96,6 +98,18 @@ class MessagePackEncoder(
             is ByteArray -> buffer.addAll(messagePacker.packByteArray(value))
             else ->
                 throw SerializationException("Non-serializable ${value::class} is not supported by ${this::class} encoder")
+        }
+    }
+
+    open fun encodeByteArray(value: ByteArray) {
+        buffer.addAll(messagePacker.packByteArray(value))
+    }
+
+    override fun <T> encodeSerializableValue(serializer: SerializationStrategy<T>, value: T) {
+        if (serializer == ByteArraySerializer() && value is ByteArray) {
+            encodeByteArray(value)
+        } else {
+            super.encodeSerializableValue(serializer, value)
         }
     }
 
