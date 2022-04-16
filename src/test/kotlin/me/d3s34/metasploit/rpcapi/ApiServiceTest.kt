@@ -7,6 +7,7 @@ import me.d3s34.metasploit.rpcapi.request.auth.LogoutRequest
 import me.d3s34.metasploit.rpcapi.request.console.*
 import me.d3s34.metasploit.rpcapi.request.core.ModuleStatsRequest
 import me.d3s34.metasploit.rpcapi.request.core.ThreadListRequest
+import me.d3s34.metasploit.rpcapi.request.job.JobListRequest
 import me.d3s34.metasploit.rpcapi.response.core.toListThread
 import org.junit.jupiter.api.Test
 
@@ -227,5 +228,25 @@ internal class ApiServiceTest {
 
         assertNotEquals(true, response.error)
         assertNotEquals(0, response.tabs.size)
+    }
+
+    @Test
+    fun listJob() {
+        val response = runBlocking {
+            apiService.listJob(
+                JobListRequest(token)
+            )
+        }
+
+        assertNotEquals(true, response.error)
+        println(response)
+    }
+
+    @Test
+    fun getInfoJob() {
+    }
+
+    @Test
+    fun stopJob() {
     }
 }

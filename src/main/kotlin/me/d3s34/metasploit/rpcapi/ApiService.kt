@@ -14,6 +14,9 @@ import me.d3s34.metasploit.rpcapi.request.auth.LogoutRequest
 import me.d3s34.metasploit.rpcapi.request.auth.TokenRemoveRequest
 import me.d3s34.metasploit.rpcapi.request.console.*
 import me.d3s34.metasploit.rpcapi.request.core.*
+import me.d3s34.metasploit.rpcapi.request.job.JobInfoRequest
+import me.d3s34.metasploit.rpcapi.request.job.JobListRequest
+import me.d3s34.metasploit.rpcapi.request.job.JobStopRequest
 import me.d3s34.metasploit.rpcapi.response.InfoResponse
 import me.d3s34.metasploit.rpcapi.response.MsfRpcResponse
 import me.d3s34.metasploit.rpcapi.response.auth.LoginResponse
@@ -21,6 +24,8 @@ import me.d3s34.metasploit.rpcapi.response.console.*
 import me.d3s34.metasploit.rpcapi.response.core.CoreModuleResponse
 import me.d3s34.metasploit.rpcapi.response.core.ThreadListResponse
 import me.d3s34.metasploit.rpcapi.response.core.VersionResponse
+import me.d3s34.metasploit.rpcapi.response.job.JobInfoResponse
+import me.d3s34.metasploit.rpcapi.response.job.JobListResponse
 
 class ApiService(
     val apiUrl: String
@@ -91,7 +96,11 @@ class ApiService(
 
     suspend fun tabsConsole(tabsRequest: ConsoleTabsRequest): ConsoleTabsResponse = sendRpc(tabsRequest)
 
+    suspend fun listJob(jobListRequest: JobListRequest): JobListResponse = sendRpc(jobListRequest)
 
+    suspend fun getInfoJob(jobInfoRequest: JobInfoRequest): JobInfoResponse = sendRpc(jobInfoRequest)
+
+    suspend fun stopJob(jobStopRequest: JobStopRequest): InfoResponse = sendRpc(jobStopRequest)
 
     companion object {
         val client = HttpClient(CIO) {
