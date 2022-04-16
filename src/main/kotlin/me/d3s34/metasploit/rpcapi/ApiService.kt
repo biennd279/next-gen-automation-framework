@@ -13,10 +13,12 @@ import me.d3s34.metasploit.rpcapi.request.auth.TokenAddRequest
 import me.d3s34.metasploit.rpcapi.request.auth.LoginRequest
 import me.d3s34.metasploit.rpcapi.request.auth.LogoutRequest
 import me.d3s34.metasploit.rpcapi.request.auth.TokenRemoveRequest
+import me.d3s34.metasploit.rpcapi.request.console.*
 import me.d3s34.metasploit.rpcapi.request.core.*
 import me.d3s34.metasploit.rpcapi.response.InfoResponse
 import me.d3s34.metasploit.rpcapi.response.MsfRpcResponse
 import me.d3s34.metasploit.rpcapi.response.auth.LoginResponse
+import me.d3s34.metasploit.rpcapi.response.console.*
 import me.d3s34.metasploit.rpcapi.response.core.CoreModuleResponse
 import me.d3s34.metasploit.rpcapi.response.core.ThreadListResponse
 import me.d3s34.metasploit.rpcapi.response.core.VersionResponse
@@ -73,6 +75,24 @@ class ApiService(
     suspend fun listThread(listThreadListRequest: ThreadListRequest): ThreadListResponse = sendRpc(listThreadListRequest)
 
     suspend fun killThread(killRequest: ThreadKillRequest): InfoResponse = sendRpc(killRequest)
+
+    suspend fun createConsole(createConsoleRequest: CreateConsoleRequest): CreateConsoleResponse = sendRpc(createConsoleRequest)
+
+    suspend fun destroyConsole(destroyConsoleRequest: DestroyConsoleRequest): InfoResponse = sendRpc(destroyConsoleRequest)
+
+    suspend fun listConsole(listConsoleRequest: ListConsoleRequest): ConsoleListResponse = sendRpc(listConsoleRequest)
+
+    suspend fun writeConsole(writeConsoleRequest: WriteConsoleRequest): ConsoleWriteResponse = sendRpc(writeConsoleRequest)
+
+    suspend fun readConsole(readConsoleRequest: ReadConsoleRequest): ConsoleReadResponse = sendRpc(readConsoleRequest)
+
+    suspend fun detachSession(sessionDetachRequest: SessionDetachRequest): InfoResponse = sendRpc(sessionDetachRequest)
+
+    suspend fun killSession(sessionKillRequest: SessionKillRequest): InfoResponse = sendRpc(sessionKillRequest)
+
+    suspend fun tabsConsole(tabsRequest: ConsoleTabsRequest): ConsoleTabsResponse = sendRpc(tabsRequest)
+
+
 
     companion object {
         val client = HttpClient(CIO) {

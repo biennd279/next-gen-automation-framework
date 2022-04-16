@@ -2,8 +2,8 @@ package me.d3s34.metasploit.rpcapi.response
 
 import me.d3s34.metasploit.rpcapi.emptyResponse
 
-class ListResponse<T>(
+class TypeResponse<T>(
     private val isError: Boolean = false,
-    val list: List<T> = emptyList(),
+    val value: T? = null,
     val response: MsfRpcResponse = emptyResponse()
-): MsfRpcResponse(isError, response), List<T> by list
+): MsfRpcResponse(isError, response)

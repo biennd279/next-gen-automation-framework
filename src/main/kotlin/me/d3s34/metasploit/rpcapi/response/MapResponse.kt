@@ -4,10 +4,10 @@ import me.d3s34.metasploit.rpcapi.emptyResponse
 
 @kotlinx.serialization.Serializable
 open class MapResponse<T, U>(
-    val isError: Boolean = false,
+    private val isError: Boolean = false,
     val map: Map<T, U> = emptyMap(),
     val response: MsfRpcResponse = emptyResponse()
-): MsfRpcResponse(response), Map<T, U> by map {
+): MsfRpcResponse(isError, response), Map<T, U> by map {
     constructor(
         mapResponse: MapResponse<T, U>
     ): this(

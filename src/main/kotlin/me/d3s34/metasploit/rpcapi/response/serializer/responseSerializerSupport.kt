@@ -13,7 +13,7 @@ inline fun  <reified T: Any, reified U: Any> deserializeMap(decoder: MessagePack
     var isError = false
     var response = emptyResponse<MsfRpcResponse>()
 
-    val map = kotlin.runCatching {
+    val map = runCatching {
         @Suppress("UNCHECKED_CAST")
         (decoder
             .tryDecodeSerializableValue(MapSerializer(T::class.serializer(), U::class.serializer())))
@@ -44,4 +44,22 @@ inline fun <reified T: Any> deserializeList(decoder: MessagePackDecoder): ListRe
         .getOrDefault(emptyList())
 
     return ListResponse(isError, list, response)
+}
+
+@OptIn(ExperimentalSerializationApi::class, InternalSerializationApi::class)
+inline fun <reified T: Any> deserializeType(decoder: MessagePackDecoder): TypeResponse<T> {
+    var isError = false
+    var response = emptyResponse<MsfRpcResponse>()
+
+    val value = kotlin.runCatching {
+        @Suppress("UNCHECKED_CAST")
+        decoder.tryDecodeSerializableValue(T::class.serializer())
+    }
+        .onFailure {
+            isError = true
+            response = decoder.decodeSerializableValue(MsfRpcResponse::class.serializer())
+        }
+        .getOrDefault(null)
+
+    return TypeResponse(isError, value, response)
 }

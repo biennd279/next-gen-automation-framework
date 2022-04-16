@@ -4,6 +4,7 @@ import kotlinx.coroutines.runBlocking
 import me.d3s34.metasploit.rpcapi.request.auth.TokenAddRequest
 import me.d3s34.metasploit.rpcapi.request.auth.LoginRequest
 import me.d3s34.metasploit.rpcapi.request.auth.LogoutRequest
+import me.d3s34.metasploit.rpcapi.request.console.*
 import me.d3s34.metasploit.rpcapi.request.core.ModuleStatsRequest
 import me.d3s34.metasploit.rpcapi.request.core.ThreadListRequest
 import me.d3s34.metasploit.rpcapi.response.core.toListThread
@@ -123,5 +124,108 @@ internal class ApiServiceTest {
 
     @Test
     fun killThread() {
+    }
+
+    @Test
+    fun createConsole() {
+        val response = runBlocking {
+            apiService.createConsole(CreateConsoleRequest(
+                token
+            ))
+        }
+
+        assertNotEquals(true, response.error)
+    }
+
+    @Test
+    fun destroyConsole() {
+    }
+
+    @Test
+    fun listConsole() {
+        val response = runBlocking {
+            apiService.listConsole(ListConsoleRequest(
+                token
+            ))
+        }
+
+        assertNotEquals(true, response.error)
+        assertNotEquals(0, response.consoles)
+    }
+
+    @Test
+    fun writeConsole() {
+        val id = runBlocking {
+            apiService.createConsole(CreateConsoleRequest(
+                token
+            )).id
+        }
+
+        val response = runBlocking {
+            apiService.writeConsole(WriteConsoleRequest(
+                token,
+                id,
+                "version\n"
+            ))
+        }
+
+        assertNotEquals(true, response.error)
+        assertNotEquals(0, response.wrote)
+    }
+
+    @Test
+    fun readConsole() {
+        val id = runBlocking {
+            apiService.createConsole(CreateConsoleRequest(
+                token
+            )).id
+        }
+
+        runBlocking {
+            apiService.writeConsole(WriteConsoleRequest(
+                token,
+                id,
+                "version\n"
+            ))
+        }
+
+        val response = runBlocking {
+            apiService.readConsole(ReadConsoleRequest(
+                token,
+                id
+            ))
+        }
+
+        assertNotEquals(true, response.error)
+        assertNotEquals(0, response.data.length)
+        assertNotEquals(0, response.prompt.length)
+    }
+
+    @Test
+    fun detachSession() {
+    }
+
+    @Test
+    fun killSession() {
+    }
+
+    @Test
+    fun tabsConsole() {
+        val id = runBlocking {
+            apiService.createConsole(CreateConsoleRequest(
+                token
+            )).id
+        }
+
+        val response = runBlocking {
+            apiService.tabsConsole(ConsoleTabsRequest(
+                token,
+                id,
+                "he"
+            ))
+        }
+
+        assertNotEquals(true, response.error)
+        assertNotEquals(0, response.tabs.size)
     }
 }

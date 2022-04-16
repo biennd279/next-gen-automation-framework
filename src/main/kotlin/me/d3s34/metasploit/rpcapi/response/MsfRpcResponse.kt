@@ -17,7 +17,7 @@ open class MsfRpcResponse(
     @SerialName("error_code")
     val errorCode: Int? = null
 ) {
-    constructor(response: MsfRpcResponse): this(
+    constructor(error: Boolean, response: MsfRpcResponse): this(
         result = response.result,
         error = response.error,
         errorClass = response.errorClass,
