@@ -120,6 +120,16 @@ open class MessagePackDecoder(
         }
     }
 
+    fun <T> tryDecodeSerializableValue(deserializer: DeserializationStrategy<T>): T {
+        return runCatching {
+            decodeSerializableValue(deserializer)
+        }
+            .onFailure {
+                buffer.reset()
+            }
+            .getOrThrow()
+    }
+
     override fun <T> decodeSerializableValue(deserializer: DeserializationStrategy<T>): T {
         return if (deserializer == ByteArraySerializer() && isBinary(peekTypeByte())) {
             //performance better than List<byte>

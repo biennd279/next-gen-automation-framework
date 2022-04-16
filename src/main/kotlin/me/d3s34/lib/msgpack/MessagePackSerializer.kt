@@ -53,9 +53,11 @@ open class NullableMessagePackSerializer : KSerializer<Any?> {
             isLong(typeByte) -> decoder.decodeLong()
             isFloat(typeByte) -> decoder.decodeFloat()
             isDouble(typeByte) -> decoder.decodeDouble()
-//            isString(typeByte) || isBinary(typeByte) -> decoder.decodeString()
-            isString(typeByte) -> decoder.decodeString()
-            isBinary(typeByte) -> decoder.decodeSerializableValue(ByteArraySerializer())
+            // string can cast to bytearray direct, but opposite is not
+            // so string why capture both two situation
+            isString(typeByte) || isBinary(typeByte) -> decoder.decodeString()
+//            isString(typeByte) -> decoder.decodeString()
+//            isBinary(typeByte) -> decoder.decodeSerializableValue(ByteArraySerializer())
             isArray(typeByte) -> ListSerializer(this).deserialize(decoder)
             isMap(typeByte) -> MapSerializer(this, this).deserialize(decoder)
             else ->

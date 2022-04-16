@@ -31,6 +31,10 @@ class InputMessageDataPacker(private val byteArray: ByteArray) : MessageDataPack
     }
 
     override fun toByteArray() = byteArray
+
+    fun reset(): Unit {
+        index = 0
+    }
 }
 
 class OutputMessageDataPacker : MessageDataPacker {

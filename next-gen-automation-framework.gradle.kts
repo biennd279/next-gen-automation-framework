@@ -43,15 +43,12 @@ dependencies {
     implementation("eu.jrie.jetbrains:kotlin-shell-core:0.2.1")
 
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:$kotlinx_serialization_version")
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-properties:$kotlinx_serialization_version")
-
 
     implementation("io.ktor:ktor-client-core:$ktor_version")
     implementation("io.ktor:ktor-client-cio:$ktor_version")
     implementation("io.ktor:ktor-client-content-negotiation:$ktor_version")
     implementation("io.ktor:ktor-serialization-kotlinx-json:$ktor_version")
     implementation("io.ktor:ktor-client-auth:$ktor_version")
-
 
     // Testing
     testImplementation(kotlin("test"))
