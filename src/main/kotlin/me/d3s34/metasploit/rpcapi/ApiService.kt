@@ -1,7 +1,6 @@
 package me.d3s34.metasploit.rpcapi
 
 import io.ktor.client.*
-import io.ktor.client.call.*
 import io.ktor.client.engine.*
 import io.ktor.client.engine.cio.*
 import io.ktor.client.plugins.*
@@ -58,33 +57,33 @@ class ApiService(
 
     suspend fun version(versionRequest: VersionRequest): VersionResponse = sendRpc(versionRequest)
 
-    suspend fun addModule(addModulePathRequest: AddModulePathRequest): CoreModuleResponse = sendRpc(addModulePathRequest)
+    suspend fun addModule(modulePathAddRequest: ModulePathAddRequest): CoreModuleResponse = sendRpc(modulePathAddRequest)
 
     suspend fun statsModule(moduleStatsRequest: ModuleStatsRequest): CoreModuleResponse = sendRpc(moduleStatsRequest)
 
-    suspend fun reloadModule(reloadModulesRequest: ReloadModulesRequest): CoreModuleResponse = sendRpc(reloadModulesRequest)
+    suspend fun reloadModule(modulesReloadRequest: ModulesReloadRequest): CoreModuleResponse = sendRpc(modulesReloadRequest)
 
     suspend fun saveCore(coreSaveRequest: CoreSaveRequest): InfoResponse = sendRpc(coreSaveRequest)
 
     suspend fun stopCore(coreStopRequest: CoreStopRequest): InfoResponse = sendRpc(coreStopRequest)
 
-    suspend fun setOptionsGlobal(setOptionGlobalRequest: SetOptionGlobalRequest): InfoResponse = sendRpc(setOptionGlobalRequest)
+    suspend fun setOptionsGlobal(optionGlobalSetRequest: OptionGlobalSetRequest): InfoResponse = sendRpc(optionGlobalSetRequest)
 
-    suspend fun unsetOptionGlobal(unsetOptionGlobalRequest: UnsetOptionGlobalRequest): InfoResponse = sendRpc(unsetOptionGlobalRequest)
+    suspend fun unsetOptionGlobal(optionGlobalUnsetRequest: OptionGlobalUnsetRequest): InfoResponse = sendRpc(optionGlobalUnsetRequest)
 
     suspend fun listThread(listThreadListRequest: ThreadListRequest): ThreadListResponse = sendRpc(listThreadListRequest)
 
     suspend fun killThread(killRequest: ThreadKillRequest): InfoResponse = sendRpc(killRequest)
 
-    suspend fun createConsole(createConsoleRequest: CreateConsoleRequest): CreateConsoleResponse = sendRpc(createConsoleRequest)
+    suspend fun createConsole(consoleCreateRequest: ConsoleCreateRequest): ConsoleCreateResponse = sendRpc(consoleCreateRequest)
 
-    suspend fun destroyConsole(destroyConsoleRequest: DestroyConsoleRequest): InfoResponse = sendRpc(destroyConsoleRequest)
+    suspend fun destroyConsole(consoleDestroyRequest: ConsoleDestroyRequest): InfoResponse = sendRpc(consoleDestroyRequest)
 
-    suspend fun listConsole(listConsoleRequest: ListConsoleRequest): ConsoleListResponse = sendRpc(listConsoleRequest)
+    suspend fun listConsole(consoleListRequest: ConsoleListRequest): ConsoleListResponse = sendRpc(consoleListRequest)
 
-    suspend fun writeConsole(writeConsoleRequest: WriteConsoleRequest): ConsoleWriteResponse = sendRpc(writeConsoleRequest)
+    suspend fun writeConsole(consoleWriteRequest: ConsoleWriteRequest): ConsoleWriteResponse = sendRpc(consoleWriteRequest)
 
-    suspend fun readConsole(readConsoleRequest: ReadConsoleRequest): ConsoleReadResponse = sendRpc(readConsoleRequest)
+    suspend fun readConsole(consoleReadRequest: ConsoleReadRequest): ConsoleReadResponse = sendRpc(consoleReadRequest)
 
     suspend fun detachSession(sessionDetachRequest: SessionDetachRequest): InfoResponse = sendRpc(sessionDetachRequest)
 

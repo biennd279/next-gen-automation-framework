@@ -129,7 +129,7 @@ internal class ApiServiceTest {
     @Test
     fun createConsole() {
         val response = runBlocking {
-            apiService.createConsole(CreateConsoleRequest(
+            apiService.createConsole(ConsoleCreateRequest(
                 token
             ))
         }
@@ -144,7 +144,7 @@ internal class ApiServiceTest {
     @Test
     fun listConsole() {
         val response = runBlocking {
-            apiService.listConsole(ListConsoleRequest(
+            apiService.listConsole(ConsoleListRequest(
                 token
             ))
         }
@@ -156,13 +156,13 @@ internal class ApiServiceTest {
     @Test
     fun writeConsole() {
         val id = runBlocking {
-            apiService.createConsole(CreateConsoleRequest(
+            apiService.createConsole(ConsoleCreateRequest(
                 token
             )).id
         }
 
         val response = runBlocking {
-            apiService.writeConsole(WriteConsoleRequest(
+            apiService.writeConsole(ConsoleWriteRequest(
                 token,
                 id,
                 "version\n"
@@ -176,13 +176,13 @@ internal class ApiServiceTest {
     @Test
     fun readConsole() {
         val id = runBlocking {
-            apiService.createConsole(CreateConsoleRequest(
+            apiService.createConsole(ConsoleCreateRequest(
                 token
             )).id
         }
 
         runBlocking {
-            apiService.writeConsole(WriteConsoleRequest(
+            apiService.writeConsole(ConsoleWriteRequest(
                 token,
                 id,
                 "version\n"
@@ -190,7 +190,7 @@ internal class ApiServiceTest {
         }
 
         val response = runBlocking {
-            apiService.readConsole(ReadConsoleRequest(
+            apiService.readConsole(ConsoleReadRequest(
                 token,
                 id
             ))
@@ -212,7 +212,7 @@ internal class ApiServiceTest {
     @Test
     fun tabsConsole() {
         val id = runBlocking {
-            apiService.createConsole(CreateConsoleRequest(
+            apiService.createConsole(ConsoleCreateRequest(
                 token
             )).id
         }

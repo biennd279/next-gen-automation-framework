@@ -1,7 +1,7 @@
 package me.d3s34.metasploit.rpcapi.request.core
 
 @kotlinx.serialization.Serializable
-data class AddModulePathRequest(
+data class OptionGlobalUnsetRequest(
     val token: String,
-    val path: String
-): CoreModuleRequest("add_module_path")
+    val optionName: String
+): CoreModuleRequest("unsetg")
