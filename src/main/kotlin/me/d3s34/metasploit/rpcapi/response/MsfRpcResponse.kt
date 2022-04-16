@@ -3,7 +3,7 @@ package me.d3s34.metasploit.rpcapi.response
 import kotlinx.serialization.SerialName
 
 @kotlinx.serialization.Serializable
-abstract class MsfRpcResponse(
+open class MsfRpcResponse(
     val result: String = "",
     val error: Boolean = false,
     @SerialName("error_class")
@@ -13,5 +13,17 @@ abstract class MsfRpcResponse(
     @SerialName("error_string")
     val errorString: String = "",
     @SerialName("error_backtrace")
-    val errorBacktrace: List<String>? = null
-)
+    val errorBacktrace: List<String>? = null,
+    @SerialName("error_code")
+    val errorCode: Int? = null
+) {
+    constructor(response: MsfRpcResponse): this(
+        result = response.result,
+        error = response.error,
+        errorClass = response.errorClass,
+        errorMessage = response.errorMessage,
+        errorString =  response.errorString,
+        errorBacktrace = response.errorBacktrace,
+        errorCode = response.errorCode
+    )
+}

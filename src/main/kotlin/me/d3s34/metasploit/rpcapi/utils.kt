@@ -11,6 +11,7 @@ import kotlinx.serialization.serializer
 import me.d3s34.lib.msgpack.MessagePack
 import me.d3s34.metasploit.rpcapi.request.MsfRpcRequest
 import me.d3s34.metasploit.rpcapi.response.MsfRpcResponse
+import java.nio.charset.Charset
 
 @OptIn(InternalSerializationApi::class)
 fun MsfRpcRequest.toMsfRequest(): List<Any> {
@@ -41,19 +42,31 @@ val tokenCharSet: List<Char> = ('a'..'z') + ('A'..'Z') + ('0'..'9')
 
 suspend inline fun <reified T: MsfRpcResponse> HttpResponse.handleMsfResponse(): T {
     when (status) {
-        HttpStatusCode.BadGateway -> throw Throwable()
-        HttpStatusCode.Unauthorized -> throw Throwable()
-        HttpStatusCode.Forbidden -> throw Throwable()
-        HttpStatusCode.NotFound -> throw Throwable()
+        HttpStatusCode.BadGateway -> throw Throwable("404")
+        HttpStatusCode.Unauthorized -> throw Throwable("401")
+        HttpStatusCode.Forbidden -> throw Throwable("403")
+        HttpStatusCode.NotFound -> throw Throwable("404")
     }
 
     return runCatching<T> {
         val response = body<T>()
-        if (response.error || response.result != "success") {
-            throw Throwable()
+        if (response.error) {
+            throw Throwable("Request error ${response.errorCode}")
         }
 
         return response
     }
         .getOrThrow()
+}
+
+
+object EmptyResponse: MsfRpcResponse()
+
+@Suppress("UNCHECKED_CAST")
+fun <T: MsfRpcResponse> emptyResponse() = EmptyResponse as T
+
+fun Any?.toByteArrayString(): String {
+    if (this is ByteArray)
+        return this.toString(Charset.defaultCharset())
+    return this.toString()
 }
