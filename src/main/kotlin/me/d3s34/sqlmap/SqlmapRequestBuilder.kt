@@ -6,18 +6,21 @@ class SqlmapRequestBuilder {
     //Data request
     var url: String? = null
     var data: String? = null
+
     //Get current information
     var getHostname: Boolean = false
     var getCurrentDb: Boolean = false
     var getCurrentUser: Boolean = false
     var getPrivileges: Boolean = false
     var getRoles: Boolean = false
+
     //Get database information
     var getDbs: Boolean = false
     var getTables: Boolean = false
     var getColumns: Boolean = false
     var getSchema: Boolean = false
     var getCount: Boolean = false
+
     //Dump option
     var dumpAll: Boolean = false
     var dumpTable: Boolean = false
@@ -28,6 +31,7 @@ class SqlmapRequestBuilder {
     //
     var cookie: String? = null
     var randomAgent: Boolean = false
+
     //Flag attack
     var level: Int = 1
     var risk: Int = 1
@@ -37,6 +41,7 @@ class SqlmapRequestBuilder {
 
     //Exec query
     var sqlQuery: String? = null
+
     //Sqlmap option
     var cleanup: Boolean = false
     var updateAll: Boolean = false

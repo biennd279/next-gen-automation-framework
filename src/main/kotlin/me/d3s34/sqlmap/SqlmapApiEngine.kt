@@ -12,7 +12,7 @@ class SqlmapApiEngine(
     private val baseUrl: String,
     override val coroutineContext: CoroutineContext = Dispatchers.IO,
     private val refreshTime: Long = 5000
-): SqlmapEngine() {
+) : SqlmapEngine() {
     private val apiService by lazy { ApiService(baseUrl) }
 
     suspend fun verifySqlInjection(request: StartTaskRequest): Boolean {
@@ -21,9 +21,13 @@ class SqlmapApiEngine(
         try {
             sqlmapProcess.start(request)
 
-            while (this.isActive && sqlmapProcess.isRunning) { delay(refreshTime) }
+            while (this.isActive && sqlmapProcess.isRunning) {
+                delay(refreshTime)
+            }
 
-            if (!isActive) { sqlmapProcess.stop() }
+            if (!isActive) {
+                sqlmapProcess.stop()
+            }
 
             val data = sqlmapProcess.getResponse().data
 
@@ -40,9 +44,13 @@ class SqlmapApiEngine(
         try {
             sqlmapProcess.start(request)
 
-            while (this.isActive && sqlmapProcess.isRunning) { delay(refreshTime) }
+            while (this.isActive && sqlmapProcess.isRunning) {
+                delay(refreshTime)
+            }
 
-            if (!isActive) { sqlmapProcess.stop() }
+            if (!isActive) {
+                sqlmapProcess.stop()
+            }
 
             return sqlmapProcess.getResponse()
         } catch (t: Throwable) {
@@ -59,7 +67,9 @@ class SqlmapApiEngine(
                 updateAll = true
             }
 
-            while (this.isActive && sqlmapProcess.isRunning) { delay(refreshTime) }
+            while (this.isActive && sqlmapProcess.isRunning) {
+                delay(refreshTime)
+            }
 
             if (!isActive) {
                 sqlmapProcess.stop()
@@ -81,7 +91,9 @@ class SqlmapApiEngine(
                 cleanup = true
             }
 
-            while (this.isActive && sqlmapProcess.isRunning) { delay(refreshTime) }
+            while (this.isActive && sqlmapProcess.isRunning) {
+                delay(refreshTime)
+            }
 
             if (!isActive) {
                 sqlmapProcess.stop()

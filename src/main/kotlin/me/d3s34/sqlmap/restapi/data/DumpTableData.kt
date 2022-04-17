@@ -5,4 +5,4 @@ class DumpTableData(
     val data: HashMap<String, List<String>>,
     val table: String,
     val db: String
-): AbstractData, Map<String, List<String>> by data
+) : AbstractData, Map<String, List<String>> by data

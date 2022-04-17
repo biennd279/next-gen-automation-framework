@@ -4,5 +4,4 @@ import kotlin.coroutines.CoroutineContext
 
 class SqlmapNativeEngine(
     override val coroutineContext: CoroutineContext
-): SqlmapEngine() {
-}
+) : SqlmapEngine()
