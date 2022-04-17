@@ -1,4 +1,4 @@
-package me.d3s34.metasploit.rpcapi.response
+package me.d3s34.metasploit.rpcapi.response.serializer
 
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.InternalSerializationApi
@@ -7,6 +7,10 @@ import kotlinx.serialization.builtins.MapSerializer
 import kotlinx.serialization.serializer
 import me.d3s34.lib.msgpack.MessagePackDecoder
 import me.d3s34.metasploit.rpcapi.emptyResponse
+import me.d3s34.metasploit.rpcapi.response.ListResponse
+import me.d3s34.metasploit.rpcapi.response.MapResponse
+import me.d3s34.metasploit.rpcapi.response.MsfRpcResponse
+import me.d3s34.metasploit.rpcapi.response.TypeResponse
 
 @OptIn(ExperimentalSerializationApi::class, InternalSerializationApi::class)
 inline fun  <reified T: Any, reified U: Any> deserializeMap(decoder: MessagePackDecoder): MapResponse<T, U> {

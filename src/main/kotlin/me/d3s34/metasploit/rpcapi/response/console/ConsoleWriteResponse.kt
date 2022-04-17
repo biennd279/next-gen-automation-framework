@@ -4,5 +4,5 @@ import me.d3s34.metasploit.rpcapi.response.MsfRpcResponse
 
 @kotlinx.serialization.Serializable
 data class ConsoleWriteResponse(
-    val wrote: Int
+    val wrote: Int = 0
 ): MsfRpcResponse()

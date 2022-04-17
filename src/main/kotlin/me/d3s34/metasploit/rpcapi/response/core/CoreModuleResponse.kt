@@ -9,9 +9,8 @@ import kotlinx.serialization.descriptors.buildSerialDescriptor
 import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
 import me.d3s34.lib.msgpack.MessagePackDecoder
-import me.d3s34.lib.msgpack.MessagePackSerializer
 import me.d3s34.metasploit.rpcapi.response.MapResponse
-import me.d3s34.metasploit.rpcapi.response.deserializeMap
+import me.d3s34.metasploit.rpcapi.response.serializer.deserializeMap
 
 @kotlinx.serialization.Serializable(
     with = CoreModuleResponseSerializer::class

@@ -1,6 +1,7 @@
 package me.d3s34.metasploit.rpcapi
 
 import kotlinx.coroutines.runBlocking
+import me.d3s34.metasploit.rpcapi.model.MsfModuleType
 import me.d3s34.metasploit.rpcapi.request.auth.TokenAddRequest
 import me.d3s34.metasploit.rpcapi.request.auth.LoginRequest
 import me.d3s34.metasploit.rpcapi.request.auth.LogoutRequest
@@ -8,6 +9,7 @@ import me.d3s34.metasploit.rpcapi.request.console.*
 import me.d3s34.metasploit.rpcapi.request.core.ModuleStatsRequest
 import me.d3s34.metasploit.rpcapi.request.core.ThreadListRequest
 import me.d3s34.metasploit.rpcapi.request.job.JobListRequest
+import me.d3s34.metasploit.rpcapi.request.module.ModuleListRequest
 import me.d3s34.metasploit.rpcapi.response.core.toListThread
 import org.junit.jupiter.api.Test
 
@@ -239,7 +241,6 @@ internal class ApiServiceTest {
         }
 
         assertNotEquals(true, response.error)
-        println(response)
     }
 
     @Test
@@ -248,5 +249,18 @@ internal class ApiServiceTest {
 
     @Test
     fun stopJob() {
+    }
+
+    @Test
+    fun getModulesList() {
+        val response = runBlocking {
+            apiService.getModulesList(ModuleListRequest(
+                token,
+                MsfModuleType.EXPLOITS
+            ))
+        }
+
+        assertNotEquals(true, response.error)
+        assertNotEquals(0, response.modules.size)
     }
 }

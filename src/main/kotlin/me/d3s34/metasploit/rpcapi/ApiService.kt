@@ -17,6 +17,8 @@ import me.d3s34.metasploit.rpcapi.request.core.*
 import me.d3s34.metasploit.rpcapi.request.job.JobInfoRequest
 import me.d3s34.metasploit.rpcapi.request.job.JobListRequest
 import me.d3s34.metasploit.rpcapi.request.job.JobStopRequest
+import me.d3s34.metasploit.rpcapi.request.module.ModuleInfoRequest
+import me.d3s34.metasploit.rpcapi.request.module.ModuleListRequest
 import me.d3s34.metasploit.rpcapi.response.InfoResponse
 import me.d3s34.metasploit.rpcapi.response.MsfRpcResponse
 import me.d3s34.metasploit.rpcapi.response.auth.LoginResponse
@@ -26,6 +28,7 @@ import me.d3s34.metasploit.rpcapi.response.core.ThreadListResponse
 import me.d3s34.metasploit.rpcapi.response.core.VersionResponse
 import me.d3s34.metasploit.rpcapi.response.job.JobInfoResponse
 import me.d3s34.metasploit.rpcapi.response.job.JobListResponse
+import me.d3s34.metasploit.rpcapi.response.module.ModuleListResponse
 
 class ApiService(
     val apiUrl: String
@@ -101,6 +104,10 @@ class ApiService(
     suspend fun getInfoJob(jobInfoRequest: JobInfoRequest): JobInfoResponse = sendRpc(jobInfoRequest)
 
     suspend fun stopJob(jobStopRequest: JobStopRequest): InfoResponse = sendRpc(jobStopRequest)
+
+    suspend fun getModulesList(moduleListRequest: ModuleListRequest): ModuleListResponse = sendRpc(moduleListRequest)
+
+    
 
     companion object {
         val client = HttpClient(CIO) {

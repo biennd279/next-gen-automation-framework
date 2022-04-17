@@ -5,5 +5,5 @@ import me.d3s34.metasploit.rpcapi.response.MsfRpcResponse
 
 @kotlinx.serialization.Serializable
 data class ConsoleListResponse(
-    val consoles: List<MsfConsole>
+    val consoles: List<MsfConsole> = emptyList()
 ): MsfRpcResponse()
