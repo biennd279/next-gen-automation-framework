@@ -10,10 +10,6 @@ class NafApi(
 ): ApiImplementor() {
     override fun getPrefix(): String = _prefix
 
-    init {
-
-    }
-
     override fun handleApiAction(name: String?, params: JSONObject?): ApiResponse {
         return super.handleApiAction(name, params)
     }

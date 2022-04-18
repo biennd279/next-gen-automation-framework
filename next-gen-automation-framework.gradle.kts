@@ -1,7 +1,10 @@
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
-val ktor_version: String = "2.0.0"
-val kotlin_version: String = "1.6.20"
-val kotlinx_serialization_version = "1.3.2"
+val ktorVersion: String = "2.0.0"
+val kotlinVersion: String = "1.6.20"
+val kotlinxSerializationVersion = "1.3.2"
+val coroutinesVersion = "1.6.0"
+
 description = "Next gen automation framework addon for ZAP"
 
 zapAddOn {
@@ -23,12 +26,15 @@ crowdin {
 
 repositories {
     mavenCentral()
+    gradlePluginPortal()
     maven { url = uri("https://maven.pkg.jetbrains.space/public/p/ktor/eap") }
+    maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
 }
 
 plugins {
-    kotlin("jvm") version "1.6.20"
+    kotlin("jvm") version "1.6.10"
     kotlin("plugin.serialization") version "1.6.20"
+    id("org.jetbrains.compose") version "1.1.1"
 }
 
 dependencies {
@@ -37,16 +43,19 @@ dependencies {
 
     // Classpath
     implementation(kotlin("stdlib"))
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.0")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:${coroutinesVersion}")
     implementation("eu.jrie.jetbrains:kotlin-shell-core:0.2.1")
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:$kotlinxSerializationVersion")
 
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:$kotlinx_serialization_version")
+    // Web client dependencies
+    implementation("io.ktor:ktor-client-core:$ktorVersion")
+    implementation("io.ktor:ktor-client-cio:$ktorVersion")
+    implementation("io.ktor:ktor-client-content-negotiation:$ktorVersion")
+    implementation("io.ktor:ktor-serialization-kotlinx-json:$ktorVersion")
 
-    implementation("io.ktor:ktor-client-core:$ktor_version")
-    implementation("io.ktor:ktor-client-cio:$ktor_version")
-    implementation("io.ktor:ktor-client-content-negotiation:$ktor_version")
-    implementation("io.ktor:ktor-serialization-kotlinx-json:$ktor_version")
-    implementation("io.ktor:ktor-client-auth:$ktor_version")
+    // Ui dependencies
+    implementation(compose.desktop.currentOs)
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-swing:$coroutinesVersion")
 
     // Testing
     testImplementation(kotlin("test"))

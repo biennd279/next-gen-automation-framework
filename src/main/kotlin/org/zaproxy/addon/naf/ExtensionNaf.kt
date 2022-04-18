@@ -1,5 +1,15 @@
 package org.zaproxy.addon.naf
 
+import androidx.compose.foundation.layout.*
+import androidx.compose.material.Button
+import androidx.compose.material.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.awt.ComposePanel
+import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -14,6 +24,7 @@ import org.zaproxy.zap.utils.FontUtils
 import java.awt.CardLayout
 import java.awt.Font
 import javax.swing.ImageIcon
+import javax.swing.SwingUtilities
 import kotlin.coroutines.CoroutineContext
 
 class ExtensionNaf: ExtensionAdaptor(NAME), CoroutineScope {
@@ -32,14 +43,12 @@ class ExtensionNaf: ExtensionAdaptor(NAME), CoroutineScope {
             name = Constant.messages.getString("$PREFIX.panel.title")
             icon = ICON
 
-            add {
-                jTextPanel {
-                    isEditable = false
-                    font = FontUtils.getFont("Dialog", Font.PLAIN)
-                    contentType = "text/html"
-                    text = Constant.messages.getString("$PREFIX.panel.msg") + "Test"
-                }
-            }
+            add(jTextPanel {
+                isEditable = false
+                font = FontUtils.getFont("Dialog", Font.PLAIN)
+                contentType = "text/html"
+                text = Constant.messages.getString("$PREFIX.panel.msg") + "Test"
+            })
         }
     }
 
@@ -50,8 +59,46 @@ class ExtensionNaf: ExtensionAdaptor(NAME), CoroutineScope {
         val api = NafApi(PREFIX)
         addApiImplementor(api)
 
+        SwingUtilities.invokeLater {
+
+            val composePanel = ComposePanel()
+
+            composePanel.setContent {
+                Panel()
+            }
+
+            view?.let {
+                hookView.addWorkPanel(abstractPanel {
+                    layout = CardLayout()
+                    name = "Workspace panel"
+                    add(composePanel)
+                })
+            }
+        }
+
         view?.let {
             hookView.addStatusPanel(statusPanel)
+
+        }
+    }
+
+    @Composable
+    fun Panel() {
+        val count = remember { mutableStateOf(0) }
+
+        Column(Modifier.fillMaxSize(), Arrangement.spacedBy(5.dp)) {
+            Button(modifier = Modifier.align(Alignment.CenterHorizontally),
+                onClick = {
+                    count.value++
+                }) {
+                Text(if (count.value == 0) "Hello World" else "Clicked ${count.value}!")
+            }
+            Button(modifier = Modifier.align(Alignment.CenterHorizontally),
+                onClick = {
+                    count.value = 0
+                }) {
+                Text("Reset")
+            }
         }
     }
 
