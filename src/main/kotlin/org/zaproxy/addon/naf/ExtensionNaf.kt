@@ -1,15 +1,6 @@
 package org.zaproxy.addon.naf
 
-import androidx.compose.foundation.layout.*
-import androidx.compose.material.Button
-import androidx.compose.material.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
 import androidx.compose.ui.awt.ComposePanel
-import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -20,6 +11,7 @@ import org.parosproxy.paros.Constant
 import org.parosproxy.paros.extension.AbstractPanel
 import org.parosproxy.paros.extension.ExtensionAdaptor
 import org.parosproxy.paros.extension.ExtensionHook
+import org.zaproxy.addon.naf.ui.Naf
 import org.zaproxy.zap.utils.FontUtils
 import java.awt.CardLayout
 import java.awt.Font
@@ -64,7 +56,7 @@ class ExtensionNaf: ExtensionAdaptor(NAME), CoroutineScope {
             val composePanel = ComposePanel()
 
             composePanel.setContent {
-                Panel()
+                Naf()
             }
 
             view?.let {
@@ -72,33 +64,14 @@ class ExtensionNaf: ExtensionAdaptor(NAME), CoroutineScope {
                     layout = CardLayout()
                     name = "Workspace panel"
                     add(composePanel)
+                }.apply {
+                    isVisible = true
                 })
             }
         }
 
         view?.let {
             hookView.addStatusPanel(statusPanel)
-
-        }
-    }
-
-    @Composable
-    fun Panel() {
-        val count = remember { mutableStateOf(0) }
-
-        Column(Modifier.fillMaxSize(), Arrangement.spacedBy(5.dp)) {
-            Button(modifier = Modifier.align(Alignment.CenterHorizontally),
-                onClick = {
-                    count.value++
-                }) {
-                Text(if (count.value == 0) "Hello World" else "Clicked ${count.value}!")
-            }
-            Button(modifier = Modifier.align(Alignment.CenterHorizontally),
-                onClick = {
-                    count.value = 0
-                }) {
-                Text("Reset")
-            }
         }
     }
 
