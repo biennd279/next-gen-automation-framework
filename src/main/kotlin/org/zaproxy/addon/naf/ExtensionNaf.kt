@@ -44,20 +44,6 @@ class ExtensionNaf: ExtensionAdaptor(NAME), CoroutineScope {
 
     override fun getDescription(): String = Constant.messages.getString("$PREFIX.desc")
 
-    private val statusPanel: AbstractPanel by lazy {
-        abstractPanel {
-            layout = CardLayout()
-            name = Constant.messages.getString("$PREFIX.panel.title")
-            icon = ICON
-
-            add(jTextPanel {
-                isEditable = false
-                font = FontUtils.getFont("Dialog", Font.PLAIN)
-                contentType = "text/html"
-                text = Constant.messages.getString("$PREFIX.panel.msg") + "Test"
-            })
-        }
-    }
 
     override fun init() {
         eventsBus.registerConsumer(EventConsumerImpl, AlertEventPublisher.getPublisher().publisherName)
@@ -78,7 +64,6 @@ class ExtensionNaf: ExtensionAdaptor(NAME), CoroutineScope {
         addConnectionRequestProxyListener(ProxyListenerImpl)
 
         view?.let {
-            hookView.addStatusPanel(statusPanel)
             SwingUtilities.invokeLater {
                 val composePanel = ComposePanel()
                 composePanel.setContent { Naf() }
@@ -87,7 +72,7 @@ class ExtensionNaf: ExtensionAdaptor(NAME), CoroutineScope {
                     name = "Workspace panel"
                     add(composePanel)
                 }.apply {
-                    isVisible = true
+                    tabIndex = 0
                 })
             }
         }
