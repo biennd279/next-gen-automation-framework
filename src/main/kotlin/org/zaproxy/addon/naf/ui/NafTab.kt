@@ -5,6 +5,7 @@ interface Tab {
 }
 
 enum class NafTab(override val title: String): Tab {
+    PROJECT("Project"),
     DASHBOARD("Dashboard"),
     SCANNING("Target"),
     ISSUE("Issue"),

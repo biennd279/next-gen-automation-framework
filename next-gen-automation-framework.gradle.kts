@@ -1,9 +1,8 @@
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
-
 val ktorVersion: String = "2.0.0"
 val kotlinVersion: String = "1.6.20"
 val kotlinxSerializationVersion = "1.3.2"
 val coroutinesVersion = "1.6.0"
+val decomposeVersion = "0.6.0"
 
 description = "Next gen automation framework addon for ZAP"
 
@@ -56,6 +55,8 @@ dependencies {
     // Ui dependencies
     implementation(compose.desktop.currentOs)
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-swing:$coroutinesVersion")
+    implementation("com.arkivanov.decompose:decompose:$decomposeVersion")
+    implementation("com.arkivanov.decompose:extensions-compose-jetbrains:$decomposeVersion")
 
     // Testing
     testImplementation(kotlin("test"))

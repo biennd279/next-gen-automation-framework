@@ -1,7 +1,6 @@
 package org.zaproxy.addon.naf.ui
 
 import androidx.compose.desktop.ui.tooling.preview.Preview
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.material.MaterialTheme.typography
@@ -13,13 +12,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import org.zaproxy.addon.naf.component.WizardComponent
 
 @Preview
 @Composable
 fun Wizard(
+    component: WizardComponent
 ) {
     val onClickStart: () -> Unit = {}
-    val onClickCancel: () -> Unit = {}
     val url = remember { mutableStateOf("") }
 
     Scaffold(
@@ -46,7 +46,9 @@ fun Wizard(
                 )
 
                 Button(
-                    onClick = onClickCancel
+                    onClick = {
+                        component.onCancel.invoke()
+                    }
                 ) {
                     Text("Cancel")
                 }
@@ -60,20 +62,6 @@ fun Wizard(
                 color = Color.Gray,
                 modifier = Modifier.padding(5.dp)
             )
-
-            Tab(
-                selected = true,
-                onClick = {}
-            ) {
-                Text("Tab")
-            }
-
-            Tab(
-                selected = false,
-                onClick = {}
-            ) {
-                Text("Tab")
-            }
         }
     }
 }
@@ -92,6 +80,7 @@ fun InputUrl(
     )
 }
 
+@Preview
 @Composable
 fun OptionWizard() {
 

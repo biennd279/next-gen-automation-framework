@@ -1,33 +1,25 @@
 package org.zaproxy.addon.naf
 
 import androidx.compose.ui.awt.ComposePanel
+import com.arkivanov.decompose.DefaultComponentContext
+import com.arkivanov.essenty.lifecycle.LifecycleRegistry
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import me.d3s34.lib.dsl.abstractPanel
-import me.d3s34.lib.dsl.jTextPanel
 import org.apache.logging.log4j.LogManager
 import org.parosproxy.paros.Constant
-import org.parosproxy.paros.core.proxy.ConnectRequestProxyListener
-import org.parosproxy.paros.core.proxy.ProxyListener
-import org.parosproxy.paros.extension.AbstractPanel
 import org.parosproxy.paros.extension.ExtensionAdaptor
 import org.parosproxy.paros.extension.ExtensionHook
-import org.parosproxy.paros.extension.history.ProxyListenerLog
 import org.parosproxy.paros.model.HistoryReferenceEventPublisher
 import org.parosproxy.paros.model.SiteMapEventPublisher
-import org.parosproxy.paros.network.HttpMessage
-import org.zaproxy.addon.naf.ui.Naf
+import org.zaproxy.addon.naf.component.RootComponent
+import org.zaproxy.addon.naf.ui.Root
 import org.zaproxy.zap.ZAP
-import org.zaproxy.zap.eventBus.Event
-import org.zaproxy.zap.eventBus.EventConsumer
 import org.zaproxy.zap.extension.alert.AlertEventPublisher
 import org.zaproxy.zap.extension.ascan.ActiveScanEventPublisher
 import org.zaproxy.zap.extension.spider.SpiderEventPublisher
-import org.zaproxy.zap.model.ScanEventPublisher
-import org.zaproxy.zap.utils.FontUtils
 import java.awt.CardLayout
-import java.awt.Font
 import javax.swing.ImageIcon
 import javax.swing.SwingUtilities
 import kotlin.coroutines.CoroutineContext
@@ -65,14 +57,26 @@ class ExtensionNaf: ExtensionAdaptor(NAME), CoroutineScope {
 
         view?.let {
             SwingUtilities.invokeLater {
+                val lifecycle = LifecycleRegistry()
+                val root = RootComponent(
+                    DefaultComponentContext(lifecycle)
+                )
+
                 val composePanel = ComposePanel()
-                composePanel.setContent { Naf() }
+                composePanel.setContent {
+                    Root(root)
+                }
+
                 hookView.addWorkPanel(abstractPanel {
                     layout = CardLayout()
                     name = "Workspace panel"
                     add(composePanel)
                 }.apply {
                     tabIndex = 0
+                    isLocked = true
+                    isLocked = true
+                    isShowByDefault = true
+                    isHideable = false
                 })
             }
         }
