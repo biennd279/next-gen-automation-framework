@@ -1,5 +1,6 @@
 package org.zaproxy.addon.naf.component
 
+import androidx.compose.runtime.State
 import com.arkivanov.decompose.ComponentContext
 import com.arkivanov.decompose.router.RouterState
 import com.arkivanov.decompose.router.replaceCurrent
@@ -7,10 +8,13 @@ import com.arkivanov.decompose.router.router
 import com.arkivanov.decompose.value.Value
 import com.arkivanov.essenty.parcelable.Parcelable
 import com.arkivanov.essenty.parcelable.Parcelize
+import org.zaproxy.addon.naf.model.ScanTemplate
 import org.zaproxy.addon.naf.ui.NafTab
+import org.zaproxy.addon.naf.model.emptyTemplate
 
 class HomeComponent(
     componentContext: ComponentContext,
+    val currentScan: State<ScanTemplate>,
     private val onCallWizard: () -> Unit
 ): ComponentContext by componentContext {
 
@@ -37,6 +41,29 @@ class HomeComponent(
         Config.Dashboard -> Child.Dashboard(DashboardComponent(componentContext))
         Config.Project -> Child.Project(ProjectComponent(componentContext), onCallWizard)
     }
+
+    init {
+        if (currentScan.value != emptyTemplate()) {
+            startScan()
+        }
+    }
+
+    private fun startScan() {
+        println("Start new scan")
+    }
+
+    private fun pauseScan() {
+
+    }
+
+    private fun resumeScan() {
+
+    }
+
+    private fun stopScan() {
+
+    }
+
 
     sealed class Child(
         val nafTab: NafTab

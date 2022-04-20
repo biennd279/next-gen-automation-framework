@@ -1,34 +1,50 @@
 package org.zaproxy.addon.naf.component
 
+import androidx.compose.runtime.State
+import androidx.compose.runtime.mutableStateOf
 import com.arkivanov.decompose.ComponentContext
-import com.arkivanov.decompose.router.RouterState
-import com.arkivanov.decompose.router.pop
-import com.arkivanov.decompose.router.push
-import com.arkivanov.decompose.router.router
+import com.arkivanov.decompose.router.*
 import com.arkivanov.decompose.value.Value
+import com.arkivanov.essenty.instancekeeper.getOrCreate
 import com.arkivanov.essenty.parcelable.Parcelable
 import com.arkivanov.essenty.parcelable.Parcelize
+import org.zaproxy.addon.naf.model.ScanTemplate
+import org.zaproxy.addon.naf.model.emptyTemplate
 
 class RootComponent internal constructor(
     componentContext: ComponentContext,
-    private val createWizard: (ComponentContext, () -> Unit) -> WizardComponent,
-    private val createHome: (ComponentContext, () -> Unit) -> HomeComponent
+    private val createWizard: (
+        ComponentContext,
+        onCancel: () -> Unit,
+        onStartNewScan: (ScanTemplate) -> Unit,
+    ) -> WizardComponent,
+    private val createHome: (
+        ComponentContext,
+        currentScan: State<ScanTemplate>,
+        onCallWizard: () -> Unit
+    ) -> HomeComponent
 ): ComponentContext by componentContext {
 
     constructor(componentContext: ComponentContext): this(
         componentContext = componentContext,
-        createWizard = { childContext, onCancel ->
-            WizardComponent(childContext, onCancel)
+        createWizard = { childContext, onCancel, onStartNewScan ->
+            WizardComponent(childContext, onCancel, onStartNewScan)
         },
-        createHome = { childContext, onCreateNewScan ->
-            HomeComponent(childContext, onCreateNewScan)
+        createHome = { childContext, currentScan, onCreateNewScan ->
+            HomeComponent(
+                childContext,
+                currentScan,
+                onCreateNewScan
+            )
         }
     )
 
+    private val currentScan = mutableStateOf(emptyTemplate())
+
     private val router = router<Config, Child>(
-        initialConfiguration = Config.DashBoard,
+        initialConfiguration = Config.Home,
         handleBackButton = true,
-        childFactory = ::createChild
+        childFactory = this::createChild
     )
 
     val routerState: Value<RouterState<Config, Child>> = router.state
@@ -37,11 +53,13 @@ class RootComponent internal constructor(
         router.pop()
     }
 
-    private fun onWizardStart() {
+    private fun onStartScan(scanTemplate: ScanTemplate) {
+        currentScan.value = scanTemplate
 
+        router.pop()
     }
 
-    private fun onCreateNewScan() {
+    private fun onCallNewWizard() {
         router.push(Config.Wizard)
     }
 
@@ -49,8 +67,8 @@ class RootComponent internal constructor(
         config: Config,
         componentContext: ComponentContext
     ): Child = when (config) {
-        Config.Wizard -> Child.Wizard(createWizard(componentContext, ::onWizardCancel))
-        Config.DashBoard -> Child.Home(createHome(componentContext, ::onCreateNewScan))
+        Config.Wizard -> Child.Wizard(createWizard(componentContext, this::onWizardCancel, this::onStartScan))
+        Config.Home -> Child.Home(createHome(componentContext, currentScan, this::onCallNewWizard))
     }
 
     sealed class Child {
@@ -63,7 +81,7 @@ class RootComponent internal constructor(
         object Wizard: Config()
 
         @Parcelize
-        object DashBoard: Config()
+        object Home: Config()
     }
 }
 

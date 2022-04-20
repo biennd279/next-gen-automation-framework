@@ -6,8 +6,6 @@ import androidx.compose.material.*
 import androidx.compose.material.MaterialTheme.typography
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
@@ -19,9 +17,6 @@ import org.zaproxy.addon.naf.component.WizardComponent
 fun Wizard(
     component: WizardComponent
 ) {
-    val onClickStart: () -> Unit = {}
-    val url = remember { mutableStateOf("") }
-
     Scaffold(
         topBar = {
             Text(
@@ -36,7 +31,7 @@ fun Wizard(
                 horizontalArrangement = Arrangement.End
             ) {
                 Button(
-                    onClick = onClickStart
+                    onClick = component::startScan
                 ) {
                     Text("Start Scan")
                 }
@@ -46,9 +41,7 @@ fun Wizard(
                 )
 
                 Button(
-                    onClick = {
-                        component.onCancel.invoke()
-                    }
+                    onClick = component.onCancel
                 ) {
                     Text("Cancel")
                 }
@@ -56,7 +49,7 @@ fun Wizard(
         }
     ) {
         Column {
-            InputUrl(url)
+            InputUrl(component.url)
 
             Divider(
                 color = Color.Gray,
