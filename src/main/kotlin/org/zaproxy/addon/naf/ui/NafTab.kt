@@ -14,5 +14,5 @@ enum class NafTab(override val title: String): Tab {
 }
 
 enum class DashboardTab(override val title: String): Tab {
-    ALERT("Alert"), CRAWL("Crawl"), SITEMAP("Sitemap")
+    PROCESS("Processing"), ALERT("Alert"), CRAWL("Crawl"), SITEMAP("Sitemap")
 }

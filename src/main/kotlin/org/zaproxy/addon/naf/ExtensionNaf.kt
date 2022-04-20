@@ -75,6 +75,7 @@ class ExtensionNaf: ExtensionAdaptor(NAME), CoroutineScope, NafState {
     override fun getDescription(): String = Constant.messages.getString("$PREFIX.desc")
 
     override fun init() {
+        // Listen info via Event Bus
         eventsBus.registerConsumer(eventConsumerImpl, AlertEventPublisher.getPublisher().publisherName)
         eventsBus.registerConsumer(eventConsumerImpl, HistoryReferenceEventPublisher.getPublisher().publisherName)
         eventsBus.registerConsumer(eventConsumerImpl, SiteMapEventPublisher.getPublisher().publisherName)

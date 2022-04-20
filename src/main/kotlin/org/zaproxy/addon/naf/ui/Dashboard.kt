@@ -49,6 +49,7 @@ fun Dashboard(
             DashboardTab.CRAWL -> Crawl(component.nafState.historyRefSate)
             DashboardTab.SITEMAP -> SiteMap(component.nafState.siteNodes)
             DashboardTab.ALERT -> Alert(component.nafState.alerts)
+            DashboardTab.PROCESS -> Processing()
         }
     }
 }
@@ -114,4 +115,9 @@ fun Alert(
             }
         }
     }
+}
+
+@Composable
+fun Processing() {
+
 }
