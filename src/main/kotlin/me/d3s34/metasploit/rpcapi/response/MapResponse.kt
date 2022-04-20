@@ -7,7 +7,7 @@ open class MapResponse<T, U>(
     private val isError: Boolean = false,
     val map: Map<T, U> = emptyMap(),
     val response: MsfRpcResponse = emptyResponse()
-): MsfRpcResponse(isError, response), Map<T, U> by map {
+): MsfRpcResponse(response), Map<T, U> by map {
     constructor(
         mapResponse: MapResponse<T, U>
     ): this(

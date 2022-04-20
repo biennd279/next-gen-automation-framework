@@ -6,4 +6,4 @@ class TypeResponse<T>(
     private val isError: Boolean = false,
     val value: T? = null,
     val response: MsfRpcResponse = emptyResponse()
-): MsfRpcResponse(isError, response)
+): MsfRpcResponse(response)

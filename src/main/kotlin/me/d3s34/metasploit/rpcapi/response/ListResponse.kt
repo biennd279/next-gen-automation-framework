@@ -6,4 +6,4 @@ class ListResponse<T>(
     private val isError: Boolean = false,
     val list: List<T> = emptyList(),
     val response: MsfRpcResponse = emptyResponse()
-): MsfRpcResponse(isError, response), List<T> by list
+): MsfRpcResponse(response), List<T> by list

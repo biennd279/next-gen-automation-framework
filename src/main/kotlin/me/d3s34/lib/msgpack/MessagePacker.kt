@@ -12,7 +12,7 @@ class MessagePacker {
         return byteArrayOf(MessagePackType.Boolean(value))
     }
 
-    fun packByte(value: Byte, strict: Boolean = false): ByteArray {
+    fun packByte(value: Byte): ByteArray {
         return if (value >= MessagePackType.Int.MIN_NEGATIVE_SINGLE_BYTE) {
             byteArrayOf(value)
         } else {
