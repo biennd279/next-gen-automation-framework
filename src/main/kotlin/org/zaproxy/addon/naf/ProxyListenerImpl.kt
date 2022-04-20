@@ -7,7 +7,7 @@ import org.parosproxy.paros.network.HttpMessage
 // Passive listener
 internal object ProxyListenerImpl: ProxyListener, ConnectRequestProxyListener {
 
-    const val PROXY_LISTENER_ORDER = 250
+    private const val PROXY_LISTENER_ORDER = 250
     override fun getArrangeableListenerOrder(): Int = PROXY_LISTENER_ORDER
 
     override fun onHttpRequestSend(msg: HttpMessage?): Boolean {
@@ -19,5 +19,6 @@ internal object ProxyListenerImpl: ProxyListener, ConnectRequestProxyListener {
     }
 
     override fun receivedConnectRequest(connectMessage: HttpMessage?) {
+
     }
 }
