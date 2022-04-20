@@ -1,10 +1,10 @@
 package org.zaproxy.addon.naf
 
+import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.awt.ComposePanel
 import com.arkivanov.decompose.DefaultComponentContext
 import com.arkivanov.essenty.lifecycle.LifecycleRegistry
-import io.ktor.client.*
-import io.ktor.client.engine.cio.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -16,9 +16,12 @@ import org.parosproxy.paros.extension.ExtensionAdaptor
 import org.parosproxy.paros.extension.ExtensionHook
 import org.parosproxy.paros.extension.ExtensionLoader
 import org.parosproxy.paros.extension.history.ExtensionHistory
+import org.parosproxy.paros.model.HistoryReference
 import org.parosproxy.paros.model.HistoryReferenceEventPublisher
 import org.parosproxy.paros.model.SiteMapEventPublisher
+import org.parosproxy.paros.model.SiteNode
 import org.zaproxy.addon.naf.component.RootComponent
+import org.zaproxy.addon.naf.model.NafAlert
 import org.zaproxy.addon.naf.ui.Root
 import org.zaproxy.zap.ZAP
 import org.zaproxy.zap.extension.alert.AlertEventPublisher
@@ -32,7 +35,8 @@ import javax.swing.ImageIcon
 import javax.swing.SwingUtilities
 import kotlin.coroutines.CoroutineContext
 
-class ExtensionNaf: ExtensionAdaptor(NAME), CoroutineScope {
+class ExtensionNaf: ExtensionAdaptor(NAME), CoroutineScope, NafState {
+
     override val coroutineContext: CoroutineContext
         get() = Job() + Dispatchers.Default
 
@@ -40,32 +44,48 @@ class ExtensionNaf: ExtensionAdaptor(NAME), CoroutineScope {
         i18nPrefix = PREFIX
     }
 
+    private val extensionLoader: ExtensionLoader = Control
+        .getSingleton()
+        .extensionLoader
+
+    lateinit var extHistory: ExtensionHistory
+
+    lateinit var extActiveScan: ExtensionActiveScan
+
+    lateinit var extAlert: ExtensionAlert
+
+    lateinit var extSpider: ExtensionSpider
+
+    override val getHistoryReference: (Int) -> HistoryReference = {
+        extHistory.getHistoryReference(it)
+    }
+
+    override val historyId: MutableSet<Int> = mutableSetOf()
+
+    override val historyRefSate: SnapshotStateList<HistoryReference> = mutableStateListOf()
+
+    override val siteNodes: SnapshotStateList<SiteNode> = mutableStateListOf()
+
+    override val alerts: SnapshotStateList<NafAlert> = mutableStateListOf()
+
     private val eventsBus = ZAP.getEventBus()!!
+
+    private val eventConsumerImpl = EventConsumerImpl(this)
 
     override fun getDescription(): String = Constant.messages.getString("$PREFIX.desc")
 
     override fun init() {
-        eventsBus.registerConsumer(EventConsumerImpl, AlertEventPublisher.getPublisher().publisherName)
-        eventsBus.registerConsumer(EventConsumerImpl, HistoryReferenceEventPublisher.getPublisher().publisherName)
-        eventsBus.registerConsumer(EventConsumerImpl, SiteMapEventPublisher.getPublisher().publisherName)
-        eventsBus.registerConsumer(EventConsumerImpl, SpiderEventPublisher.getPublisher().publisherName)
-        eventsBus.registerConsumer(EventConsumerImpl, ActiveScanEventPublisher.getPublisher().publisherName)
+        eventsBus.registerConsumer(eventConsumerImpl, AlertEventPublisher.getPublisher().publisherName)
+        eventsBus.registerConsumer(eventConsumerImpl, HistoryReferenceEventPublisher.getPublisher().publisherName)
+        eventsBus.registerConsumer(eventConsumerImpl, SiteMapEventPublisher.getPublisher().publisherName)
+        eventsBus.registerConsumer(eventConsumerImpl, SpiderEventPublisher.getPublisher().publisherName)
+        eventsBus.registerConsumer(eventConsumerImpl, ActiveScanEventPublisher.getPublisher().publisherName)
+
+        extHistory = extensionLoader.getExtension(ExtensionHistory::class.java)
+        extActiveScan = extensionLoader.getExtension(ExtensionActiveScan::class.java)
+        extAlert = extensionLoader.getExtension(ExtensionAlert::class.java)
+        extSpider = extensionLoader.getExtension(ExtensionSpider::class.java)
     }
-
-    private val extensionLoader: ExtensionLoader by lazy {
-        Control
-            .getSingleton()
-            .extensionLoader
-    }
-
-    val extensionHistory: ExtensionHistory by lazy { extensionLoader.getExtension(ExtensionHistory::class.java) }
-
-    val extensionActiveScan: ExtensionActiveScan by lazy { extensionLoader.getExtension(ExtensionActiveScan::class.java) }
-
-    val extensionAlert: ExtensionAlert by lazy { extensionLoader.getExtension(ExtensionAlert::class.java) }
-
-    val extensionSpider: ExtensionSpider by lazy { extensionLoader.getExtension(ExtensionSpider::class.java) }
-
 
     override fun hook(extensionHook: ExtensionHook): Unit = with(extensionHook) {
         super.hook(this)
@@ -81,7 +101,8 @@ class ExtensionNaf: ExtensionAdaptor(NAME), CoroutineScope {
             SwingUtilities.invokeLater {
                 val lifecycle = LifecycleRegistry()
                 val root = RootComponent(
-                    DefaultComponentContext(lifecycle)
+                    DefaultComponentContext(lifecycle),
+                    this@ExtensionNaf
                 )
 
                 val composePanel = ComposePanel()
@@ -110,6 +131,5 @@ class ExtensionNaf: ExtensionAdaptor(NAME), CoroutineScope {
         const val RESOURCES = "resources"
         private val ICON = ImageIcon(ExtensionNaf::class.java.getResource("$RESOURCES/cake.png"))
         private val LOGGER = LogManager.getLogger(ExtensionNaf::class.java)!!
-
     }
 }

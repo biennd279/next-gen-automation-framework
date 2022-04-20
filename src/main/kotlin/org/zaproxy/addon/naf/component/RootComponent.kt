@@ -3,16 +3,20 @@ package org.zaproxy.addon.naf.component
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import com.arkivanov.decompose.ComponentContext
-import com.arkivanov.decompose.router.*
+import com.arkivanov.decompose.router.RouterState
+import com.arkivanov.decompose.router.pop
+import com.arkivanov.decompose.router.push
+import com.arkivanov.decompose.router.router
 import com.arkivanov.decompose.value.Value
-import com.arkivanov.essenty.instancekeeper.getOrCreate
 import com.arkivanov.essenty.parcelable.Parcelable
 import com.arkivanov.essenty.parcelable.Parcelize
+import org.zaproxy.addon.naf.NafState
 import org.zaproxy.addon.naf.model.ScanTemplate
 import org.zaproxy.addon.naf.model.emptyTemplate
 
 class RootComponent internal constructor(
     componentContext: ComponentContext,
+    val nafState: NafState,
     private val createWizard: (
         ComponentContext,
         onCancel: () -> Unit,
@@ -25,16 +29,18 @@ class RootComponent internal constructor(
     ) -> HomeComponent
 ): ComponentContext by componentContext {
 
-    constructor(componentContext: ComponentContext): this(
+    constructor(componentContext: ComponentContext, nafState: NafState): this(
         componentContext = componentContext,
+        nafState = nafState,
         createWizard = { childContext, onCancel, onStartNewScan ->
             WizardComponent(childContext, onCancel, onStartNewScan)
         },
-        createHome = { childContext, currentScan, onCreateNewScan ->
+        createHome = { childContext, currentScan, onCallWizard ->
             HomeComponent(
                 childContext,
                 currentScan,
-                onCreateNewScan
+                nafState,
+                onCallWizard
             )
         }
     )

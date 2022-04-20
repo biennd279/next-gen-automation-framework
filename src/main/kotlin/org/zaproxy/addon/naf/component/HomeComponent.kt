@@ -8,13 +8,15 @@ import com.arkivanov.decompose.router.router
 import com.arkivanov.decompose.value.Value
 import com.arkivanov.essenty.parcelable.Parcelable
 import com.arkivanov.essenty.parcelable.Parcelize
+import org.zaproxy.addon.naf.NafState
 import org.zaproxy.addon.naf.model.ScanTemplate
-import org.zaproxy.addon.naf.ui.NafTab
 import org.zaproxy.addon.naf.model.emptyTemplate
+import org.zaproxy.addon.naf.ui.NafTab
 
 class HomeComponent(
     componentContext: ComponentContext,
     val currentScan: State<ScanTemplate>,
+    val nafState: NafState,
     private val onCallWizard: () -> Unit
 ): ComponentContext by componentContext {
 
@@ -38,7 +40,7 @@ class HomeComponent(
         config: Config,
         componentContext: ComponentContext
     ): Child = when (config) {
-        Config.Dashboard -> Child.Dashboard(DashboardComponent(componentContext))
+        Config.Dashboard -> Child.Dashboard(DashboardComponent(componentContext, nafState))
         Config.Project -> Child.Project(ProjectComponent(componentContext), onCallWizard)
     }
 

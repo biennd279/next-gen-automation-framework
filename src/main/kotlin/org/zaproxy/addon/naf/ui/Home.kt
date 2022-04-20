@@ -36,9 +36,6 @@ fun Home(
             is HomeComponent.Child.Dashboard -> Dashboard(child.component)
             is HomeComponent.Child.Project -> Project(child.component, child.onCallWizard)
         }
-
-        Text("Current url: ${component.currentScan.value.url}")
-
     }
 }
 
