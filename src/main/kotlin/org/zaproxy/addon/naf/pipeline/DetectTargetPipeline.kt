@@ -1,10 +1,11 @@
 package org.zaproxy.addon.naf.pipeline
 
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.withContext
 import org.apache.commons.httpclient.URI
 import org.parosproxy.paros.extension.history.ExtensionHistory
 import org.parosproxy.paros.model.HistoryReference
-import org.parosproxy.paros.model.Model
 import org.parosproxy.paros.model.SiteNode
 import org.parosproxy.paros.network.HttpMessage
 import org.parosproxy.paros.network.HttpSender
@@ -13,13 +14,17 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.zaproxy.zap.model.Target
 import java.net.URL
+import javax.swing.SwingUtilities
 import kotlin.coroutines.CoroutineContext
 
-class CollectTargetPipeline(
-    private val extHistory: ExtensionHistory,
-    private val model: Model,
+class DetectTargetPipeline(
     override val coroutineContext: CoroutineContext
 ): NafPipeline<URL, Target>(NafPhase.INIT) {
+
+    private val extHistory: ExtensionHistory by lazy {
+        extensionLoader
+            .getExtension(ExtensionHistory::class.java)
+    }
 
     private val httpSender by lazy {
         HttpSender(
@@ -52,7 +57,11 @@ class CollectTargetPipeline(
 
         extHistory.addHistory(msg, HistoryReference.TYPE_PROXIED)
 
-        model.session.siteTree.addPath(msg.historyRef)
+        withContext(Dispatchers.IO) {
+            SwingUtilities.invokeAndWait {
+                model.session.siteTree.addPath(msg.historyRef)
+            }
+        }
 
         val uri = URI(if (url.endsWith("/")) url.dropLast(1) else url, false)
 

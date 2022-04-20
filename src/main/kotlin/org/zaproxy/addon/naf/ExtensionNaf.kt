@@ -103,7 +103,8 @@ class ExtensionNaf: ExtensionAdaptor(NAME), CoroutineScope, NafState {
                 val lifecycle = LifecycleRegistry()
                 val root = RootComponent(
                     DefaultComponentContext(lifecycle),
-                    this@ExtensionNaf
+                    this@ExtensionNaf,
+                    coroutineContext
                 )
 
                 val composePanel = ComposePanel()

@@ -10,9 +10,13 @@ import com.arkivanov.decompose.router.router
 import com.arkivanov.decompose.value.Value
 import com.arkivanov.essenty.parcelable.Parcelable
 import com.arkivanov.essenty.parcelable.Parcelize
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
+import org.zaproxy.addon.naf.NafScanner
 import org.zaproxy.addon.naf.NafState
 import org.zaproxy.addon.naf.model.ScanTemplate
 import org.zaproxy.addon.naf.model.emptyTemplate
+import kotlin.coroutines.CoroutineContext
 
 class RootComponent internal constructor(
     componentContext: ComponentContext,
@@ -26,10 +30,11 @@ class RootComponent internal constructor(
         ComponentContext,
         currentScan: State<ScanTemplate>,
         onCallWizard: () -> Unit
-    ) -> HomeComponent
-): ComponentContext by componentContext {
+    ) -> HomeComponent,
+    override val coroutineContext: CoroutineContext
+): CoroutineScope ,ComponentContext by componentContext {
 
-    constructor(componentContext: ComponentContext, nafState: NafState): this(
+    constructor(componentContext: ComponentContext, nafState: NafState, coroutineContext: CoroutineContext): this(
         componentContext = componentContext,
         nafState = nafState,
         createWizard = { childContext, onCancel, onStartNewScan ->
@@ -42,7 +47,8 @@ class RootComponent internal constructor(
                 nafState,
                 onCallWizard
             )
-        }
+        },
+        coroutineContext
     )
 
     private val currentScan = mutableStateOf(emptyTemplate())
@@ -60,8 +66,15 @@ class RootComponent internal constructor(
     }
 
     private fun onStartScan(scanTemplate: ScanTemplate) {
-        currentScan.value = scanTemplate
+        launch {
+            currentScan.value = scanTemplate
+            val scanner = NafScanner(
+                scanTemplate,
+                coroutineContext
+            )
 
+            scanner.start()
+        }
         router.pop()
     }
 
