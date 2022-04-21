@@ -97,11 +97,13 @@ class ExtensionNaf: ExtensionAdaptor(NAME), CoroutineScope, NafState {
 
         view?.let {
             SwingUtilities.invokeLater {
+                val nafScanner = NafScanner(coroutineContext)
                 val lifecycle = LifecycleRegistry()
                 val rootComponent = RootComponent(
-                    DefaultComponentContext(lifecycle),
-                    this@ExtensionNaf,
-                    coroutineContext
+                    componentContext = DefaultComponentContext(lifecycle),
+                    nafScanner = nafScanner,
+                    nafState =  this@ExtensionNaf,
+                    coroutineContext = coroutineContext
                 )
 
                 val composePanel = ComposePanel()

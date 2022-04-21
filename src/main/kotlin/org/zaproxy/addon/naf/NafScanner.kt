@@ -2,27 +2,25 @@ package org.zaproxy.addon.naf
 
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.runBlocking
 import org.zaproxy.addon.naf.model.ScanTemplate
 import org.zaproxy.addon.naf.pipeline.*
 import java.net.URL
 import kotlin.coroutines.CoroutineContext
 
 class NafScanner(
-    val scanTemplate: ScanTemplate,
     override val coroutineContext: CoroutineContext = Dispatchers.Default
 ): CoroutineScope {
+    private suspend fun detectTarget(url: String): org.zaproxy.zap.model.Target {
+        val detectTargetPipeline = DetectTargetPipeline(coroutineContext)
+        return detectTargetPipeline.start(
+            URL(url)
+        )
+    }
+     suspend fun parseScanTemplate(scanTemplate: ScanTemplate): NafScan {
 
-    private val _phase = MutableStateFlow(NafPhase.INIT)
-    val phase: StateFlow<NafPhase> = _phase
-
-    lateinit var listPipeline: MutableList<NafPipeline<*, *>>
-    lateinit var target: org.zaproxy.zap.model.Target
-
-    private suspend fun parseScanTemplate(scanTemplate: ScanTemplate) {
-        target = detectTarget(scanTemplate.url)
-        listPipeline = mutableListOf()
+        val target = runBlocking { detectTarget(scanTemplate.url) }
+        val listPipeline: MutableList<NafPipeline<*, *>> = mutableListOf()
 
         with(scanTemplate) {
             if (crawlOptions.crawl) {
@@ -37,34 +35,10 @@ class NafScanner(
                 listPipeline.add(ActiveScanPipeline(coroutineContext))
             }
         }
-    }
 
-    private suspend fun detectTarget(url: String): org.zaproxy.zap.model.Target {
-        val detectTargetPipeline = DetectTargetPipeline(coroutineContext)
-        return detectTargetPipeline.start(
-            URL(url)
+        return NafScan(
+            target = target,
+            listPipeline = listPipeline
         )
-    }
-    suspend fun start() {
-        parseScanTemplate(scanTemplate)
-        listPipeline.sortBy { it.phase.priority }
-
-        listPipeline.forEach {
-            runCatching<Unit> {
-                when (it) {
-                    is NafCrawlPipeline -> {
-                        _phase.value = NafPhase.CRAWL
-                        it.start(target)
-                    }
-                    is ActiveScanPipeline -> {
-                        _phase.value = NafPhase.SCAN
-                        it.start(target)
-                    }
-                }
-            }
-                .onFailure {
-                    println(it)
-                }
-        }
     }
 }

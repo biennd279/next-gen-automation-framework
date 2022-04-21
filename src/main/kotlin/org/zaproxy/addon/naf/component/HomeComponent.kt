@@ -8,19 +8,19 @@ import com.arkivanov.decompose.router.router
 import com.arkivanov.decompose.value.Value
 import com.arkivanov.essenty.parcelable.Parcelable
 import com.arkivanov.essenty.parcelable.Parcelize
+import org.zaproxy.addon.naf.NafScan
 import org.zaproxy.addon.naf.NafState
-import org.zaproxy.addon.naf.model.ScanTemplate
 import org.zaproxy.addon.naf.ui.NafTab
 
 class HomeComponent(
     componentContext: ComponentContext,
-    val currentScan: State<ScanTemplate>,
+    val currentScan: State<NafScan?>,
     val nafState: NafState,
     private val onCallWizard: () -> Unit
 ): ComponentContext by componentContext {
 
     private val router = router<Config, Child>(
-        initialConfiguration = Config.Dashboard,
+        initialConfiguration = Config.Project,
         handleBackButton = true,
         childFactory = ::createChild
     )

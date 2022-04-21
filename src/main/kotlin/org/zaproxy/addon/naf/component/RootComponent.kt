@@ -1,6 +1,6 @@
 package org.zaproxy.addon.naf.component
 
-import androidx.compose.runtime.State
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import com.arkivanov.decompose.ComponentContext
 import com.arkivanov.decompose.router.RouterState
@@ -12,14 +12,16 @@ import com.arkivanov.essenty.parcelable.Parcelable
 import com.arkivanov.essenty.parcelable.Parcelize
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import org.zaproxy.addon.naf.NafScan
 import org.zaproxy.addon.naf.NafScanner
 import org.zaproxy.addon.naf.NafState
 import org.zaproxy.addon.naf.model.ScanTemplate
-import org.zaproxy.addon.naf.model.emptyTemplate
+import org.zaproxy.addon.naf.ui.NafTab
 import kotlin.coroutines.CoroutineContext
 
 class RootComponent internal constructor(
     componentContext: ComponentContext,
+    val nafScanner: NafScanner,
     val nafState: NafState,
     private val createWizard: (
         ComponentContext,
@@ -29,14 +31,20 @@ class RootComponent internal constructor(
     private val createHomeComponent: (
         ComponentContext,
         NafState,
-        currentScan: State<ScanTemplate>,
+        MutableState<NafScan?>,
         onCallWizard: () -> Unit
     ) -> HomeComponent,
     override val coroutineContext: CoroutineContext
 ): CoroutineScope, ComponentContext by componentContext, NafState by nafState {
 
-    constructor(componentContext: ComponentContext, nafState: NafState, coroutineContext: CoroutineContext): this(
+    constructor(
+        componentContext: ComponentContext,
+        nafScanner: NafScanner,
+        nafState: NafState,
+        coroutineContext: CoroutineContext
+    ): this(
         componentContext = componentContext,
+        nafScanner = nafScanner,
         nafState = nafState,
         createWizard = { childContext, onCancel, onStartNewScan ->
             WizardComponent(childContext, onCancel, onStartNewScan)
@@ -52,7 +60,7 @@ class RootComponent internal constructor(
         coroutineContext
     )
 
-    private val currentScan = mutableStateOf(emptyTemplate())
+    private val currentScan: MutableState<NafScan?> = mutableStateOf(null)
 
     private val router = router<Config, Child>(
         initialConfiguration = Config.Home,
@@ -67,18 +75,17 @@ class RootComponent internal constructor(
     }
 
     private fun onStartScan(scanTemplate: ScanTemplate) {
-        currentScan.value = scanTemplate
-
-        val scanner = NafScanner(
-            scanTemplate,
-            coroutineContext
-        )
-
         launch {
-            scanner.start()
+            val scan = nafScanner.parseScanTemplate(scanTemplate)
+            currentScan.value = scan
+            scan.start()
         }
-
         router.pop()
+        val currentChild = router.state.value.activeChild.instance
+
+        if (currentChild is Child.Home) {
+            currentChild.component.onSelectedTab(NafTab.DASHBOARD)
+        }
     }
 
     private fun onCallNewWizard() {

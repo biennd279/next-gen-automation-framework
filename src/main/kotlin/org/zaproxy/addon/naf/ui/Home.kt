@@ -18,6 +18,7 @@ import org.zaproxy.addon.naf.component.HomeComponent
 fun Home(
     component: HomeComponent
 ) = Children(component.routerState) { router ->
+
     val child = router.instance
     Scaffold(
         topBar = {
