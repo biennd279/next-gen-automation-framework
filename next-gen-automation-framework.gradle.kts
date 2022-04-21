@@ -12,6 +12,21 @@ zapAddOn {
 
     manifest {
         author.set("NDBien from UET/VNU")
+
+        extensions {
+            register("org.zaproxy.addon.naf.ExtensionNaf") {
+                dependencies {
+                    addOns {
+                        register("selenium") {
+                            version.set(">= 15.6.0")
+                        }
+                        register("spiderAjax") {
+                            version.set("23.*")
+                        }
+                    }
+                }
+            }
+        }
     }
 }
 
@@ -61,6 +76,9 @@ dependencies {
     // Testing
     testImplementation(kotlin("test"))
     testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.6.0")
+
+    compileOnly(parent!!.childProjects["selenium"]!!)
+    compileOnly(parent!!.childProjects["spiderAjax"]!!)
 }
 
 tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().all {

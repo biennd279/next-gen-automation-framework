@@ -24,11 +24,13 @@ class NafScanner(
         target = detectTarget(scanTemplate.url)
         listPipeline = mutableListOf()
 
-        when {
-            scanTemplate.crawlOptions.crawl -> {
+        with(scanTemplate) {
+            if (crawlOptions.crawl) {
                 listPipeline.add(SpiderCrawlPipeline(coroutineContext))
             }
-            scanTemplate.crawlOptions.ajaxCrawl -> {
+
+            if (crawlOptions.ajaxCrawl) {
+                listPipeline.add(AjaxSpiderCrawlPipeline(coroutineContext))
 
             }
         }
@@ -45,12 +47,17 @@ class NafScanner(
         listPipeline.sortBy { it.phase.priority }
 
         listPipeline.forEach {
-            when (it) {
-                is NafCrawlPipeline -> {
-                    _phase.value = NafPhase.CRAWL
-                    it.start(target)
+            runCatching<Unit> {
+                when (it) {
+                    is NafCrawlPipeline -> {
+                        _phase.value = NafPhase.CRAWL
+                        it.start(target)
+                    }
                 }
             }
+                .onFailure {
+                    println(it)
+                }
         }
     }
 }
