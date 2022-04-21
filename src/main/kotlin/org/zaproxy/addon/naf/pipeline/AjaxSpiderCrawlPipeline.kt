@@ -1,8 +1,8 @@
 package org.zaproxy.addon.naf.pipeline
 
-import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import org.parosproxy.paros.model.HistoryReference
 import org.zaproxy.zap.extension.spiderAjax.AjaxSpiderParam
 import org.zaproxy.zap.extension.spiderAjax.AjaxSpiderTarget
@@ -10,9 +10,12 @@ import org.zaproxy.zap.extension.spiderAjax.ExtensionAjax
 import org.zaproxy.zap.extension.spiderAjax.SpiderListener
 import org.zaproxy.zap.model.Target
 import java.net.URI
+import java.util.concurrent.Executors
 import kotlin.coroutines.CoroutineContext
 
 class AjaxSpiderCrawlPipeline(override val coroutineContext: CoroutineContext) : NafCrawlPipeline() {
+
+    val timeRefresh = 500L
 
     private val extensionAjax: ExtensionAjax? by lazy {
         extensionLoader
@@ -72,11 +75,15 @@ class AjaxSpiderCrawlPipeline(override val coroutineContext: CoroutineContext) :
             }
         )
 
-        val thread = Thread(threadScan)
-        thread.start()
+        val executor = Executors.newSingleThreadExecutor()
+        val future = executor.submit(threadScan)
 
-        withContext(Dispatchers.IO) {
-            thread.join()
+        do {
+            delay(timeRefresh)
+        } while (isActive && !future.isDone)
+
+        if (!isActive && !future.isDone) {
+            future.cancel(true)
         }
     }
 }
