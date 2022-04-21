@@ -63,7 +63,7 @@ fun Wizard(
                 modifier = Modifier.padding(5.dp)
             )
 
-            ScrollableTabRow(
+            TabRow(
                 selectedTabIndex = currentTab.value.ordinal,
                 backgroundColor = Color.Transparent,
                 modifier = Modifier.fillMaxWidth()
@@ -83,6 +83,7 @@ fun Wizard(
                     component.crawlSiteMap,
                     component.crawlAjax
                 )
+                else -> {}
             }
         }
     }

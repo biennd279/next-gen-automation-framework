@@ -13,7 +13,6 @@ class SpiderCrawlPipeline(
 
     val timeRefresh = 500L
 
-
     private val extensionSpider: ExtensionSpider by lazy {
         extensionLoader
             .getExtension(ExtensionSpider::class.java)

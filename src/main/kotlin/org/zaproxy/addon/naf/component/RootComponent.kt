@@ -18,7 +18,7 @@ import org.zaproxy.addon.naf.model.ScanTemplate
 import org.zaproxy.addon.naf.model.emptyTemplate
 import kotlin.coroutines.CoroutineContext
 
-class Root internal constructor(
+class RootComponent internal constructor(
     componentContext: ComponentContext,
     val nafState: NafState,
     private val createWizard: (
@@ -26,12 +26,12 @@ class Root internal constructor(
         onCancel: () -> Unit,
         onStartNewScan: (ScanTemplate) -> Unit,
     ) -> WizardComponent,
-    private val createHome: (
+    private val createHomeComponent: (
         ComponentContext,
         NafState,
         currentScan: State<ScanTemplate>,
         onCallWizard: () -> Unit
-    ) -> Home,
+    ) -> HomeComponent,
     override val coroutineContext: CoroutineContext
 ): CoroutineScope, ComponentContext by componentContext, NafState by nafState {
 
@@ -41,8 +41,8 @@ class Root internal constructor(
         createWizard = { childContext, onCancel, onStartNewScan ->
             WizardComponent(childContext, onCancel, onStartNewScan)
         },
-        createHome = { childContext, scanState, currentScan, onCallWizard ->
-            Home(
+        createHomeComponent = { childContext, scanState, currentScan, onCallWizard ->
+            HomeComponent(
                 childContext,
                 currentScan,
                 scanState,
@@ -68,10 +68,12 @@ class Root internal constructor(
 
     private fun onStartScan(scanTemplate: ScanTemplate) {
         currentScan.value = scanTemplate
+
         val scanner = NafScanner(
             scanTemplate,
             coroutineContext
         )
+
         launch {
             scanner.start()
         }
@@ -87,12 +89,27 @@ class Root internal constructor(
         config: Config,
         componentContext: ComponentContext
     ): Child = when (config) {
-        Config.Wizard -> Child.Wizard(createWizard(componentContext, this::onWizardCancel, this::onStartScan))
-        Config.Home -> Child.Home(createHome(componentContext, nafState, currentScan, this::onCallNewWizard))
+        Config.Wizard -> Child.Wizard(wizard(componentContext, Config.Wizard))
+        Config.Home -> Child.Home(home(componentContext, Config.Home))
     }
 
+    private fun wizard(componentContext: ComponentContext, config: Config.Wizard): WizardComponent =
+        createWizard(
+            componentContext,
+            this::onWizardCancel,
+            this::onStartScan,
+        )
+
+    private fun home(componentContext: ComponentContext, config: Config.Home): HomeComponent =
+        createHomeComponent(
+            componentContext,
+            nafState,
+            currentScan,
+            this::onCallNewWizard
+        )
+
     sealed class Child {
-        data class Home(val component: org.zaproxy.addon.naf.component.Home): Child()
+        data class Home(val component: HomeComponent): Child()
         data class Wizard(val component: WizardComponent): Child()
     }
 

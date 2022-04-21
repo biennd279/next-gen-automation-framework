@@ -16,12 +16,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import org.parosproxy.paros.model.HistoryReference
 import org.parosproxy.paros.model.SiteNode
-import org.zaproxy.addon.naf.component.Dashboard
+import org.zaproxy.addon.naf.component.DashboardComponent
 import org.zaproxy.addon.naf.model.NafAlert
 
 @Composable
 fun Dashboard(
-    component: Dashboard
+    component: DashboardComponent
 ) {
 
     val subTab = remember { mutableStateOf(DashboardTab.CRAWL) }

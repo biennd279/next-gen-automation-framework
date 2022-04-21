@@ -19,7 +19,7 @@ import org.parosproxy.paros.model.HistoryReference
 import org.parosproxy.paros.model.HistoryReferenceEventPublisher
 import org.parosproxy.paros.model.SiteMapEventPublisher
 import org.parosproxy.paros.model.SiteNode
-import org.zaproxy.addon.naf.component.Root
+import org.zaproxy.addon.naf.component.RootComponent
 import org.zaproxy.addon.naf.model.NafAlert
 import org.zaproxy.addon.naf.ui.Root
 import org.zaproxy.zap.ZAP
@@ -98,7 +98,7 @@ class ExtensionNaf: ExtensionAdaptor(NAME), CoroutineScope, NafState {
         view?.let {
             SwingUtilities.invokeLater {
                 val lifecycle = LifecycleRegistry()
-                val root = Root(
+                val rootComponent = RootComponent(
                     DefaultComponentContext(lifecycle),
                     this@ExtensionNaf,
                     coroutineContext
@@ -106,7 +106,7 @@ class ExtensionNaf: ExtensionAdaptor(NAME), CoroutineScope, NafState {
 
                 val composePanel = ComposePanel()
                 composePanel.setContent {
-                    Root(root)
+                    Root(rootComponent)
                 }
 
                 hookView.addWorkPanel(abstractPanel {

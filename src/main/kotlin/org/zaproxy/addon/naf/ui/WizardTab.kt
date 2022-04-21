@@ -3,5 +3,5 @@ package org.zaproxy.addon.naf.ui
 enum class WizardTab(
     override val title: String
 ): Tab {
-    CRAWL("Crawl")
+    FUZZ("Fuzz"), CRAWL("Crawl"), SCAN("Scan"), AUTH("Authentication"), SCRIPT("Script")
 }
