@@ -7,10 +7,7 @@ import org.zaproxy.addon.naf.model.NafAlert
 
 interface NafState {
     val getHistoryReference: (Int) -> HistoryReference
-    val historyId: MutableSet<Int>
     val historyRefSate: MutableStateFlow<List<HistoryReference>>
-
     val siteNodes: MutableStateFlow<List<SiteNode>>
-
     val alerts: MutableStateFlow<List<NafAlert>>
 }

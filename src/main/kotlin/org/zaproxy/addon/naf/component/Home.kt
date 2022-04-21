@@ -10,7 +10,6 @@ import com.arkivanov.essenty.parcelable.Parcelable
 import com.arkivanov.essenty.parcelable.Parcelize
 import org.zaproxy.addon.naf.NafState
 import org.zaproxy.addon.naf.model.ScanTemplate
-import org.zaproxy.addon.naf.model.emptyTemplate
 import org.zaproxy.addon.naf.ui.NafTab
 
 class Home(
@@ -43,29 +42,6 @@ class Home(
         Config.Dashboard -> Child.Dashboard(Dashboard(componentContext, nafState))
         Config.Project -> Child.Project(ProjectComponent(componentContext), onCallWizard)
     }
-
-    init {
-        if (currentScan.value != emptyTemplate()) {
-            startScan()
-        }
-    }
-
-    private fun startScan() {
-        println("Start new scan")
-    }
-
-    private fun pauseScan() {
-
-    }
-
-    private fun resumeScan() {
-
-    }
-
-    private fun stopScan() {
-
-    }
-
 
     sealed class Child(
         val nafTab: NafTab

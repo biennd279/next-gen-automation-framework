@@ -59,8 +59,6 @@ class ExtensionNaf: ExtensionAdaptor(NAME), CoroutineScope, NafState {
         extHistory.getHistoryReference(it)
     }
 
-    override val historyId: MutableSet<Int> = mutableSetOf()
-
     override val alerts: MutableStateFlow<List<NafAlert>> = MutableStateFlow(emptyList())
 
     override val historyRefSate: MutableStateFlow<List<HistoryReference>> = MutableStateFlow(emptyList())

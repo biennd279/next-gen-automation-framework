@@ -6,6 +6,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import org.parosproxy.paros.model.HistoryReferenceEventPublisher
 import org.parosproxy.paros.model.SiteMapEventPublisher
+import org.zaproxy.addon.naf.model.NafAlert
 import org.zaproxy.addon.naf.model.toNafAlert
 import org.zaproxy.zap.eventBus.Event
 import org.zaproxy.zap.eventBus.EventConsumer
@@ -18,16 +19,20 @@ internal class EventConsumerImpl(
     val nafState: NafState,
     override val coroutineContext: CoroutineContext = Dispatchers.Default
 ): EventConsumer, CoroutineScope {
+
+    private val setHistoryRef = mutableSetOf<Int>()
+    private val setAlerts = mutableSetOf<NafAlert>()
+
     override fun eventReceived(event: Event?) {
         when (event?.eventType) {
             // Append to list, only change when done
             HistoryReferenceEventPublisher.EVENT_TAG_ADDED -> {
                 val id = event.parameters[HistoryReferenceEventPublisher.FIELD_HISTORY_REFERENCE_ID]?.toInt()
                 id?.let {
-                    if (!nafState.historyId.contains(id)) {
+                    if (!setHistoryRef.contains(id)) {
                         launch {
                             val historyReference = nafState.getHistoryReference(it)
-                            nafState.historyId.add(id)
+                            setHistoryRef.add(id)
                             nafState.historyRefSate.update {
                                 it +  historyReference
                             }
@@ -61,8 +66,11 @@ internal class EventConsumerImpl(
                     launch {
                         val map = event.parameters
                         val alert = map.toNafAlert()
-                        nafState.alerts.update {
-                            it + alert
+                        if (!setAlerts.contains(alert)) {
+                            setAlerts.add(alert)
+                            nafState.alerts.update {
+                                it + alert
+                            }
                         }
                     }
                 }
