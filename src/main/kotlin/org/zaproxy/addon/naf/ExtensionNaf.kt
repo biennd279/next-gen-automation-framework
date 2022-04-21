@@ -3,9 +3,10 @@ package org.zaproxy.addon.naf
 import androidx.compose.ui.awt.ComposePanel
 import com.arkivanov.decompose.DefaultComponentContext
 import com.arkivanov.essenty.lifecycle.LifecycleRegistry
+import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.MutableStateFlow
 import me.d3s34.lib.dsl.abstractPanel
 import org.apache.logging.log4j.LogManager
@@ -36,8 +37,12 @@ import kotlin.coroutines.CoroutineContext
 
 class ExtensionNaf: ExtensionAdaptor(NAME), CoroutineScope, NafState {
 
+    private val exceptionHandler = CoroutineExceptionHandler { context, cause ->
+        println("Has exception $cause on $context ")
+    }
+
     override val coroutineContext: CoroutineContext
-        get() = Job() + Dispatchers.Default
+        get() = SupervisorJob() + Dispatchers.Default + exceptionHandler
 
     init {
         i18nPrefix = PREFIX
