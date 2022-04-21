@@ -8,11 +8,16 @@ import org.zaproxy.zap.model.Target
 import kotlin.coroutines.CoroutineContext
 
 class SpiderCrawlPipeline(
-    private val extensionSpider: ExtensionSpider,
     override val coroutineContext: CoroutineContext = Dispatchers.Default
 ) : NafCrawlPipeline() {
 
     val timeRefresh = 500L
+
+
+    private val extensionSpider: ExtensionSpider by lazy {
+        extensionLoader
+            .getExtension(ExtensionSpider::class.java)
+    }
 
     override suspend fun start(input: Target): Set<String> {
         val scanId = kotlin.runCatching {

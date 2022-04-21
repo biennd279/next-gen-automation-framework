@@ -1,8 +1,8 @@
 package org.zaproxy.addon.naf.component
 
-import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import com.arkivanov.decompose.ComponentContext
+import org.zaproxy.addon.naf.model.CrawlOptions
 import org.zaproxy.addon.naf.model.ScanTemplate
 
 class WizardComponent(
@@ -11,10 +11,16 @@ class WizardComponent(
     val onWizardStart: (ScanTemplate) -> Unit
 ): ComponentContext by componentContext {
     val url = mutableStateOf("")
+    val crawlSiteMap = mutableStateOf(true)
+    val crawlAjax = mutableStateOf(true)
 
     private fun buildTemplate(): ScanTemplate {
         return ScanTemplate(
-            url = url.value
+            url = url.value,
+            crawlOptions = CrawlOptions(
+                crawl = crawlSiteMap.value,
+                ajaxCrawl = crawlAjax.value
+            )
         )
     }
 

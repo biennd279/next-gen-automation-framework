@@ -6,8 +6,12 @@ import androidx.compose.material.*
 import androidx.compose.material.MaterialTheme.typography
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import org.zaproxy.addon.naf.component.WizardComponent
@@ -17,6 +21,9 @@ import org.zaproxy.addon.naf.component.WizardComponent
 fun Wizard(
     component: WizardComponent
 ) {
+
+    val currentTab = remember { mutableStateOf(WizardTab.CRAWL) }
+
     Scaffold(
         topBar = {
             Text(
@@ -55,11 +62,32 @@ fun Wizard(
                 color = Color.Gray,
                 modifier = Modifier.padding(5.dp)
             )
+
+            ScrollableTabRow(
+                selectedTabIndex = currentTab.value.ordinal,
+                backgroundColor = Color.Transparent,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                WizardTab.values().forEachIndexed { index, tab ->
+                    Tab(
+                        selected = index == currentTab.value.ordinal,
+                        onClick = { currentTab.value = tab }
+                    ) {
+                        Text(tab.title)
+                    }
+                }
+            }
+
+            when (currentTab.value) {
+                WizardTab.CRAWL -> CrawlOptions(
+                    component.crawlSiteMap,
+                    component.crawlAjax
+                )
+            }
         }
     }
 }
 
-@Preview
 @Composable
 fun InputUrl(
     url: MutableState<String>
@@ -72,9 +100,47 @@ fun InputUrl(
         modifier = Modifier.fillMaxWidth()
     )
 }
-
-@Preview
 @Composable
-fun OptionWizard() {
+fun CrawlOptions(
+    crawlSiteMap: MutableState<Boolean>,
+    crawlAjax: MutableState<Boolean>
+) {
+    Column {
+        LabelCheckBox(crawlSiteMap) {
+            Text(
+                text = "Crawl sitemap",
+                modifier = Modifier.padding(10.dp),
+                fontWeight = FontWeight.Bold
+            )
+        }
 
+        LabelCheckBox(crawlAjax) {
+            Text(
+                text = "Crawl ajax",
+                modifier = Modifier.padding(10.dp),
+                fontWeight = FontWeight.Bold
+            )
+        }
+    }
+}
+
+@Composable
+fun LabelCheckBox(
+    checkedState: MutableState<Boolean>,
+    canCheck: Boolean = true,
+    content: @Composable () -> Unit
+) {
+    Row(
+        modifier = Modifier.padding(8.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Checkbox(
+            checked = checkedState.value,
+            onCheckedChange = {
+                checkedState.value = it
+            },
+            enabled = canCheck
+        )
+        content()
+    }
 }

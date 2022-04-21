@@ -1,12 +1,11 @@
 package org.zaproxy.addon.naf
 
-import androidx.compose.runtime.mutableStateOf
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import org.zaproxy.addon.naf.model.ScanTemplate
-import org.zaproxy.addon.naf.pipeline.DetectTargetPipeline
-import org.zaproxy.addon.naf.pipeline.NafPhase
-import org.zaproxy.addon.naf.pipeline.NafPipeline
+import org.zaproxy.addon.naf.pipeline.*
 import java.net.URL
 import kotlin.coroutines.CoroutineContext
 
@@ -15,13 +14,24 @@ class NafScanner(
     override val coroutineContext: CoroutineContext = Dispatchers.Default
 ): CoroutineScope {
 
-    val phase = mutableStateOf(NafPhase.INIT)
+    private val _phase = MutableStateFlow(NafPhase.INIT)
+    val phase: StateFlow<NafPhase> = _phase
 
-    lateinit var listPipeline: List<NafPipeline<Any, Any>>
+    lateinit var listPipeline: MutableList<NafPipeline<*, *>>
     lateinit var target: org.zaproxy.zap.model.Target
 
     private suspend fun parseScanTemplate(scanTemplate: ScanTemplate) {
         target = detectTarget(scanTemplate.url)
+        listPipeline = mutableListOf()
+
+        when {
+            scanTemplate.crawlOptions.crawl -> {
+                listPipeline.add(SpiderCrawlPipeline(coroutineContext))
+            }
+            scanTemplate.crawlOptions.ajaxCrawl -> {
+
+            }
+        }
     }
 
     private suspend fun detectTarget(url: String): org.zaproxy.zap.model.Target {
@@ -32,5 +42,15 @@ class NafScanner(
     }
     suspend fun start() {
         parseScanTemplate(scanTemplate)
+        listPipeline.sortBy { it.phase.priority }
+
+        listPipeline.forEach {
+            when (it) {
+                is NafCrawlPipeline -> {
+                    _phase.value = NafPhase.CRAWL
+                    it.start(target)
+                }
+            }
+        }
     }
 }
