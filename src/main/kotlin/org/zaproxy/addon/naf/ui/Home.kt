@@ -10,13 +10,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.arkivanov.decompose.ExperimentalDecomposeApi
 import com.arkivanov.decompose.extensions.compose.jetbrains.Children
-import org.zaproxy.addon.naf.component.HomeComponent
+import org.zaproxy.addon.naf.component.Home
 
 @OptIn(ExperimentalDecomposeApi::class)
 @Preview
 @Composable
 fun Home(
-    component: HomeComponent
+    component: Home
 ) = Children(component.routerState) { router ->
     val child = router.instance
     Scaffold(
@@ -33,8 +33,8 @@ fun Home(
         Divider()
 
         when (child) {
-            is HomeComponent.Child.Dashboard -> Dashboard(child.component)
-            is HomeComponent.Child.Project -> Project(child.component, child.onCallWizard)
+            is Home.Child.Dashboard -> Dashboard(child.component)
+            is Home.Child.Project -> Project(child.component, child.onCallWizard)
         }
     }
 }

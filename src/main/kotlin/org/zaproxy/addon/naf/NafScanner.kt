@@ -1,9 +1,11 @@
 package org.zaproxy.addon.naf
 
+import androidx.compose.runtime.mutableStateOf
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import org.zaproxy.addon.naf.model.ScanTemplate
 import org.zaproxy.addon.naf.pipeline.DetectTargetPipeline
+import org.zaproxy.addon.naf.pipeline.NafPhase
 import org.zaproxy.addon.naf.pipeline.NafPipeline
 import java.net.URL
 import kotlin.coroutines.CoroutineContext
@@ -12,6 +14,8 @@ class NafScanner(
     val scanTemplate: ScanTemplate,
     override val coroutineContext: CoroutineContext = Dispatchers.Default
 ): CoroutineScope {
+
+    val phase = mutableStateOf(NafPhase.INIT)
 
     lateinit var listPipeline: List<NafPipeline<Any, Any>>
     lateinit var target: org.zaproxy.zap.model.Target

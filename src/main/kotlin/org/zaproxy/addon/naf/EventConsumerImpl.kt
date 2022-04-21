@@ -1,5 +1,9 @@
 package org.zaproxy.addon.naf
 
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 import org.parosproxy.paros.model.HistoryReferenceEventPublisher
 import org.parosproxy.paros.model.SiteMapEventPublisher
 import org.zaproxy.addon.naf.model.toNafAlert
@@ -7,11 +11,13 @@ import org.zaproxy.zap.eventBus.Event
 import org.zaproxy.zap.eventBus.EventConsumer
 import org.zaproxy.zap.extension.alert.AlertEventPublisher
 import org.zaproxy.zap.model.ScanEventPublisher
+import kotlin.coroutines.CoroutineContext
 
 // All event Consumer
 internal class EventConsumerImpl(
-    val nafState: NafState
-): EventConsumer {
+    val nafState: NafState,
+    override val coroutineContext: CoroutineContext = Dispatchers.Default
+): EventConsumer, CoroutineScope {
     override fun eventReceived(event: Event?) {
         when (event?.eventType) {
             // Append to list, only change when done
@@ -19,9 +25,13 @@ internal class EventConsumerImpl(
                 val id = event.parameters[HistoryReferenceEventPublisher.FIELD_HISTORY_REFERENCE_ID]?.toInt()
                 id?.let {
                     if (!nafState.historyId.contains(id)) {
-                        val historyReference = nafState.getHistoryReference(it)
-                        nafState.historyId.add(id)
-                        nafState.historyRefSate.add(historyReference)
+                        launch {
+                            val historyReference = nafState.getHistoryReference(it)
+                            nafState.historyId.add(id)
+                            nafState.historyRefSate.update {
+                                it +  historyReference
+                            }
+                        }
                     }
                 }
             }
@@ -29,22 +39,32 @@ internal class EventConsumerImpl(
                 event.target?.let { it ->
                     println(it.displayName)
                     if (it.isValid) {
-                        nafState.siteNodes.add(it.startNode)
+                        launch {
+                            nafState.siteNodes.update {siteNodes ->
+                                siteNodes + it.startNode
+                            }
+                        }
                     }
                 }
             }
             SiteMapEventPublisher.SITE_NODE_ADDED_EVENT -> {
                 event.target?.let { it ->
                     if (it.isValid) {
-                        nafState.siteNodes.add(it.startNode)
+                        nafState.siteNodes.update {siteNodes ->
+                            siteNodes + it.startNode
+                        }
                     }
                 }
             }
             AlertEventPublisher.ALERT_ADDED_EVENT -> {
                 kotlin.runCatching {
-                    val map = event.parameters
-                    val alert = map.toNafAlert()
-                    nafState.alerts.add(alert)
+                    launch {
+                        val map = event.parameters
+                        val alert = map.toNafAlert()
+                        nafState.alerts.update {
+                            it + alert
+                        }
+                    }
                 }
                     .onFailure {
 

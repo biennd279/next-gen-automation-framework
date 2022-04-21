@@ -13,7 +13,7 @@ import org.zaproxy.addon.naf.model.ScanTemplate
 import org.zaproxy.addon.naf.model.emptyTemplate
 import org.zaproxy.addon.naf.ui.NafTab
 
-class HomeComponent(
+class Home(
     componentContext: ComponentContext,
     val currentScan: State<ScanTemplate>,
     val nafState: NafState,
@@ -40,7 +40,7 @@ class HomeComponent(
         config: Config,
         componentContext: ComponentContext
     ): Child = when (config) {
-        Config.Dashboard -> Child.Dashboard(DashboardComponent(componentContext, nafState))
+        Config.Dashboard -> Child.Dashboard(Dashboard(componentContext, nafState))
         Config.Project -> Child.Project(ProjectComponent(componentContext), onCallWizard)
     }
 
@@ -70,7 +70,7 @@ class HomeComponent(
     sealed class Child(
         val nafTab: NafTab
     ) {
-        data class Dashboard(val component: DashboardComponent): Child(NafTab.DASHBOARD)
+        data class Dashboard(val component: org.zaproxy.addon.naf.component.Dashboard): Child(NafTab.DASHBOARD)
         data class Project(
             val component: ProjectComponent,
             val onCallWizard: () -> Unit

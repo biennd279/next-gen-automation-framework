@@ -11,21 +11,19 @@ import androidx.compose.material.Scaffold
 import androidx.compose.material.Tab
 import androidx.compose.material.TabRow
 import androidx.compose.material.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.snapshots.SnapshotStateList
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import org.parosproxy.paros.model.HistoryReference
 import org.parosproxy.paros.model.SiteNode
-import org.zaproxy.addon.naf.component.DashboardComponent
+import org.zaproxy.addon.naf.component.Dashboard
 import org.zaproxy.addon.naf.model.NafAlert
 
 @Composable
 fun Dashboard(
-    component: DashboardComponent
+    component: Dashboard
 ) {
+
     val subTab = remember { mutableStateOf(DashboardTab.CRAWL) }
     Scaffold(
         topBar = {
@@ -46,9 +44,9 @@ fun Dashboard(
         },
     ) {
         when (subTab.value) {
-            DashboardTab.CRAWL -> Crawl(component.nafState.historyRefSate)
-            DashboardTab.SITEMAP -> SiteMap(component.nafState.siteNodes)
-            DashboardTab.ALERT -> Alert(component.nafState.alerts)
+            DashboardTab.CRAWL -> Crawl(component.historyRefSate.collectAsState())
+            DashboardTab.SITEMAP -> SiteMap(component.siteNodes.collectAsState())
+            DashboardTab.ALERT -> Alert(component.alerts.collectAsState())
             DashboardTab.PROCESS -> Processing()
         }
     }
@@ -57,23 +55,23 @@ fun Dashboard(
 @Preview
 @Composable
 fun Crawl(
-    listHistory: SnapshotStateList<HistoryReference>
+    listHistory: State<List<HistoryReference>>
 ) {
     LazyColumn {
         items(
-            listHistory.size,
+            listHistory.value.size,
             key = {
-                listHistory[it].historyId
+                listHistory.value[it].historyId
             }
         ) { index ->
             Row {
-                Text(text = listHistory[index].historyId.toString())
+                Text(text = listHistory.value[index].historyId.toString())
                 Spacer(modifier = Modifier.padding(5.dp))
-                Text(text = listHistory[index].uri.toString())
+                Text(text = listHistory.value[index].uri.toString())
                 Spacer(modifier = Modifier.padding(5.dp))
-                Text(text = listHistory[index].requestBody)
+                Text(text = listHistory.value[index].requestBody)
                 Spacer(modifier = Modifier.padding(5.dp))
-                Text(text = listHistory[index].statusCode.toString())
+                Text(text = listHistory.value[index].statusCode.toString())
             }
         }
     }
@@ -81,10 +79,10 @@ fun Crawl(
 
 @Composable
 fun SiteMap(
-    siteNodes: SnapshotStateList<SiteNode>
+    siteNodes: State<List<SiteNode>>
 ) {
     LazyColumn {
-        items(siteNodes) {
+        items(siteNodes.value) {
             Row {
                 Text(it.name)
                 Spacer(modifier = Modifier.padding(5.dp))
@@ -96,10 +94,10 @@ fun SiteMap(
 
 @Composable
 fun Alert(
-    alerts: SnapshotStateList<NafAlert>
+    alerts: State<List<NafAlert>>
 ) {
     LazyColumn {
-        items(alerts) {
+        items(alerts.value) {
             Row {
                 Text(it.name)
                 Spacer(modifier = Modifier.padding(5.dp))

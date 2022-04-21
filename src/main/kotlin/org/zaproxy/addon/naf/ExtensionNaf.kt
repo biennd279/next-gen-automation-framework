@@ -1,13 +1,12 @@
 package org.zaproxy.addon.naf
 
-import androidx.compose.runtime.mutableStateListOf
-import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.awt.ComposePanel
 import com.arkivanov.decompose.DefaultComponentContext
 import com.arkivanov.essenty.lifecycle.LifecycleRegistry
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.MutableStateFlow
 import me.d3s34.lib.dsl.abstractPanel
 import org.apache.logging.log4j.LogManager
 import org.parosproxy.paros.Constant
@@ -20,7 +19,7 @@ import org.parosproxy.paros.model.HistoryReference
 import org.parosproxy.paros.model.HistoryReferenceEventPublisher
 import org.parosproxy.paros.model.SiteMapEventPublisher
 import org.parosproxy.paros.model.SiteNode
-import org.zaproxy.addon.naf.component.RootComponent
+import org.zaproxy.addon.naf.component.Root
 import org.zaproxy.addon.naf.model.NafAlert
 import org.zaproxy.addon.naf.ui.Root
 import org.zaproxy.zap.ZAP
@@ -62,11 +61,11 @@ class ExtensionNaf: ExtensionAdaptor(NAME), CoroutineScope, NafState {
 
     override val historyId: MutableSet<Int> = mutableSetOf()
 
-    override val historyRefSate: SnapshotStateList<HistoryReference> = mutableStateListOf()
+    override val alerts: MutableStateFlow<List<NafAlert>> = MutableStateFlow(emptyList())
 
-    override val siteNodes: SnapshotStateList<SiteNode> = mutableStateListOf()
+    override val historyRefSate: MutableStateFlow<List<HistoryReference>> = MutableStateFlow(emptyList())
 
-    override val alerts: SnapshotStateList<NafAlert> = mutableStateListOf()
+    override val siteNodes: MutableStateFlow<List<SiteNode>> = MutableStateFlow(emptyList())
 
     private val eventsBus = ZAP.getEventBus()!!
 
@@ -101,7 +100,7 @@ class ExtensionNaf: ExtensionAdaptor(NAME), CoroutineScope, NafState {
         view?.let {
             SwingUtilities.invokeLater {
                 val lifecycle = LifecycleRegistry()
-                val root = RootComponent(
+                val root = Root(
                     DefaultComponentContext(lifecycle),
                     this@ExtensionNaf,
                     coroutineContext

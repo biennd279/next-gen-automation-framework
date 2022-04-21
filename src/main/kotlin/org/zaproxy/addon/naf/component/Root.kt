@@ -18,7 +18,7 @@ import org.zaproxy.addon.naf.model.ScanTemplate
 import org.zaproxy.addon.naf.model.emptyTemplate
 import kotlin.coroutines.CoroutineContext
 
-class RootComponent internal constructor(
+class Root internal constructor(
     componentContext: ComponentContext,
     val nafState: NafState,
     private val createWizard: (
@@ -28,11 +28,12 @@ class RootComponent internal constructor(
     ) -> WizardComponent,
     private val createHome: (
         ComponentContext,
+        NafState,
         currentScan: State<ScanTemplate>,
         onCallWizard: () -> Unit
-    ) -> HomeComponent,
+    ) -> Home,
     override val coroutineContext: CoroutineContext
-): CoroutineScope ,ComponentContext by componentContext {
+): CoroutineScope, ComponentContext by componentContext, NafState by nafState {
 
     constructor(componentContext: ComponentContext, nafState: NafState, coroutineContext: CoroutineContext): this(
         componentContext = componentContext,
@@ -40,11 +41,11 @@ class RootComponent internal constructor(
         createWizard = { childContext, onCancel, onStartNewScan ->
             WizardComponent(childContext, onCancel, onStartNewScan)
         },
-        createHome = { childContext, currentScan, onCallWizard ->
-            HomeComponent(
+        createHome = { childContext, scanState, currentScan, onCallWizard ->
+            Home(
                 childContext,
                 currentScan,
-                nafState,
+                scanState,
                 onCallWizard
             )
         },
@@ -66,15 +67,15 @@ class RootComponent internal constructor(
     }
 
     private fun onStartScan(scanTemplate: ScanTemplate) {
+        currentScan.value = scanTemplate
+        val scanner = NafScanner(
+            scanTemplate,
+            coroutineContext
+        )
         launch {
-            currentScan.value = scanTemplate
-            val scanner = NafScanner(
-                scanTemplate,
-                coroutineContext
-            )
-
             scanner.start()
         }
+
         router.pop()
     }
 
@@ -87,11 +88,11 @@ class RootComponent internal constructor(
         componentContext: ComponentContext
     ): Child = when (config) {
         Config.Wizard -> Child.Wizard(createWizard(componentContext, this::onWizardCancel, this::onStartScan))
-        Config.Home -> Child.Home(createHome(componentContext, currentScan, this::onCallNewWizard))
+        Config.Home -> Child.Home(createHome(componentContext, nafState, currentScan, this::onCallNewWizard))
     }
 
     sealed class Child {
-        data class Home(val component: HomeComponent): Child()
+        data class Home(val component: org.zaproxy.addon.naf.component.Home): Child()
         data class Wizard(val component: WizardComponent): Child()
     }
 
