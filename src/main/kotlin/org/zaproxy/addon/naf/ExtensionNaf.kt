@@ -111,7 +111,8 @@ class ExtensionNaf: ExtensionAdaptor(NAME), CoroutineScope, NafState {
 
                 hookView.addWorkPanel(abstractPanel {
                     layout = CardLayout()
-                    name = "Workspace panel"
+                    name = "Nextgen Automation"
+                    icon = ICON
                     add(composePanel)
                 }.apply {
                     tabIndex = 0
