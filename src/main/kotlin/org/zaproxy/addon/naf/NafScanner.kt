@@ -31,7 +31,10 @@ class NafScanner(
 
             if (crawlOptions.ajaxCrawl) {
                 listPipeline.add(AjaxSpiderCrawlPipeline(coroutineContext))
+            }
 
+            if (scanOptions.activeScan) {
+                listPipeline.add(ActiveScanPipeline(coroutineContext))
             }
         }
     }
@@ -51,6 +54,10 @@ class NafScanner(
                 when (it) {
                     is NafCrawlPipeline -> {
                         _phase.value = NafPhase.CRAWL
+                        it.start(target)
+                    }
+                    is ActiveScanPipeline -> {
+                        _phase.value = NafPhase.SCAN
                         it.start(target)
                     }
                 }

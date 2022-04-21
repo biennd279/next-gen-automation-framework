@@ -83,6 +83,9 @@ fun Wizard(
                     component.crawlSiteMap,
                     component.crawlAjax
                 )
+                WizardTab.SCAN -> ScanOptions(
+                    component.activeScan
+                )
                 else -> {}
             }
         }
@@ -118,6 +121,21 @@ fun CrawlOptions(
         LabelCheckBox(crawlAjax) {
             Text(
                 text = "Crawl ajax",
+                modifier = Modifier.padding(10.dp),
+                fontWeight = FontWeight.Bold
+            )
+        }
+    }
+}
+
+@Composable
+fun ScanOptions(
+    activeScan: MutableState<Boolean>
+) {
+    Column {
+        LabelCheckBox(activeScan) {
+            Text(
+                text = "Run Active Scan",
                 modifier = Modifier.padding(10.dp),
                 fontWeight = FontWeight.Bold
             )
