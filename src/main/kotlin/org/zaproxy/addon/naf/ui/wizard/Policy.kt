@@ -2,7 +2,6 @@ package org.zaproxy.addon.naf.ui.wizard
 
 import androidx.compose.desktop.ui.tooling.preview.Preview
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.*
@@ -33,10 +32,8 @@ fun TableHeader(
             Text(
                 text = title,
                 modifier = Modifier
-                    .border(1.dp, color = Color.Black)
                     .weight(weights[index]),
-                fontWeight = FontWeight.Bold,
-                style = MaterialTheme.typography.h6
+                style = MaterialTheme.typography.subtitle1
             )
         }
     }
@@ -162,7 +159,10 @@ fun Polices(
         )
         val selectedCategory = remember { mutableStateOf(availableCategory.first()) }
 
-        TabRow(selectedTabIndex = selectedCategory.value) {
+        TabRow(
+            selectedTabIndex = selectedCategory.value,
+            backgroundColor = Color.Transparent
+        ) {
             availableCategory.forEach { category ->
                 Tab(
                     selected = selectedCategory.value == category,
@@ -177,6 +177,8 @@ fun Polices(
                 }
             }
         }
+
+        Divider(Modifier.padding(10.dp))
 
         TableHeader(
             titles = titles,
