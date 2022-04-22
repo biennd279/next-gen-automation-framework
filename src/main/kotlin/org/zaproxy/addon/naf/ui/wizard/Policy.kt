@@ -19,6 +19,15 @@ import androidx.compose.ui.unit.dp
 import org.parosproxy.paros.core.scanner.Category
 import org.zaproxy.addon.naf.model.NafPlugin
 
+
+val availableCategory = listOf(
+    Category.INFO_GATHER,
+    Category.BROWSER,
+    Category.SERVER,
+    Category.MISC,
+    Category.INJECTION
+)
+
 @Composable
 fun TableHeader(
     titles: List<String>,
@@ -150,13 +159,7 @@ fun Polices(
         Divider(Modifier.padding(10.dp))
 
         val groupPolicy = policies.groupBy { it.value.category }
-        val availableCategory = listOf(
-            Category.INFO_GATHER,
-            Category.BROWSER,
-            Category.SERVER,
-            Category.MISC,
-            Category.INJECTION
-        )
+
         val selectedCategory = remember { mutableStateOf(availableCategory.first()) }
 
         TabRow(

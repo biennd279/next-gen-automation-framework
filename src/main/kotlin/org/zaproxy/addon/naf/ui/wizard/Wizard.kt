@@ -22,7 +22,7 @@ fun Wizard(
     component: WizardComponent
 ) {
 
-    val currentTab = remember { mutableStateOf(WizardTab.CRAWL) }
+    val currentTab = remember { mutableStateOf(WizardTab.SCOPE) }
 
     Scaffold(
         topBar = {
@@ -87,7 +87,11 @@ fun Wizard(
                     component.activeScan,
                     component.nafPlugin
                 )
-                WizardTab.SCOPE -> Scope()
+                WizardTab.SCOPE -> Scope(
+                    component.includesRegex,
+                    component.exludesRegex,
+                    WizardComponent::isValidRegex
+                )
                 else -> {}
             }
         }

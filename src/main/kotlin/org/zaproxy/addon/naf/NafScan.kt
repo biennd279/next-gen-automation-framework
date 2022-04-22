@@ -2,10 +2,7 @@ package org.zaproxy.addon.naf
 
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import org.zaproxy.addon.naf.pipeline.ActiveScanPipeline
-import org.zaproxy.addon.naf.pipeline.NafCrawlPipeline
-import org.zaproxy.addon.naf.pipeline.NafPhase
-import org.zaproxy.addon.naf.pipeline.NafPipeline
+import org.zaproxy.addon.naf.pipeline.*
 
 class NafScan(
     val listPipeline: MutableList<NafPipeline<*, *>>,
@@ -20,10 +17,16 @@ class NafScan(
         listPipeline.forEach {
             runCatching<Unit> {
                 when (it) {
+                    is InitContextPipeline -> {
+                        _phase.value = NafPhase.INIT
+                        it.start(null)
+                    }
+
                     is NafCrawlPipeline -> {
                         _phase.value = NafPhase.CRAWL
                         it.start(target)
                     }
+
                     is ActiveScanPipeline -> {
                         _phase.value = NafPhase.SCAN
                         it.start(target)

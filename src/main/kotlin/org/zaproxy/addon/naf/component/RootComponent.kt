@@ -98,11 +98,11 @@ class RootComponent internal constructor(
         config: Config,
         componentContext: ComponentContext
     ): Child = when (config) {
-        Config.Wizard -> Child.Wizard(wizard(componentContext, Config.Wizard))
-        Config.Home -> Child.Home(home(componentContext, Config.Home))
+        Config.Wizard -> Child.Wizard(wizard(componentContext))
+        Config.Home -> Child.Home(home(componentContext))
     }
 
-    private fun wizard(componentContext: ComponentContext, config: Config.Wizard): WizardComponent =
+    private fun wizard(componentContext: ComponentContext): WizardComponent =
         createWizard(
             componentContext,
             nafScanner.defaultPolicy,
@@ -110,7 +110,7 @@ class RootComponent internal constructor(
             this::onStartScan,
         )
 
-    private fun home(componentContext: ComponentContext, config: Config.Home): HomeComponent =
+    private fun home(componentContext: ComponentContext): HomeComponent =
         createHomeComponent(
             componentContext,
             nafState,

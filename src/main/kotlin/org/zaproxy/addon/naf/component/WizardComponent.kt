@@ -1,6 +1,7 @@
 package org.zaproxy.addon.naf.component
 
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import com.arkivanov.decompose.ComponentContext
 import org.zaproxy.addon.naf.model.*
@@ -16,6 +17,8 @@ class WizardComponent(
     val crawlSiteMap = mutableStateOf(true)
     val crawlAjax = mutableStateOf(true)
     val activeScan = mutableStateOf(true)
+    val includesRegex = mutableStateListOf<String>()
+    val exludesRegex = mutableStateListOf<String>()
 
     val nafPlugin: List<MutableState<NafPlugin>> = defaultPolicy
         .pluginFactory
@@ -38,6 +41,8 @@ class WizardComponent(
 
         return ScanTemplate(
             url = url.value,
+            includesRegex = includesRegex,
+            excludesRegex = exludesRegex,
             crawlOptions = CrawlOptions(
                 crawl = crawlSiteMap.value,
                 ajaxCrawl = crawlAjax.value
@@ -52,5 +57,15 @@ class WizardComponent(
     fun startScan() {
         val template = buildTemplate()
         onWizardStart.invoke(template)
+    }
+
+    companion object {
+        fun isValidRegex(regex: String): Boolean {
+            return kotlin.runCatching {
+                regex.toRegex()
+                return true
+            }
+                .getOrDefault(false)
+        }
     }
 }

@@ -29,6 +29,9 @@ class NafScanner(
         val listPipeline: MutableList<NafPipeline<*, *>> = mutableListOf()
 
         with(scanTemplate) {
+
+            listPipeline.add(InitContextPipeline(scanTemplate, coroutineContext))
+
             if (crawlOptions.crawl) {
                 listPipeline.add(SpiderCrawlPipeline(coroutineContext))
             }
