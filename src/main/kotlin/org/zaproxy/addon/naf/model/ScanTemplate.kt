@@ -4,7 +4,7 @@ package org.zaproxy.addon.naf.model
 data class ScanTemplate(
     val url: String,
     val crawlOptions: CrawlOptions = CrawlOptions(),
-    val scanOptions: ActiveScanOptions = ActiveScanOptions()
+    val scanOptions: ActiveScanOptions
 )
 
 data class CrawlOptions(
@@ -13,7 +13,6 @@ data class CrawlOptions(
 )
 
 data class ActiveScanOptions(
-    val activeScan: Boolean = true
+    val activeScan: Boolean = true,
+    val plugins: List<NafPlugin>
 )
-
-fun emptyTemplate(): ScanTemplate = ScanTemplate("")

@@ -28,6 +28,7 @@ import org.zaproxy.zap.extension.alert.AlertEventPublisher
 import org.zaproxy.zap.extension.alert.ExtensionAlert
 import org.zaproxy.zap.extension.ascan.ActiveScanEventPublisher
 import org.zaproxy.zap.extension.ascan.ExtensionActiveScan
+import org.zaproxy.zap.extension.ascan.ScanPolicy
 import org.zaproxy.zap.extension.spider.ExtensionSpider
 import org.zaproxy.zap.extension.spider.SpiderEventPublisher
 import java.awt.CardLayout
@@ -60,6 +61,8 @@ class ExtensionNaf: ExtensionAdaptor(NAME), CoroutineScope, NafState {
 
     lateinit var extSpider: ExtensionSpider
 
+    lateinit var defaultPolicy: ScanPolicy
+
     override val getHistoryReference: (Int) -> HistoryReference = {
         extHistory.getHistoryReference(it)
     }
@@ -88,6 +91,19 @@ class ExtensionNaf: ExtensionAdaptor(NAME), CoroutineScope, NafState {
         extActiveScan = extensionLoader.getExtension(ExtensionActiveScan::class.java)
         extAlert = extensionLoader.getExtension(ExtensionAlert::class.java)
         extSpider = extensionLoader.getExtension(ExtensionSpider::class.java)
+
+        try {
+            val policyManager = extActiveScan.policyManager
+
+            defaultPolicy = policyManager
+                .templatePolicy
+
+            defaultPolicy.name = "NAF"
+
+            policyManager.savePolicy(defaultPolicy)
+        } catch (t: Throwable) {
+            println("Save error $t")
+        }
     }
 
     override fun hook(extensionHook: ExtensionHook): Unit = with(extensionHook) {
@@ -102,7 +118,7 @@ class ExtensionNaf: ExtensionAdaptor(NAME), CoroutineScope, NafState {
 
         view?.let {
             SwingUtilities.invokeLater {
-                val nafScanner = NafScanner(coroutineContext)
+                val nafScanner = NafScanner(defaultPolicy, coroutineContext)
                 val lifecycle = LifecycleRegistry()
                 val rootComponent = RootComponent(
                     componentContext = DefaultComponentContext(lifecycle),

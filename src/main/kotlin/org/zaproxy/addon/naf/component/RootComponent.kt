@@ -17,6 +17,7 @@ import org.zaproxy.addon.naf.NafScanner
 import org.zaproxy.addon.naf.NafState
 import org.zaproxy.addon.naf.model.ScanTemplate
 import org.zaproxy.addon.naf.ui.NafTab
+import org.zaproxy.zap.extension.ascan.ScanPolicy
 import kotlin.coroutines.CoroutineContext
 
 class RootComponent internal constructor(
@@ -25,6 +26,7 @@ class RootComponent internal constructor(
     val nafState: NafState,
     private val createWizard: (
         ComponentContext,
+        policy: ScanPolicy,
         onCancel: () -> Unit,
         onStartNewScan: (ScanTemplate) -> Unit,
     ) -> WizardComponent,
@@ -46,8 +48,8 @@ class RootComponent internal constructor(
         componentContext = componentContext,
         nafScanner = nafScanner,
         nafState = nafState,
-        createWizard = { childContext, onCancel, onStartNewScan ->
-            WizardComponent(childContext, onCancel, onStartNewScan)
+        createWizard = { childContext, policy , onCancel, onStartNewScan ->
+            WizardComponent(childContext, policy, onCancel, onStartNewScan)
         },
         createHomeComponent = { childContext, scanState, currentScan, onCallWizard ->
             HomeComponent(
@@ -103,6 +105,7 @@ class RootComponent internal constructor(
     private fun wizard(componentContext: ComponentContext, config: Config.Wizard): WizardComponent =
         createWizard(
             componentContext,
+            nafScanner.defaultPolicy,
             this::onWizardCancel,
             this::onStartScan,
         )
