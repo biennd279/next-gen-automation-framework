@@ -1,4 +1,4 @@
-package org.zaproxy.addon.naf.ui
+package org.zaproxy.addon.naf.ui.home
 
 import androidx.compose.desktop.ui.tooling.preview.Preview
 import androidx.compose.foundation.layout.fillMaxSize
@@ -11,6 +11,7 @@ import androidx.compose.ui.unit.dp
 import com.arkivanov.decompose.ExperimentalDecomposeApi
 import com.arkivanov.decompose.extensions.compose.jetbrains.Children
 import org.zaproxy.addon.naf.component.HomeComponent
+import org.zaproxy.addon.naf.ui.NafTab
 
 @OptIn(ExperimentalDecomposeApi::class)
 @Preview

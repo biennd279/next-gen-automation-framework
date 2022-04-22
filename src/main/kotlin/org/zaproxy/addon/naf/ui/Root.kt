@@ -4,6 +4,8 @@ import androidx.compose.runtime.Composable
 import com.arkivanov.decompose.ExperimentalDecomposeApi
 import com.arkivanov.decompose.extensions.compose.jetbrains.Children
 import org.zaproxy.addon.naf.component.RootComponent
+import org.zaproxy.addon.naf.ui.home.Home
+import org.zaproxy.addon.naf.ui.wizard.Wizard
 
 @OptIn(ExperimentalDecomposeApi::class)
 @Composable

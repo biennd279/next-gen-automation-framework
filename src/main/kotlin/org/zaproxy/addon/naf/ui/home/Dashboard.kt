@@ -1,4 +1,4 @@
-package org.zaproxy.addon.naf.ui
+package org.zaproxy.addon.naf.ui.home
 
 import androidx.compose.desktop.ui.tooling.preview.Preview
 import androidx.compose.foundation.layout.Row
@@ -18,6 +18,7 @@ import org.parosproxy.paros.model.HistoryReference
 import org.parosproxy.paros.model.SiteNode
 import org.zaproxy.addon.naf.component.DashboardComponent
 import org.zaproxy.addon.naf.model.NafAlert
+import org.zaproxy.addon.naf.ui.MainColors
 
 @Composable
 fun Dashboard(
