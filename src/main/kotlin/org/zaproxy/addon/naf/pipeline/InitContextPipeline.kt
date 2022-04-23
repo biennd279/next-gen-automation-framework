@@ -11,7 +11,8 @@ class InitContextPipeline(
     override suspend fun start(input: Nothing?) {
         val session = model.session
 
-        val context = session.getNewContext("NAF")
+
+        val context = session.getContext("NAF") ?: session.getNewContext("NAF")
 
         with(scanTemplate) {
             includesRegex.forEach { regex ->
