@@ -15,7 +15,7 @@ import kotlin.coroutines.CoroutineContext
 class NafScanner(
     val defaultPolicy: ScanPolicy,
     override val coroutineContext: CoroutineContext = Dispatchers.Default
-): CoroutineScope {
+): CoroutineScope, NafService {
     private suspend fun detectTarget(url: String): org.zaproxy.zap.model.Target {
         val detectTargetPipeline = DetectTargetPipeline(coroutineContext)
         return detectTargetPipeline.start(

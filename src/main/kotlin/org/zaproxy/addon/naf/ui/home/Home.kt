@@ -21,13 +21,12 @@ fun Home(
 ) = Children(component.routerState) { router ->
 
     val child = router.instance
+
     Scaffold(
         topBar = {
             NafTopBar(
                 nafTab = child.nafTab,
-                onSelectedTab = {
-                    component.onSelectedTab(it)
-                }
+                onSelectedTab = { component.onSelectedTab(it) }
             )
         },
         modifier = Modifier.padding(5.dp).fillMaxSize()
@@ -37,6 +36,7 @@ fun Home(
         when (child) {
             is HomeComponent.Child.Dashboard -> Dashboard(child.component)
             is HomeComponent.Child.Project -> Project(child.component, child.onCallWizard)
+            is HomeComponent.Child.Setting -> Setting(child.componentContext)
         }
     }
 }

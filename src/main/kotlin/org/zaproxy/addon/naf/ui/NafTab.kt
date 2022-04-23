@@ -10,5 +10,6 @@ enum class NafTab(override val title: String): Tab {
     TARGET("Target"),
     ISSUE("Issue"),
     EXPLOIT("Exploit"),
-    REPORT("Report")
+    REPORT("Report"),
+    SETTING("Setting")
 }

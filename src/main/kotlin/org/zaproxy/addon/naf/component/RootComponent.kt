@@ -56,6 +56,7 @@ class RootComponent internal constructor(
                 childContext,
                 currentScan,
                 scanState,
+                nafScanner,
                 onCallWizard
             )
         },

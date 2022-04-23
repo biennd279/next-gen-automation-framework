@@ -9,6 +9,7 @@ import com.arkivanov.decompose.value.Value
 import com.arkivanov.essenty.parcelable.Parcelable
 import com.arkivanov.essenty.parcelable.Parcelize
 import org.zaproxy.addon.naf.NafScan
+import org.zaproxy.addon.naf.NafService
 import org.zaproxy.addon.naf.NafState
 import org.zaproxy.addon.naf.ui.NafTab
 
@@ -16,6 +17,7 @@ class HomeComponent(
     componentContext: ComponentContext,
     val currentScan: State<NafScan?>,
     val nafState: NafState,
+    val nafService: NafService,
     private val onCallWizard: () -> Unit
 ): ComponentContext by componentContext {
 
@@ -31,6 +33,7 @@ class HomeComponent(
         when (nafTab) {
             NafTab.DASHBOARD -> router.replaceCurrent(Config.Dashboard)
             NafTab.PROJECT -> router.replaceCurrent(Config.Project)
+            NafTab.SETTING -> router.replaceCurrent(Config.Setting)
             else -> {}
         }
     }
@@ -41,6 +44,7 @@ class HomeComponent(
     ): Child = when (config) {
         Config.Dashboard -> Child.Dashboard(DashboardComponent(componentContext, nafState))
         Config.Project -> Child.Project(ProjectComponent(componentContext), onCallWizard)
+        Config.Setting -> Child.Setting(SettingComponent(componentContext, nafService))
     }
 
     sealed class Child(
@@ -51,6 +55,8 @@ class HomeComponent(
             val component: ProjectComponent,
             val onCallWizard: () -> Unit
         ): Child(NafTab.PROJECT)
+
+        data class Setting(val componentContext: SettingComponent): Child(NafTab.SETTING)
     }
 
     sealed class Config: Parcelable {
@@ -59,5 +65,8 @@ class HomeComponent(
 
         @Parcelize
         object Project: Config()
+
+        @Parcelize
+        object Setting: Config()
     }
 }

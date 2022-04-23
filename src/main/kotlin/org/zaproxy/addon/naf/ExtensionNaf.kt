@@ -36,7 +36,7 @@ import javax.swing.ImageIcon
 import javax.swing.SwingUtilities
 import kotlin.coroutines.CoroutineContext
 
-class ExtensionNaf: ExtensionAdaptor(NAME), CoroutineScope, NafState {
+class ExtensionNaf: ExtensionAdaptor(NAME), CoroutineScope, NafState, NafService {
 
     private val exceptionHandler = CoroutineExceptionHandler { context, cause ->
         println("Has exception $cause on $context ")
