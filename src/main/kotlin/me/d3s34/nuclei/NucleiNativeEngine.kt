@@ -35,27 +35,33 @@ class NucleiNativeEngine(
     @OptIn(ExperimentalCoroutinesApi::class)
     suspend fun exec(
         url: String,
-        template: NucleiTemplate,
+        templates: List<NucleiTemplate>,
         responseChannel: ProcessSendChannel
     ) = shell {
 
-        val nucleiCommand = buildCommand {
-            path = fullPath
-            shortFlag = mapOf(
-                "target" to url,
-                "t" to template.path,
-                "silent" to null,
-                "json" to null,
-            )
+        kotlin.runCatching {
+            val nucleiCommand = buildCommand {
+                path = fullPath
+                shortFlag = mapOf(
+                    "target" to url,
+                    "t" to templates.joinToString(separator = ", ") { it.path },
+                    "silent" to null,
+                    "json" to null,
+//                    "as" to null, // automation scan with tech set
+                    "duc" to null, // For scanning disable update, we will check update manual
+                    "s" to "info, low, medium, high, critical" // Only collect p1-p5 vulnerability
+                )
+            }
+
+            val executor = buildSystemExecutor(nucleiCommand)
+
+            pipeline { executor pipe responseChannel }
+
+            executor.process.throwOnError()
+        }.also {
+            responseChannel.close()
         }
-
-        val executor = buildSystemExecutor(nucleiCommand)
-
-        pipeline { executor pipe responseChannel }
-
-        responseChannel.close()
-        executor.process.throwOnError()
-
+            .getOrThrow()
     }
 
     private suspend fun resultProcess(
@@ -97,10 +103,10 @@ class NucleiNativeEngine(
     }
 
 
-    @OptIn(ObsoleteCoroutinesApi::class, ExperimentalCoroutinesApi::class)
+    @OptIn(ObsoleteCoroutinesApi::class)
     override suspend fun scan(
         url: String,
-        template: NucleiTemplate,
+        templates: List<NucleiTemplate>,
     ): List<NucleiResponse> = withContext(coroutineContext) {
         val results = mutableListOf<NucleiResponse>()
         val responseChannel: ProcessChannel = Channel()
@@ -112,7 +118,7 @@ class NucleiNativeEngine(
         }
 
         val execJob = launch {
-            exec(url, template, responseChannel)
+            exec(url, templates, responseChannel)
         }
 
         val processJob = launch {
@@ -127,7 +133,7 @@ class NucleiNativeEngine(
     @OptIn(ObsoleteCoroutinesApi::class)
     override suspend fun scan(
         url: String,
-        template: NucleiTemplate,
+        templates: List<NucleiTemplate>,
         onReceive: suspend (NucleiResponse) -> Unit
     ) {
         val responseChannel: ProcessChannel = Channel()
@@ -140,7 +146,7 @@ class NucleiNativeEngine(
 
         //coroutine only process io stream from process thread
         val execJob = launch(Dispatchers.IO) {
-            exec(url, template, responseChannel)
+            exec(url, templates, responseChannel)
         }
 
         val processJob = launch {

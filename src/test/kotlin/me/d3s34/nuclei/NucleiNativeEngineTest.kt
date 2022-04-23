@@ -1,8 +1,8 @@
 package me.d3s34.nuclei
 
-import kotlinx.coroutines.*
-import me.d3s34.nuclei.NucleiNativeEngine
-import me.d3s34.nuclei.NucleiTemplateDir
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Test
 import java.io.File
 import kotlin.test.assertEquals
@@ -21,7 +21,7 @@ internal class NucleiNativeEngineTest {
         val p = launch {
             val result = nucleiEngine.scan(
                 "d3s34.me",
-                NucleiTemplateDir("${home}/nuclei-templates/dns/")
+                listOf(NucleiTemplateDir("${home}/nuclei-templates/dns/"))
             )
             assertNotEquals(0, result.size)
             assertEquals(4, result.size)
