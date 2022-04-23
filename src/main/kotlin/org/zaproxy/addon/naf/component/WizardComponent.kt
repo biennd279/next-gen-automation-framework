@@ -4,12 +4,14 @@ import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import com.arkivanov.decompose.ComponentContext
+import me.d3s34.nuclei.NucleiTemplate
+import me.d3s34.nuclei.NucleiTemplateDir
+import org.zaproxy.addon.naf.NafScanner
 import org.zaproxy.addon.naf.model.*
-import org.zaproxy.zap.extension.ascan.ScanPolicy
 
 class WizardComponent(
     componentContext: ComponentContext,
-    val defaultPolicy: ScanPolicy,
+    val nafScanner: NafScanner,
     val onCancel: () -> Unit,
     val onWizardStart: (ScanTemplate) -> Unit
 ): ComponentContext by componentContext {
@@ -19,8 +21,12 @@ class WizardComponent(
     val activeScan = mutableStateOf(true)
     val includesRegex = mutableStateListOf<String>()
     val exludesRegex = mutableStateListOf<String>()
+    val useNuclei = mutableStateOf(true)
+    val templates = mutableStateListOf<NucleiTemplate>(
+        NucleiTemplateDir(nafScanner.nafService.nucleiRootTemplatePath)
+    )
 
-    val nafPlugin: List<MutableState<NafPlugin>> = defaultPolicy
+    val nafPlugin: List<MutableState<NafPlugin>> = nafScanner.defaultPolicy
         .pluginFactory
         .allPlugin
         .map {
@@ -50,6 +56,10 @@ class WizardComponent(
             scanOptions = ActiveScanOptions(
                 activeScan = activeScan.value,
                 plugins = nafPlugins
+            ),
+            systemOptions = SystemOptions(
+                useNuclei = useNuclei.value,
+                templates = templates
             )
         )
     }

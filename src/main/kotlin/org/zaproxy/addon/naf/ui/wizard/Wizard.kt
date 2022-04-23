@@ -8,11 +8,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import me.d3s34.nuclei.NucleiTemplate
 import org.zaproxy.addon.naf.component.WizardComponent
 import org.zaproxy.addon.naf.model.NafPlugin
 
@@ -92,6 +94,10 @@ fun Wizard(
                     component.exludesRegex,
                     WizardComponent::isValidRegex
                 )
+                WizardTab.SYSTEM -> System(
+                    component.useNuclei,
+                    component.templates
+                )
                 else -> {}
             }
         }
@@ -154,6 +160,33 @@ fun ScanOptions(
             modifier = Modifier.padding(10.dp)
         ) {
             Polices(policies)
+        }
+    }
+}
+
+@Composable
+fun System(
+    useNuclei: MutableState<Boolean>,
+    templates: SnapshotStateList<NucleiTemplate>
+) {
+
+    Column {
+        LabelCheckBox(useNuclei) {
+            Text(
+                text = "Run Nuclei Scan",
+                modifier = Modifier.padding(10.dp),
+                fontWeight = FontWeight.Bold
+            )
+        }
+
+        Divider(Modifier.padding(10.dp))
+
+        if (useNuclei.value) {
+            templates.forEach { template ->
+                Text(
+                    text = template.path
+                )
+            }
         }
     }
 }

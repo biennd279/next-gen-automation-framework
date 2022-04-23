@@ -119,15 +119,16 @@ fun NucleiSetting() {
 
             }
             NucleiEngineType.Native -> {
-                Text(
-                    text = "Path",
-                    style = typography.subtitle2,
-                    fontWeight = FontWeight.Bold
-                )
-
                 OutlinedTextField(
                     value = path.value,
                     onValueChange = { path.value = it },
+                    label = {
+                        Text(
+                            text = "Path",
+                            style = typography.subtitle2,
+                            fontWeight = FontWeight.Bold
+                        )
+                    },
                     trailingIcon = {
                         IconButton(
                             onClick = {
@@ -178,7 +179,14 @@ fun NucleiSetting() {
         OutlinedTextField(
             value = templatePath.value,
             onValueChange = { templatePath.value = it },
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth(),
+            label = {
+                Text(
+                    text = "Path",
+                    style = typography.subtitle2,
+                    fontWeight = FontWeight.Bold
+                )
+            }
         )
 
         Row(

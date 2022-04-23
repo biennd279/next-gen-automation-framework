@@ -13,9 +13,10 @@ import java.net.URL
 import kotlin.coroutines.CoroutineContext
 
 class NafScanner(
+    val nafService: NafService,
     val defaultPolicy: ScanPolicy,
     override val coroutineContext: CoroutineContext = Dispatchers.Default
-): CoroutineScope, NafService {
+): CoroutineScope, NafService by nafService {
     private suspend fun detectTarget(url: String): org.zaproxy.zap.model.Target {
         val detectTargetPipeline = DetectTargetPipeline(coroutineContext)
         return detectTargetPipeline.start(
@@ -61,7 +62,12 @@ class NafScanner(
                     }
 
                 listPipeline.add(ActiveScanPipeline(policy, coroutineContext))
+            }
 
+            if (systemOptions.useNuclei) {
+                nafService.nucleiEngine?.let {
+                    listPipeline.add(NucleiScanPipeline(it, systemOptions.templates,coroutineContext))
+                }
             }
         }
 

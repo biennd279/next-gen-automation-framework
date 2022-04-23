@@ -36,7 +36,7 @@ import javax.swing.ImageIcon
 import javax.swing.SwingUtilities
 import kotlin.coroutines.CoroutineContext
 
-class ExtensionNaf: ExtensionAdaptor(NAME), CoroutineScope, NafState, NafService {
+class ExtensionNaf: ExtensionAdaptor(NAME), CoroutineScope, NafState {
 
     private val exceptionHandler = CoroutineExceptionHandler { context, cause ->
         println("Has exception $cause on $context ")
@@ -77,6 +77,8 @@ class ExtensionNaf: ExtensionAdaptor(NAME), CoroutineScope, NafState, NafService
 
     private val eventConsumerImpl = EventConsumerImpl(this)
 
+    private val nafService = NafServiceImpl(coroutineContext)
+
     override fun getDescription(): String = Constant.messages.getString("$PREFIX.desc")
 
     override fun init() {
@@ -105,7 +107,6 @@ class ExtensionNaf: ExtensionAdaptor(NAME), CoroutineScope, NafState, NafService
             println("Save error $t")
         }
     }
-
     override fun hook(extensionHook: ExtensionHook): Unit = with(extensionHook) {
         super.hook(this)
 
@@ -118,7 +119,7 @@ class ExtensionNaf: ExtensionAdaptor(NAME), CoroutineScope, NafState, NafService
 
         view?.let {
             SwingUtilities.invokeLater {
-                val nafScanner = NafScanner(defaultPolicy, coroutineContext)
+                val nafScanner = NafScanner(nafService, defaultPolicy, coroutineContext)
                 val lifecycle = LifecycleRegistry()
                 val rootComponent = RootComponent(
                     componentContext = DefaultComponentContext(lifecycle),

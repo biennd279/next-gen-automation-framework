@@ -31,6 +31,11 @@ class NafScan(
                         _phase.value = NafPhase.SCAN
                         it.start(target)
                     }
+
+                    is NucleiScanPipeline -> {
+                        _phase.value = NafPhase.SCAN
+                        it.start(target)
+                    }
                 }
             }
                 .onFailure {
