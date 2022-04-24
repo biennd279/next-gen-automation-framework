@@ -4,6 +4,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import org.parosproxy.paros.control.Control
 import org.parosproxy.paros.model.HistoryReferenceEventPublisher
 import org.parosproxy.paros.model.SiteMapEventPublisher
 import org.zaproxy.addon.naf.model.NafAlert
@@ -11,6 +12,7 @@ import org.zaproxy.addon.naf.model.toNafAlert
 import org.zaproxy.zap.eventBus.Event
 import org.zaproxy.zap.eventBus.EventConsumer
 import org.zaproxy.zap.extension.alert.AlertEventPublisher
+import org.zaproxy.zap.extension.alert.ExtensionAlert
 import org.zaproxy.zap.model.ScanEventPublisher
 import kotlin.coroutines.CoroutineContext
 
@@ -22,6 +24,10 @@ internal class EventConsumerImpl(
 
     private val setHistoryRef = mutableSetOf<Int>()
     private val setAlerts = mutableSetOf<NafAlert>()
+
+    private val extensionAlert: ExtensionAlert by lazy {
+        Control.getSingleton().extensionLoader.getExtension(ExtensionAlert::class.java)
+    }
 
     override fun eventReceived(event: Event?) {
         when (event?.eventType) {
@@ -63,20 +69,15 @@ internal class EventConsumerImpl(
             }
             AlertEventPublisher.ALERT_ADDED_EVENT -> {
                 kotlin.runCatching {
-                    launch {
-                        val map = event.parameters
-                        val alert = map.toNafAlert()
-                        if (!setAlerts.contains(alert)) {
-                            setAlerts.add(alert)
-                            nafState.alerts.update {
-                                it + alert
-                            }
-                        }
+                    val map = event.parameters
+                    val id = map[AlertEventPublisher.ALERT_ID]?.toIntOrNull()!!
+                    val alert = extensionAlert
+                        .allAlerts
+                        .find { it.alertId == id }!!
+                    nafState.alerts.update { alerts ->
+                        alerts + alert.toNafAlert()
                     }
                 }
-                    .onFailure {
-
-                    }
             }
 
             // Add to set of changed, removed
