@@ -1,6 +1,7 @@
 package org.zaproxy.addon.naf.ui.home
 
 import androidx.compose.desktop.ui.tooling.preview.Preview
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -12,6 +13,7 @@ import com.arkivanov.decompose.ExperimentalDecomposeApi
 import com.arkivanov.decompose.extensions.compose.jetbrains.Children
 import org.zaproxy.addon.naf.component.HomeComponent
 import org.zaproxy.addon.naf.ui.NafTab
+import org.zaproxy.addon.naf.ui.exploit.Exploit
 
 @OptIn(ExperimentalDecomposeApi::class)
 @Preview
@@ -31,12 +33,16 @@ fun Home(
         },
         modifier = Modifier.padding(5.dp).fillMaxSize()
     ) {
-        Divider()
 
-        when (child) {
-            is HomeComponent.Child.Dashboard -> Dashboard(child.component)
-            is HomeComponent.Child.Project -> Project(child.component, child.onCallWizard)
-            is HomeComponent.Child.Setting -> Setting(child.componentContext)
+        Column {
+            Divider()
+
+            when (child) {
+                is HomeComponent.Child.Dashboard -> Dashboard(child.component)
+                is HomeComponent.Child.Project -> Project(child.component, child.onCallWizard)
+                is HomeComponent.Child.Setting -> Setting(child.componentContext)
+                is HomeComponent.Child.Exploit -> Exploit(child.exploitComponent)
+            }
         }
     }
 }

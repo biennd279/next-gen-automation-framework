@@ -49,9 +49,9 @@ class SqlmapRequestBuilder {
 
     fun build(): StartTaskRequest {
 
-        require(cleanup || updateAll || url != null) {
-            "Require either cleanup, update or attack request"
-        }
+//        require(cleanup || updateAll || url != null) {
+//            "Require either cleanup, update or attack request"
+//        }
 
         return StartTaskRequest(
             url,

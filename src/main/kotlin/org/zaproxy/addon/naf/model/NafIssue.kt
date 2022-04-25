@@ -1,6 +1,6 @@
 package org.zaproxy.addon.naf.model
 
-data class Issue(
+data class NafIssue(
     val name: String,
     val severity: Severity,
     val description: String,

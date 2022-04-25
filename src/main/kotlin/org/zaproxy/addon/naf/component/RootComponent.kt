@@ -55,7 +55,8 @@ class RootComponent internal constructor(
                 currentScan,
                 scanState,
                 nafScanner,
-                onCallWizard
+                onCallWizard,
+                coroutineContext
             )
         },
         coroutineContext
