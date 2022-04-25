@@ -24,7 +24,6 @@ class DockerClientManager {
 
     var dockerClient = DockerClientImpl.getInstance(config, httpClient)
 
-
     fun createSqlmapImage(): String? {
         val image = dockerClient
             .buildImageCmd()
@@ -77,11 +76,4 @@ class DockerClientManager {
         val SQLMAP_API_CONTAINER_NAME = "naf-sqlmap-api"
         val SQLMAP_API_IMAGE_TAG = "biennd279/naf-sqlmap-api"
     }
-}
-
-fun main() {
-    val dockerManger = DockerClientManager()
-
-    dockerManger.stopSqlmapApiContainer()
-
 }

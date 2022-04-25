@@ -18,6 +18,7 @@ import androidx.compose.ui.unit.dp
 import me.d3s34.docker.DockerClientManager
 import org.zaproxy.addon.naf.component.SettingComponent
 import org.zaproxy.addon.naf.model.NucleiEngineType
+import org.zaproxy.addon.naf.model.SqlmapEngineType
 import org.zaproxy.addon.naf.ui.MainColors
 
 @Composable
@@ -78,8 +79,96 @@ fun Setting(settingComponent: SettingComponent) {
 
             when (currentTab.value) {
                 SettingTab.NUCLEI -> NucleiSetting()
-                else -> {}
+                SettingTab.SQLMAP -> SqlmapSetting()
+                SettingTab.METASPLOIT -> {}
+                SettingTab.COMMIX -> {}
             }
+        }
+    }
+}
+
+
+@Composable
+fun SqlmapSetting() {
+    val currentEngineType = remember { mutableStateOf(SqlmapEngineType.NONE) }
+    val url = remember { mutableStateOf("") }
+    val isValidUri = remember { mutableStateOf<Boolean?>(null) }
+
+
+    Column {
+        Row(
+            modifier = Modifier.padding(10.dp)
+        ) {
+            Text(
+                text = "Engine",
+                style = typography.subtitle2,
+                fontWeight = FontWeight.Bold
+            )
+        }
+
+        Spacer(Modifier.padding(10.dp))
+
+        Row(
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            SqlmapEngineType.values().forEach { engineType ->
+                Row(
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    RadioButton(
+                        selected = currentEngineType.value == engineType,
+                        onClick = { currentEngineType.value = engineType },
+                        colors = RadioButtonDefaults.colors()
+                    )
+                    Text(
+                        text = engineType.name
+                    )
+                }
+            }
+        }
+
+        when (currentEngineType.value) {
+            SqlmapEngineType.API,
+            SqlmapEngineType.API_WITH_DOCKER -> {
+                OutlinedTextField(
+                    value = url.value,
+                    onValueChange = { url.value = it },
+                    label = {
+                        Text(
+                            text = "Uri",
+                            style = typography.subtitle2,
+                            fontWeight = FontWeight.Bold
+                        )
+                    },
+                    trailingIcon = {
+                        IconButton(
+                            onClick = {
+                                // Check Path
+
+                                if (isValidUri.value == null) {
+                                    isValidUri.value = true
+                                } else {
+                                    isValidUri.value = !isValidUri.value!!
+                                }
+                            }
+                        ) {
+                            Row {
+                                Icon(
+                                    Icons.Default.Check,
+                                    contentDescription = "Check Uri",
+                                    tint = when (isValidUri.value) {
+                                        null -> Color.Gray
+                                        true -> Color.Green
+                                        false -> Color.Red
+                                    }
+                                )
+                            }
+                        }
+                    },
+                    modifier = Modifier.fillMaxWidth()
+                )
+            }
+            SqlmapEngineType.NONE -> {}
         }
     }
 }
