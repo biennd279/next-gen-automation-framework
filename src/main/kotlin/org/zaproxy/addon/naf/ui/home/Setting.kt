@@ -15,6 +15,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import me.d3s34.docker.DockerClientManager
 import org.zaproxy.addon.naf.component.SettingComponent
 import org.zaproxy.addon.naf.model.NucleiEngineType
 import org.zaproxy.addon.naf.ui.MainColors
@@ -63,6 +64,16 @@ fun Setting(settingComponent: SettingComponent) {
     ) {
 
         Column {
+
+            Button(
+                onClick = {
+                    val dockerManager = DockerClientManager()
+                    println(dockerManager.createSqlmapImage())
+                }
+            ) {
+                Text("Create sqlmap image")
+            }
+
             Divider(Modifier.padding(10.dp))
 
             when (currentTab.value) {
