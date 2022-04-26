@@ -3,11 +3,14 @@ package me.d3s34.docker
 import com.github.dockerjava.core.DefaultDockerClientConfig
 import com.github.dockerjava.core.DockerClientImpl
 import com.github.dockerjava.httpclient5.ApacheDockerHttpClient
+import kotlinx.coroutines.*
 import org.parosproxy.paros.Constant
 import java.io.File
+import java.nio.charset.Charset
 import java.time.Duration
 
-class DockerClientManager {
+
+class DockerClientManager() {
 
     var config = DefaultDockerClientConfig
         .createDefaultConfigBuilder()
@@ -35,7 +38,7 @@ class DockerClientManager {
         return image.awaitImageId()
     }
 
-    fun createSqlmapApiContainer(host: String = "127.0.0.1", port: Int = 8875): String? {
+    fun createSqlmapApiContainer(host: String = "127.0.0.1", port: Int = 8775): String? {
         val listContainer = dockerClient
             .listContainersCmd()
             .withStatusFilter(listOf("created", "restarting", "running", "paused", "exited"))
@@ -43,10 +46,21 @@ class DockerClientManager {
             .exec()
 
         if (listContainer.size > 0) {
-            dockerClient
-                .removeContainerCmd(SQLMAP_API_CONTAINER_NAME)
-                .withRemoveVolumes(true)
-                .exec()
+
+            listContainer.first().status
+
+            kotlin.runCatching {
+                dockerClient
+                    .stopContainerCmd(SQLMAP_API_CONTAINER_NAME)
+                    .exec()
+            }
+
+            kotlin.runCatching {
+                dockerClient
+                    .removeContainerCmd(SQLMAP_API_CONTAINER_NAME)
+                    .withRemoveVolumes(true)
+                    .exec()
+            }
         }
 
         val container = dockerClient
@@ -57,6 +71,10 @@ class DockerClientManager {
             .exec()
 
         return container.id
+    }
+
+    fun checkStatusContainer() {
+
     }
 
     fun startSqlmapApiContainer() {
@@ -72,8 +90,64 @@ class DockerClientManager {
     }
 
     companion object {
-        val SQLMAP_API_DOCKER_URI = "me/d3s34/sqlmap/Dockerfile"
-        val SQLMAP_API_CONTAINER_NAME = "naf-sqlmap-api"
-        val SQLMAP_API_IMAGE_TAG = "biennd279/naf-sqlmap-api"
+        const val SQLMAP_API_DOCKER_URI = "me/d3s34/sqlmap/Dockerfile"
+        const val SQLMAP_API_CONTAINER_NAME = "naf-sqlmap-api"
+        const val SQLMAP_API_IMAGE_TAG = "biennd279/naf-sqlmap-api"
+
+        const val COMMIX_DOCKER_URI = "me/d3s34/commix/Dockerfile"
+        const val COMMIX_CONTAINER_NAME = "naf-commix"
+        const val COMMIX_IMAGE_TAG = "biennd279/naf-commix"
+    }
+}
+
+@OptIn(DelicateCoroutinesApi::class, ExperimentalCoroutinesApi::class)
+fun main() {
+    val client = DockerClientManager()
+    val dockerClient = client.dockerClient
+
+    runBlocking {
+        val container = dockerClient
+            .createContainerCmd("biennd279/naf-commix")
+            .withNetworkMode("host")
+            .withCmd("commix","-u", "http://localhost:8888/command.php", "-d", "dir=/", "--batch")
+            .withAttachStdin(true)
+            .withAttachStdout(true)
+            .withAttachStderr(true)
+//            .withTty(true)
+            .withStdinOpen(true)
+            .exec()
+
+        val containerAttachClient = ContainerAttachClient(
+            containerId = container.id,
+            dockerClient = dockerClient,
+            coroutineContext = Dispatchers.IO
+        )
+
+        GlobalScope.launch {
+            containerAttachClient.status
+                .collect {
+                    println("Update status ${it.name}")
+                }
+        }
+
+        GlobalScope.launch {
+            containerAttachClient.attach()
+            dockerClient
+                .startContainerCmd(container.id)
+                .exec()
+            for (output in containerAttachClient.stdoutChannel) {
+                println(output.toString(Charset.defaultCharset()))
+            }
+        }
+
+        while (containerAttachClient.status.value != ContainerAttachClient.Status.DEATTACH) {
+            val line = readln()
+            if (line == "exit") {
+                containerAttachClient.close()
+                break
+            }
+
+            containerAttachClient.send((line + "\n").toByteArray())
+        }
     }
 }
