@@ -1,16 +1,18 @@
 package me.d3s34.commix
 
-import eu.jrie.jetbrains.kotlinshell.processes.process.ProcessChannelUnit
 import eu.jrie.jetbrains.kotlinshell.processes.process.ProcessReceiveChannel
 import eu.jrie.jetbrains.kotlinshell.processes.process.ProcessSendChannel
 import eu.jrie.jetbrains.kotlinshell.shell.shell
-import kotlinx.coroutines.*
-import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import me.d3s34.lib.command.buildCommand
 import me.d3s34.lib.process.buildSystemExecutor
 import me.d3s34.lib.process.throwOnError
 import kotlin.coroutines.CoroutineContext
 
+@Deprecated(
+    message = "This Engine can not retry all stdout",
+    level = DeprecationLevel.WARNING,
+)
 class CommixNativeEngine(
     val fullPath: String,
     override val coroutineContext: CoroutineContext
@@ -49,41 +51,3 @@ class CommixNativeEngine(
             }.getOrThrow()
         }
 }
-
-fun main(): Unit = runBlocking {
-    val engine = CommixNativeEngine(
-        "/home/bien/Downloads/commix-3.4/commix.py",
-        Dispatchers.IO + SupervisorJob()
-    )
-
-    val stdin = Channel<ProcessChannelUnit>()
-    val stdout = Channel<ProcessChannelUnit>()
-
-    val commixRequest = CommixRequest(
-        url = "http://localhost:8888/command.php",
-        data = "dir=/tmp"
-    )
-
-    launch {
-        for (output in stdout) {
-            println(output.readText())
-            System.out.flush()
-        }
-    }
-
-    val job = launch { engine.tryGetShell(commixRequest, stdin, stdout) }
-
-//    launch {
-//        delay(500)
-//        while (true) {
-//            val input = readLine()
-//            input?.let {
-//                stdin.send(it.toByteArray())
-//            }
-//        }
-//    }
-
-    job.join()
-    stdin.close()
-}
-

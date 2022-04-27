@@ -12,14 +12,13 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.io.*
-import kotlin.coroutines.CoroutineContext
 
 class ContainerAttachClient(
     val containerId: String,
     val dockerClient: DockerClient,
-    override val coroutineContext: CoroutineContext
-): CoroutineScope {
-    enum class Status { NOT_ATTACH, ATTACHING, DEATTACH, ERROR }
+    val coroutineScope: CoroutineScope
+) {
+    enum class Status { NOT_RUNNING, NOT_ATTACH, ATTACHING, DETACH, ERROR }
 
     private val _status = MutableStateFlow(Status.NOT_ATTACH)
     val status = _status.asStateFlow()
@@ -52,20 +51,22 @@ class ContainerAttachClient(
             override fun onComplete() {
                 super.onComplete()
                 _stdoutChannel.close()
-                _status.update { Status.DEATTACH }
+                _status.update { Status.DETACH }
             }
         }
 
-        out = PipedOutputStream()
-        `in` = PipedInputStream(out as PipedOutputStream)
+        coroutineScope.launch(Dispatchers.IO) {
+            out = PipedOutputStream()
+            `in` = PipedInputStream(out as PipedOutputStream)
 
-        dockerClient
-            .attachContainerCmd(containerId)
-            .withStdIn(`in`)
-            .withStdOut(true)
-            .withStdErr(true)
-            .withFollowStream(true)
-            .exec(resultCallback)
+            dockerClient
+                .attachContainerCmd(containerId)
+                .withStdIn(`in`)
+                .withStdOut(true)
+                .withStdErr(true)
+                .withFollowStream(true)
+                .exec(resultCallback)
+        }
 
         return resultCallback.awaitStarted()
     }
@@ -83,16 +84,14 @@ class ContainerAttachClient(
     }
 
     fun send(message: ByteArray) {
-        launch(Dispatchers.IO) {
-            out.write(message)
-            out.flush()
-        }
+        out.write(message)
+        out.flush()
     }
 
     fun close() {
         resultCallback.close()
         _stdoutChannel.close()
-        _status.update { Status.DEATTACH }
+        _status.update { Status.DETACH }
 
         kotlin.runCatching {
             stop()
