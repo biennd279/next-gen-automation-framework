@@ -44,6 +44,7 @@ class HomeComponent(
             NafTab.PROJECT -> router.replaceCurrent(Config.Project)
             NafTab.SETTING -> router.replaceCurrent(Config.Setting)
             NafTab.EXPLOIT -> router.replaceCurrent(Config.Exploit)
+            NafTab.ISSUE -> router.replaceCurrent(Config.Issue)
             else -> {}
         }
     }
@@ -76,6 +77,7 @@ class HomeComponent(
             listExploitTabComponent,
             coroutineContext)
         )
+        Config.Issue -> Child.Issue(IssueComponent(componentContext))
     }
 
     sealed class Child(
@@ -90,6 +92,8 @@ class HomeComponent(
         data class Setting(val componentContext: SettingComponent): Child(NafTab.SETTING)
 
         data class Exploit(val exploitComponent: ExploitComponent): Child(NafTab.EXPLOIT)
+
+        data class Issue(val issueComponent: IssueComponent): Child(NafTab.ISSUE)
     }
 
     sealed class Config: Parcelable {
@@ -101,5 +105,7 @@ class HomeComponent(
         object Setting: Config()
         @Parcelize
         object Exploit: Config()
+        @Parcelize
+        object Issue: Config()
     }
 }

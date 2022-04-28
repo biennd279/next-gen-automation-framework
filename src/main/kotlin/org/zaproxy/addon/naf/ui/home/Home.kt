@@ -42,6 +42,7 @@ fun Home(
                 is HomeComponent.Child.Project -> Project(child.component, child.onCallWizard)
                 is HomeComponent.Child.Setting -> Setting(child.componentContext)
                 is HomeComponent.Child.Exploit -> Exploit(child.exploitComponent)
+                is HomeComponent.Child.Issue -> Issue(child.issueComponent)
             }
         }
     }
