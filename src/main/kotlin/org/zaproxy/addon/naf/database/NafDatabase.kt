@@ -45,7 +45,9 @@ class NafDatabase {
             .map { it.toNafConfig() }
             .firstOrNull()
 
+
         if (lastConfig == null) {
+            ConfigTable.insert(emptyConfig)
             lastConfig = emptyConfig
         }
 

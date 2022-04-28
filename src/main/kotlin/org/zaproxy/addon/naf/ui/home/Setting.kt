@@ -8,6 +8,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -15,14 +16,18 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import me.d3s34.docker.DockerClientManager
 import org.zaproxy.addon.naf.component.SettingComponent
+import org.zaproxy.addon.naf.model.CommixEngineType
+import org.zaproxy.addon.naf.model.NafConfig
 import org.zaproxy.addon.naf.model.NucleiEngineType
 import org.zaproxy.addon.naf.model.SqlmapEngineType
 import org.zaproxy.addon.naf.ui.MainColors
+import org.zaproxy.addon.naf.ui.collectAsMutableState
 
 @Composable
-fun Setting(settingComponent: SettingComponent) {
+fun Setting(
+    settingComponent: SettingComponent
+) {
     val currentTab = remember { mutableStateOf(SettingTab.NUCLEI) }
 
     Scaffold(
@@ -51,37 +56,26 @@ fun Setting(settingComponent: SettingComponent) {
                 horizontalArrangement = Arrangement.End
             ) {
                 TextButton(
-                    onClick = {}
+                    onClick = {
+                        settingComponent.nafService.saveConfig()
+                    }
                 ) {
                     Text("Save")
-                }
-                TextButton(
-                    onClick = {}
-                ) {
-                    Text("Cancel")
                 }
             }
         }
     ) {
 
         Column {
-
-            Button(
-                onClick = {
-                    val dockerManager = DockerClientManager()
-                    println(dockerManager.createSqlmapImage())
-                }
-            ) {
-                Text("Create sqlmap image")
-            }
-
             Divider(Modifier.padding(10.dp))
 
+            val configState =  settingComponent.nafService.nafConfig.collectAsMutableState()
+
             when (currentTab.value) {
-                SettingTab.NUCLEI -> NucleiSetting()
-                SettingTab.SQLMAP -> SqlmapSetting()
-                SettingTab.METASPLOIT -> {}
-                SettingTab.COMMIX -> {}
+                SettingTab.NUCLEI -> NucleiSetting(configState)
+                SettingTab.SQLMAP -> SqlmapSetting(configState)
+                SettingTab.COMMIX -> CommixSetting(configState)
+                SettingTab.METASPLOIT -> MetasploitSetting()
             }
         }
     }
@@ -89,11 +83,10 @@ fun Setting(settingComponent: SettingComponent) {
 
 
 @Composable
-fun SqlmapSetting() {
-    val currentEngineType = remember { mutableStateOf(SqlmapEngineType.NONE) }
-    val url = remember { mutableStateOf("") }
+fun SqlmapSetting(
+    nafConfig: MutableState<NafConfig>
+) {
     val isValidUri = remember { mutableStateOf<Boolean?>(null) }
-
 
     Column {
         Row(
@@ -116,8 +109,10 @@ fun SqlmapSetting() {
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     RadioButton(
-                        selected = currentEngineType.value == engineType,
-                        onClick = { currentEngineType.value = engineType },
+                        selected = nafConfig.value.sqlmapEngineType == engineType,
+                        onClick = {
+                            nafConfig.value = nafConfig.value.copy(sqlmapEngineType = engineType)
+                        },
                         colors = RadioButtonDefaults.colors()
                     )
                     Text(
@@ -127,12 +122,14 @@ fun SqlmapSetting() {
             }
         }
 
-        when (currentEngineType.value) {
+        when (nafConfig.value.sqlmapEngineType) {
             SqlmapEngineType.API,
             SqlmapEngineType.API_WITH_DOCKER -> {
                 OutlinedTextField(
-                    value = url.value,
-                    onValueChange = { url.value = it },
+                    value = nafConfig.value.sqlmapApiUrl ?: "",
+                    onValueChange = {
+                        nafConfig.value = nafConfig.value.copy(sqlmapApiUrl = it)
+                    },
                     label = {
                         Text(
                             text = "Uri",
@@ -175,11 +172,10 @@ fun SqlmapSetting() {
 
 @Preview
 @Composable
-fun NucleiSetting() {
-    val currentEngineType = remember { mutableStateOf(NucleiEngineType.None) }
-    val path = remember { mutableStateOf("") }
+fun NucleiSetting(
+    nafConfig: MutableState<NafConfig>
+) {
     val isValidPath = remember { mutableStateOf<Boolean?>(null) }
-    val templatePath = remember { mutableStateOf("") }
 
     Column {
 
@@ -198,13 +194,15 @@ fun NucleiSetting() {
         Row(
             modifier = Modifier.fillMaxWidth()
         ) {
-            NucleiEngineType.values().forEach {  engineType ->
+            NucleiEngineType.values().forEach { engineType ->
                 Row(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     RadioButton(
-                        selected = currentEngineType.value == engineType,
-                        onClick = { currentEngineType.value = engineType },
+                        selected = nafConfig.value.nucleiEngineType == engineType,
+                        onClick = {
+                            nafConfig.value = nafConfig.value.copy(nucleiEngineType = engineType)
+                        },
                         colors = RadioButtonDefaults.colors()
                     )
                     Text(
@@ -214,94 +212,97 @@ fun NucleiSetting() {
             }
         }
 
-        when (currentEngineType.value) {
-            NucleiEngineType.None -> {
-
-            }
+        when (nafConfig.value.nucleiEngineType) {
             NucleiEngineType.Native -> {
+                Spacer(Modifier.padding(10.dp))
+
+                Row(
+                    modifier = Modifier.padding(10.dp)
+                ) {
+                    Text(
+                        text = "Root Template",
+                        style = typography.subtitle2,
+                        fontWeight = FontWeight.Bold
+                    )
+                }
+
+                Spacer(Modifier.padding(10.dp))
+
                 OutlinedTextField(
-                    value = path.value,
-                    onValueChange = { path.value = it },
+                    value = nafConfig.value.templateRootDir ?: "",
+                    onValueChange = {
+                        nafConfig.value = nafConfig.value.copy(templateRootDir = it)
+                    },
+                    modifier = Modifier.fillMaxWidth(),
                     label = {
                         Text(
                             text = "Path",
                             style = typography.subtitle2,
                             fontWeight = FontWeight.Bold
                         )
-                    },
-                    trailingIcon = {
-                        IconButton(
-                            onClick = {
-                                // Check Path
+                    }
+                )
 
-                                if (isValidPath.value == null) {
-                                    isValidPath.value = true
-                                } else {
-                                    isValidPath.value = !isValidPath.value!!
-                                }
-                            }
-                        ) {
-                            Row {
-                                Icon(
-                                    Icons.Default.Check,
-                                    contentDescription = "Check path",
-                                    tint = when (isValidPath.value) {
-                                        null -> Color.Gray
-                                        true -> Color.Green
-                                        false -> Color.Red
-                                    }
-                                )
-                            }
+                Row(
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = "Reset to default"
+                    )
+                    IconButton(
+                        onClick = {
+
                         }
-                    },
-                    modifier = Modifier.fillMaxWidth()
-                )
-            }
-            NucleiEngineType.Docker -> {
-
-            }
-        }
-
-        Spacer(Modifier.padding(10.dp))
-
-        Row(
-            modifier = Modifier.padding(10.dp)
-        ) {
-            Text(
-                text = "Root Template",
-                style = typography.subtitle2,
-                fontWeight = FontWeight.Bold
-            )
-        }
-
-        Spacer(Modifier.padding(10.dp))
-
-        OutlinedTextField(
-            value = templatePath.value,
-            onValueChange = { templatePath.value = it },
-            modifier = Modifier.fillMaxWidth(),
-            label = {
-                Text(
-                    text = "Path",
-                    style = typography.subtitle2,
-                    fontWeight = FontWeight.Bold
-                )
-            }
-        )
-
-        Row(
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Text(
-                text = "Reset to default"
-            )
-            IconButton(
-                onClick = {
-
+                    ) {
+                        Icon(Icons.Default.Refresh, "Refresh path")
+                    }
                 }
+            }
+            NucleiEngineType.Docker -> {}
+            NucleiEngineType.None -> {}
+        }
+    }
+}
+
+@Composable
+fun CommixSetting(
+    nafConfig: MutableState<NafConfig>
+) {
+    Row(
+        modifier = Modifier.padding(10.dp)
+    ) {
+        Text(
+            text = "Engine",
+            style = typography.subtitle2,
+            fontWeight = FontWeight.Bold
+        )
+    }
+
+    Spacer(Modifier.padding(10.dp))
+
+    Row(
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        CommixEngineType.values().forEach { engineType ->
+            Row(
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                Icon(Icons.Default.Refresh, "Refresh path")
+                RadioButton(
+                    selected = nafConfig.value.commixEngineType == engineType,
+                    onClick = {
+                        nafConfig.value = nafConfig.value.copy(commixEngineType = engineType)
+                    },
+                    colors = RadioButtonDefaults.colors()
+                )
+                Text(
+                    text = engineType.name
+                )
             }
         }
     }
+}
+
+@Composable
+fun MetasploitSetting() {
+
 }

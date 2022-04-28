@@ -54,7 +54,7 @@ class RootComponent internal constructor(
                 childContext,
                 currentScan,
                 scanState,
-                nafScanner,
+                nafScanner.nafService,
                 onCallWizard,
                 coroutineContext
             )

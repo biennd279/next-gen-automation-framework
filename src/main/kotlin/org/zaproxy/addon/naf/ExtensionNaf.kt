@@ -64,6 +64,8 @@ class ExtensionNaf: ExtensionAdaptor(NAME), CoroutineScope, NafState {
 
     lateinit var defaultPolicy: ScanPolicy
 
+    lateinit var database: NafDatabase
+
     override val getHistoryReference: (Int) -> HistoryReference = {
         extHistory.getHistoryReference(it)
     }
@@ -93,7 +95,7 @@ class ExtensionNaf: ExtensionAdaptor(NAME), CoroutineScope, NafState {
         extAlert = extensionLoader.getExtension(ExtensionAlert::class.java)
         extSpider = extensionLoader.getExtension(ExtensionSpider::class.java)
 
-        try {
+        kotlin.runCatching {
             val policyManager = extActiveScan.policyManager
 
             defaultPolicy = policyManager
@@ -102,9 +104,13 @@ class ExtensionNaf: ExtensionAdaptor(NAME), CoroutineScope, NafState {
             defaultPolicy.name = "NAF"
 
             policyManager.savePolicy(defaultPolicy)
-        } catch (t: Throwable) {
-            println("Save error $t")
+        }.onFailure {
+            println("Save error $it")
         }
+
+        database = NafDatabase()
+
+        database.connectAndMigrate()
     }
     override fun hook(extensionHook: ExtensionHook): Unit = with(extensionHook) {
         super.hook(this)
@@ -116,17 +122,14 @@ class ExtensionNaf: ExtensionAdaptor(NAME), CoroutineScope, NafState {
         addProxyListener(ProxyListenerImpl)
 
         addConnectionRequestProxyListener(ProxyListenerImpl)
-
-        val nafDatabase = NafDatabase()
-
-        nafDatabase.connectAndMigrate()
-
-        val nafConfig = nafDatabase.loadConfig()
+        val nafConfig = MutableStateFlow(database.loadConfig())
 
         view?.let {
             SwingUtilities.invokeLater {
 
-                val nafService = NafServiceImpl(coroutineContext)
+                val nafService = NafServiceImpl(nafConfig, coroutineContext) {
+                    database.saveConfig(nafConfig = nafConfig.value)
+                }
 
                 val nafScanner = NafScanner(nafService, defaultPolicy, coroutineContext)
 

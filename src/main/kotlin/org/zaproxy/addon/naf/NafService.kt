@@ -1,13 +1,22 @@
 package org.zaproxy.addon.naf
 
+import kotlinx.coroutines.flow.MutableStateFlow
 import me.d3s34.commix.CommixDockerEngine
 import me.d3s34.nuclei.NucleiEngine
 import me.d3s34.sqlmap.SqlmapApiEngine
+import org.zaproxy.addon.naf.model.NafConfig
 
 interface NafService {
-    var nucleiRootTemplatePath: String
-    var nucleiEngine: NucleiEngine?
 
-    var sqlmapEngine: SqlmapApiEngine?
-    var commixDockerEngine: CommixDockerEngine?
+    val nafConfig: MutableStateFlow<NafConfig>
+
+    val nucleiEngine: NucleiEngine?
+    val nucleiRootTemplatePath: String
+
+    val sqlmapEngine: SqlmapApiEngine?
+    val sqlmapUrl: String
+
+    val commixDockerEngine: CommixDockerEngine?
+
+    val saveConfig: () -> Unit
 }
