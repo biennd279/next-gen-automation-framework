@@ -19,7 +19,10 @@ class NafServiceImpl(
     override var nucleiRootTemplatePath: String = "${home}/nuclei-templates/dns/"
 
     private val baseUrl: String = "http://127.0.0.1:8775/"
+
     override var sqlmapEngine: SqlmapApiEngine? = SqlmapApiEngine(baseUrl, coroutineContext)
 
     override var commixDockerEngine: CommixDockerEngine? = CommixDockerEngine(coroutineContext)
+
+
 }

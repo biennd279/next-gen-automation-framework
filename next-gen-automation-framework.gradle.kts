@@ -1,8 +1,11 @@
-val ktorVersion: String = "2.0.0"
-val kotlinVersion: String = "1.6.20"
+val ktorVersion = "2.0.0"
+val kotlinVersion = "1.6.20"
 val kotlinxSerializationVersion = "1.3.2"
 val coroutinesVersion = "1.6.0"
 val decomposeVersion = "0.6.0"
+val h2Version = "2.1.212"
+val hikariCpVersion = "5.0.1"
+val exposedVersion = "0.38.1"
 
 description = "Next gen automation framework addon for ZAP"
 
@@ -57,7 +60,7 @@ dependencies {
 
     // Classpath
     implementation(kotlin("stdlib"))
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:${coroutinesVersion}")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutinesVersion")
     implementation("eu.jrie.jetbrains:kotlin-shell-core:0.2.1")
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:$kotlinxSerializationVersion")
 
@@ -76,6 +79,13 @@ dependencies {
     // Docker
     implementation("com.github.docker-java:docker-java-core:3.2.13")
     implementation("com.github.docker-java:docker-java-transport-httpclient5:3.2.13")
+
+    // Database
+    implementation("org.jetbrains.exposed:exposed-core:$exposedVersion")
+    implementation("org.jetbrains.exposed:exposed-dao:$exposedVersion")
+    implementation("org.jetbrains.exposed:exposed-jdbc:$exposedVersion")
+    implementation("com.h2database:h2:$h2Version")
+    implementation("com.zaxxer:HikariCP:$hikariCpVersion")
 
     // Testing
     testImplementation(kotlin("test"))
