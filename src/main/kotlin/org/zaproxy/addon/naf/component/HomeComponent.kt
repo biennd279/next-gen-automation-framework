@@ -1,6 +1,7 @@
 package org.zaproxy.addon.naf.component
 
 import androidx.compose.runtime.State
+import androidx.compose.runtime.mutableStateListOf
 import com.arkivanov.decompose.ComponentContext
 import com.arkivanov.decompose.router.RouterState
 import com.arkivanov.decompose.router.replaceCurrent
@@ -26,6 +27,8 @@ class HomeComponent(
     private val onCallWizard: () -> Unit,
     override val coroutineContext: CoroutineContext
 ): ComponentContext by componentContext, CoroutineScope {
+
+    private val listExploitTabComponent = mutableStateListOf<ExploitTabComponent>(StartTabComponent())
 
     private val router = router<Config, Child>(
         initialConfiguration = Config.Project,
@@ -67,7 +70,12 @@ class HomeComponent(
         Config.Dashboard -> Child.Dashboard(DashboardComponent(componentContext, nafState))
         Config.Project -> Child.Project(ProjectComponent(componentContext), onCallWizard)
         Config.Setting -> Child.Setting(SettingComponent(componentContext, nafService))
-        Config.Exploit -> Child.Exploit(ExploitComponent(componentContext, nafService, coroutineContext))
+        Config.Exploit -> Child.Exploit(ExploitComponent(
+            componentContext,
+            nafService,
+            listExploitTabComponent,
+            coroutineContext)
+        )
     }
 
     sealed class Child(
