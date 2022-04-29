@@ -22,23 +22,22 @@ import org.zaproxy.addon.naf.model.emptyIssue
 
 @Composable
 fun Issue(component: IssueComponent) {
-
-    Text(
-        text = "List Issue",
-        style = typography.h4
-    )
-
-    Divider()
-
-    Spacer(Modifier.height(20.dp))
-
-    val issues = component.issues.collectAsState()
-    val selectedIssue = remember { mutableStateOf<NafIssue?>(null) }
-
     Column(
         modifier = Modifier
             .fillMaxHeight()
     ) {
+        Text(
+            text = "List Issue",
+            style = typography.h4
+        )
+
+        Divider()
+
+        Spacer(Modifier.height(20.dp))
+
+        val issues = component.issues.collectAsState()
+        val selectedIssue = remember { mutableStateOf<NafIssue?>(null) }
+
         LazyColumn(modifier = Modifier.weight(1f)) {
             items(issues.value) {issue ->
                 Row(
@@ -78,16 +77,16 @@ fun Issue(component: IssueComponent) {
         ) {
             Text("New Issue")
         }
-    }
 
-    selectedIssue.value?.also {
-        val issueState = mutableStateOf(it)
-        EditIssueDialog(issueState) {
-            if (issueState.value != it) {
-                component.saveIssue(issueState.value)
+        selectedIssue.value?.also {
+            val issueState = mutableStateOf(it)
+            EditIssueDialog(issueState) {
+                if (issueState.value != it) {
+                    component.saveIssue(issueState.value)
+                }
+
+                selectedIssue.value = null
             }
-
-            selectedIssue.value = null
         }
     }
 }
