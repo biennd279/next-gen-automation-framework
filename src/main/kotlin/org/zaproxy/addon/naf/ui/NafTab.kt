@@ -7,7 +7,7 @@ internal interface Tab {
 enum class NafTab(override val title: String): Tab {
     PROJECT("Project"),
     DASHBOARD("Dashboard"),
-    TARGET("Target"),
+//    TARGET("Target"),
     ISSUE("Issue"),
     EXPLOIT("Exploit"),
     REPORT("Report"),

@@ -87,6 +87,11 @@ dependencies {
     implementation("com.h2database:h2:$h2Version")
     implementation("com.zaxxer:HikariCP:$hikariCpVersion")
 
+    // Markdown
+    implementation("com.mikepenz:multiplatform-markdown-renderer:0.4.0")
+    implementation("eu.de-swaef.pdf:Markdown2Pdf:2.0.1")
+
+
     // Testing
     testImplementation(kotlin("test"))
     testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.6.0")
