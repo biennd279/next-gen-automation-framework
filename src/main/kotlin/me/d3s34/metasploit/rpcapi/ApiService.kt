@@ -1,6 +1,7 @@
 package me.d3s34.metasploit.rpcapi
 
 import io.ktor.client.*
+import io.ktor.client.engine.*
 import io.ktor.client.engine.cio.*
 import io.ktor.client.plugins.*
 import io.ktor.client.plugins.contentnegotiation.*
@@ -17,6 +18,7 @@ import me.d3s34.metasploit.rpcapi.request.job.JobInfoRequest
 import me.d3s34.metasploit.rpcapi.request.job.JobListRequest
 import me.d3s34.metasploit.rpcapi.request.job.JobStopRequest
 import me.d3s34.metasploit.rpcapi.request.module.ModuleListRequest
+import me.d3s34.metasploit.rpcapi.request.module.ModuleOptionsRequest
 import me.d3s34.metasploit.rpcapi.response.InfoResponse
 import me.d3s34.metasploit.rpcapi.response.MsfRpcResponse
 import me.d3s34.metasploit.rpcapi.response.auth.LoginResponse
@@ -27,6 +29,7 @@ import me.d3s34.metasploit.rpcapi.response.core.VersionResponse
 import me.d3s34.metasploit.rpcapi.response.job.JobInfoResponse
 import me.d3s34.metasploit.rpcapi.response.job.JobListResponse
 import me.d3s34.metasploit.rpcapi.response.module.ModuleListResponse
+import me.d3s34.metasploit.rpcapi.response.module.ModuleOptionsResponse
 
 class ApiService(
     val apiUrl: String
@@ -105,7 +108,7 @@ class ApiService(
 
     suspend fun getModulesList(moduleListRequest: ModuleListRequest): ModuleListResponse = sendRpc(moduleListRequest)
 
-
+    suspend fun getModuleOptions(moduleOptionsRequest: ModuleOptionsRequest): ModuleOptionsResponse = sendRpc(moduleOptionsRequest)
 
     companion object {
         val client = HttpClient(CIO) {
@@ -117,6 +120,10 @@ class ApiService(
 
             install(ContentNegotiation) {
                 messagePack()
+            }
+
+            engine {
+                proxy = ProxyBuilder.http("http://localhost:8080/")
             }
         }
     }

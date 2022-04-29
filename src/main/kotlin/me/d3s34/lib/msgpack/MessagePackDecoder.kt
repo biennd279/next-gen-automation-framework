@@ -125,6 +125,7 @@ open class MessagePackDecoder(
             decodeSerializableValue(deserializer)
         }
             .onFailure {
+                println(it)
                 buffer.reset()
             }
             .getOrThrow()

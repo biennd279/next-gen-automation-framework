@@ -11,7 +11,6 @@ import kotlinx.serialization.serializer
 import me.d3s34.lib.msgpack.MessagePack
 import me.d3s34.metasploit.rpcapi.request.MsfRpcRequest
 import me.d3s34.metasploit.rpcapi.response.MsfRpcResponse
-import java.nio.charset.Charset
 
 @OptIn(InternalSerializationApi::class)
 fun MsfRpcRequest.toMsfRequest(): List<Any> {
@@ -64,9 +63,3 @@ object EmptyResponse: MsfRpcResponse()
 
 @Suppress("UNCHECKED_CAST")
 fun <T: MsfRpcResponse> emptyResponse() = EmptyResponse as T
-
-fun Any?.toByteArrayString(): String {
-    if (this is ByteArray)
-        return this.toString(Charset.defaultCharset())
-    return this.toString()
-}

@@ -2,18 +2,18 @@ package me.d3s34.metasploit.rpcapi
 
 import kotlinx.coroutines.runBlocking
 import me.d3s34.metasploit.rpcapi.model.MsfModuleType
-import me.d3s34.metasploit.rpcapi.request.auth.TokenAddRequest
 import me.d3s34.metasploit.rpcapi.request.auth.LoginRequest
 import me.d3s34.metasploit.rpcapi.request.auth.LogoutRequest
+import me.d3s34.metasploit.rpcapi.request.auth.TokenAddRequest
 import me.d3s34.metasploit.rpcapi.request.console.*
 import me.d3s34.metasploit.rpcapi.request.core.ModuleStatsRequest
 import me.d3s34.metasploit.rpcapi.request.core.ThreadListRequest
 import me.d3s34.metasploit.rpcapi.request.job.JobListRequest
-import me.d3s34.metasploit.rpcapi.request.module.ModuleListRequest
+import me.d3s34.metasploit.rpcapi.request.module.ModuleOptionsRequest
 import me.d3s34.metasploit.rpcapi.response.core.toListThread
+import org.junit.jupiter.api.Assertions.assertNotEquals
+import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.Test
-
-import org.junit.jupiter.api.Assertions.*
 
 internal class ApiServiceTest {
 
@@ -253,14 +253,18 @@ internal class ApiServiceTest {
 
     @Test
     fun getModulesList() {
-        val response = runBlocking {
-            apiService.getModulesList(ModuleListRequest(
-                token,
-                MsfModuleType.EXPLOITS
-            ))
+        val options = runBlocking {
+            apiService.getModuleOptions(
+                ModuleOptionsRequest(
+                    token,
+                    MsfModuleType.EXPLOITS.toString(),
+                    "linux/http/nagios_xi_plugins_filename_authenticated_rce"
+                )
+            )
         }
 
-        assertNotEquals(true, response.error)
-        assertNotEquals(0, response.modules.size)
+
+
+        println(options.map)
     }
 }

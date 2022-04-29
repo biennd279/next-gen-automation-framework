@@ -6,11 +6,9 @@ import kotlinx.serialization.builtins.ListSerializer
 import kotlinx.serialization.builtins.MapSerializer
 import kotlinx.serialization.serializer
 import me.d3s34.lib.msgpack.MessagePackDecoder
+import me.d3s34.lib.msgpack.MessagePackSerializer
 import me.d3s34.metasploit.rpcapi.emptyResponse
-import me.d3s34.metasploit.rpcapi.response.ListResponse
-import me.d3s34.metasploit.rpcapi.response.MapResponse
-import me.d3s34.metasploit.rpcapi.response.MsfRpcResponse
-import me.d3s34.metasploit.rpcapi.response.TypeResponse
+import me.d3s34.metasploit.rpcapi.response.*
 
 @OptIn(ExperimentalSerializationApi::class, InternalSerializationApi::class)
 inline fun  <reified T: Any, reified U: Any> deserializeMap(decoder: MessagePackDecoder): MapResponse<T, U> {
@@ -30,6 +28,32 @@ inline fun  <reified T: Any, reified U: Any> deserializeMap(decoder: MessagePack
 
 
     return MapResponse(isError, map, response)
+}
+
+@OptIn(ExperimentalSerializationApi::class, InternalSerializationApi::class)
+inline fun  <reified T: Any, reified U: Any, reified V: Any> deserializeMapOfMap(decoder: MessagePackDecoder): MapOfMapResponse<T, U, V> {
+    var isError = false
+    var response = emptyResponse<MsfRpcResponse>()
+
+    val map = runCatching {
+        @Suppress("UNCHECKED_CAST")
+        (decoder
+            .tryDecodeSerializableValue(
+                MapSerializer(
+                    T::class.serializer(),
+                    MapSerializer(U::class.serializer(), MessagePackSerializer)
+                )
+            )) as Map<T, Map<U, V>>
+    }
+        .onFailure {
+            println("Error at decode MapToMap $it")
+            isError = true
+            response = decoder.decodeSerializableValue(MsfRpcResponse::class.serializer())
+        }
+        .getOrDefault(emptyMap())
+
+
+    return MapOfMapResponse(isError, map, response)
 }
 
 @OptIn(ExperimentalSerializationApi::class, InternalSerializationApi::class)
