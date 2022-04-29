@@ -76,7 +76,7 @@ class HomeComponent(
             listExploitTabComponent,
             coroutineContext)
         )
-        Config.Issue -> Child.Issue(IssueComponent(nafDatabase, componentContext))
+        Config.Issue -> Child.Issue(IssueComponent(nafDatabase.issueService, componentContext))
     }
 
     sealed class Child(

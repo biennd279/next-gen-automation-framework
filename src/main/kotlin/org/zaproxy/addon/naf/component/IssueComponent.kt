@@ -3,24 +3,24 @@ package org.zaproxy.addon.naf.component
 import com.arkivanov.decompose.ComponentContext
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.update
-import org.zaproxy.addon.naf.database.NafDatabase
+import org.zaproxy.addon.naf.database.IssueService
 import org.zaproxy.addon.naf.model.NafIssue
 
 class IssueComponent(
-    val nafDatabase: NafDatabase,
+    val issueService: IssueService,
     componentContext: ComponentContext,
 ): ComponentContext by componentContext {
 
-    val issues = MutableStateFlow(nafDatabase.getAllIssue())
+    val issues = MutableStateFlow(issueService.getAllIssue())
     fun saveIssue(issue: NafIssue) {
         if (issue.id == null) {
-            val newIssue = issue.copy(id = nafDatabase.saveNewIssue(issue))
+            val newIssue = issue.copy(id = issueService.saveNewIssue(issue))
             issues.update {
                 it + newIssue
             }
         } else {
-            nafDatabase.updateIssue(issue)
-            val updatedIssue = nafDatabase.findIssue(issue.id)!!
+            issueService.updateIssue(issue)
+            val updatedIssue = issueService.findIssue(issue.id)!!
             issues.update { currentIssues ->
                 currentIssues.map { if (it.id == issue.id) updatedIssue else it }
             }
