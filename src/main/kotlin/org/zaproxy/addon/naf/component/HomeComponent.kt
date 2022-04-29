@@ -13,6 +13,7 @@ import kotlinx.coroutines.CoroutineScope
 import org.zaproxy.addon.naf.NafScan
 import org.zaproxy.addon.naf.NafService
 import org.zaproxy.addon.naf.NafState
+import org.zaproxy.addon.naf.database.NafDatabase
 import org.zaproxy.addon.naf.model.ExploitEvent
 import org.zaproxy.addon.naf.model.NafEvent
 import org.zaproxy.addon.naf.model.NopEvent
@@ -24,6 +25,7 @@ class HomeComponent(
     val currentScan: State<NafScan?>,
     private val nafState: NafState,
     private val nafService: NafService,
+    private val nafDatabase: NafDatabase,
     private val onCallWizard: () -> Unit,
     override val coroutineContext: CoroutineContext
 ): ComponentContext by componentContext, CoroutineScope {
@@ -51,10 +53,7 @@ class HomeComponent(
 
     fun sendEvent(nafEvent: NafEvent) {
         when (nafEvent) {
-            is NopEvent -> {
-                //TODO: Testing purpose only
-                router.replaceCurrent(Config.Exploit)
-            }
+            is NopEvent -> {}
             is ExploitEvent -> {
                 router.replaceCurrent(Config.Exploit)
                 val child = routerState.value.activeChild.instance
@@ -77,7 +76,7 @@ class HomeComponent(
             listExploitTabComponent,
             coroutineContext)
         )
-        Config.Issue -> Child.Issue(IssueComponent(componentContext))
+        Config.Issue -> Child.Issue(IssueComponent(nafDatabase, componentContext))
     }
 
     sealed class Child(

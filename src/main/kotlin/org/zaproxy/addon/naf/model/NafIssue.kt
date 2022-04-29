@@ -9,3 +9,14 @@ data class NafIssue(
     val solution: String,
     val note: String
 )
+
+fun emptyIssue() = NafIssue(
+    null,
+    "",
+    Severity.UNKNOWN,
+    "",
+    "",
+    "",
+    ""
+)
+

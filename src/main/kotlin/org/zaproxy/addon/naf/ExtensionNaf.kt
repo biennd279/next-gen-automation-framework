@@ -138,6 +138,7 @@ class ExtensionNaf: ExtensionAdaptor(NAME), CoroutineScope, NafState {
                     componentContext = DefaultComponentContext(lifecycle),
                     nafScanner = nafScanner,
                     nafState =  this@ExtensionNaf,
+                    nafDatabase = database,
                     coroutineContext = coroutineContext
                 )
 

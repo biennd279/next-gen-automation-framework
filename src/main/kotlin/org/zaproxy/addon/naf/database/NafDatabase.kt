@@ -6,6 +6,7 @@ import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.transactions.transaction
 import org.slf4j.LoggerFactory
 import org.zaproxy.addon.naf.model.NafConfig
+import org.zaproxy.addon.naf.model.NafIssue
 import org.zaproxy.addon.naf.model.emptyConfig
 
 class NafDatabase {
@@ -58,5 +59,31 @@ class NafDatabase {
         addLogger(sqlLogger)
 
         ConfigTable.update(nafConfig)
+    }
+
+
+    fun getAllIssue() = transaction {
+        addLogger(sqlLogger)
+
+        IssueTable.selectAll()
+            .map { it.toNafIssue() }
+    }
+
+    fun saveNewIssue(nafIssue: NafIssue) = transaction {
+        addLogger(sqlLogger)
+
+        IssueTable.insert(nafIssue)
+    }
+
+    fun updateIssue(nafIssue: NafIssue) = transaction {
+        addLogger(sqlLogger)
+
+        IssueTable.update(nafIssue)
+    }
+
+    fun findIssue(id: Int) = transaction {
+        addLogger(sqlLogger)
+
+        IssueTable.findById(id)
     }
 }
