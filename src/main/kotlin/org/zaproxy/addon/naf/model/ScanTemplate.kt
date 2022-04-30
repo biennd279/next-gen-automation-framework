@@ -1,12 +1,15 @@
 package org.zaproxy.addon.naf.model
 
 import me.d3s34.nuclei.NucleiTemplate
+import org.zaproxy.zap.model.Tech
 
 
 data class ScanTemplate(
     val url: String,
     val excludesRegex: List<String> = emptyList(),
     val includesRegex: List<String> = emptyList(),
+    val includeTech: Set<Tech> = setOf(*Tech.getAll().toTypedArray()),
+    val excludeTech: Set<Tech> = emptySet(),
     val crawlOptions: CrawlOptions = CrawlOptions(),
     val systemOptions: SystemOptions = SystemOptions(),
     val scanOptions: ActiveScanOptions,

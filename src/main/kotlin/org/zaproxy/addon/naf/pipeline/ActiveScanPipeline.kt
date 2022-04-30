@@ -23,7 +23,12 @@ class ActiveScanPipeline(
         
         val context = mutableListOf<Any>()
 
+        val session = model.session
+        val techSet = session.getContext("NAF")
+            .techSet
+
         context.add(policy)
+        context.add(techSet)
 
         val scanId = extensionActiveScan.startScan(input, null, context.toTypedArray())
         val scan = extensionActiveScan.getScan(scanId)

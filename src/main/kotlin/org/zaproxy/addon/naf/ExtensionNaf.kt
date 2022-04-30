@@ -162,6 +162,10 @@ class ExtensionNaf: ExtensionAdaptor(NAME), CoroutineScope, NafState {
             }
         }
     }
+    
+    override fun destroy() {
+        super.destroy()
+    }
 
     companion object {
         const val NAME = "Nextgen-automation-framework"

@@ -19,7 +19,7 @@ class NafScan(
                 when (it) {
                     is InitContextPipeline -> {
                         _phase.value = NafPhase.INIT
-                        it.start(null)
+                        it.start(target)
                     }
 
                     is NafCrawlPipeline -> {

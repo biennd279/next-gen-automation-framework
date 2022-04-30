@@ -8,6 +8,7 @@ import me.d3s34.nuclei.NucleiTemplate
 import me.d3s34.nuclei.NucleiTemplateDir
 import org.zaproxy.addon.naf.NafScanner
 import org.zaproxy.addon.naf.model.*
+import org.zaproxy.zap.model.Tech
 
 class WizardComponent(
     componentContext: ComponentContext,
@@ -25,6 +26,8 @@ class WizardComponent(
     val templates = mutableStateListOf<NucleiTemplate>(
         NucleiTemplateDir(nafScanner.nafService.nucleiRootTemplatePath)
     )
+    val includeTech = mutableStateListOf(*Tech.getAll().toTypedArray())
+    val excludeTech = mutableStateListOf<Tech>()
 
     val nafPlugin: List<MutableState<NafPlugin>> = nafScanner.defaultPolicy
         .pluginFactory
@@ -49,6 +52,8 @@ class WizardComponent(
             url = url.value,
             includesRegex = includesRegex,
             excludesRegex = exludesRegex,
+            includeTech = includeTech.toSet(),
+            excludeTech = excludeTech.toSet(),
             crawlOptions = CrawlOptions(
                 crawl = crawlSiteMap.value,
                 ajaxCrawl = crawlAjax.value

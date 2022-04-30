@@ -15,10 +15,11 @@ import androidx.compose.ui.unit.dp
 fun LabelCheckBox(
     checkedState: MutableState<Boolean>,
     canCheck: Boolean = true,
+    modifier: Modifier = Modifier.padding(8.dp),
     content: @Composable () -> Unit
 ) {
     Row(
-        modifier = Modifier.padding(8.dp),
+        modifier = modifier,
         verticalAlignment = Alignment.CenterVertically
     ) {
         Checkbox(
@@ -37,10 +38,11 @@ fun LabelCheckBox(
     checkedState: State<Boolean>,
     onCheckedChange: (Boolean) -> Unit,
     canCheck: Boolean = true,
+    modifier: Modifier = Modifier.padding(8.dp),
     content: @Composable () -> Unit
 ) {
     Row(
-        modifier = Modifier.padding(8.dp),
+        modifier = modifier,
         verticalAlignment = Alignment.CenterVertically
     ) {
         Checkbox(
@@ -57,10 +59,11 @@ fun LabelCheckBox(
     checkedState: Boolean,
     onCheckedChange: (Boolean) -> Unit,
     canCheck: Boolean = true,
+    modifier: Modifier = Modifier.padding(8.dp),
     content: @Composable () -> Unit
 ) {
     Row(
-        modifier = Modifier.padding(8.dp),
+        modifier = modifier,
         verticalAlignment = Alignment.CenterVertically
     ) {
         Checkbox(
