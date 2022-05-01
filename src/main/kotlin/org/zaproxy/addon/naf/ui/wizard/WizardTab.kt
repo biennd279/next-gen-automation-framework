@@ -6,7 +6,8 @@ enum class WizardTab(
     override val title: String
 ): Tab {
     SCOPE("Scope"),
-    TechSet("Tech"),
+    TECH_SET("Tech"),
+    FUZZ("Fuzzing"),
     CRAWL("Crawl"),
     SCAN("Scan"),
     SYSTEM("System"),

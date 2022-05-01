@@ -24,7 +24,10 @@ zapAddOn {
                             version.set(">= 15.6.0")
                         }
                         register("spiderAjax") {
-                            version.set("23.*")
+                            version.set(">= 23.0.0")
+                        }
+                        register("bruteforce") {
+                            version.set(">= 12.0.0")
                         }
                     }
                 }
@@ -91,13 +94,13 @@ dependencies {
     implementation("com.mikepenz:multiplatform-markdown-renderer:0.4.0")
     implementation("eu.de-swaef.pdf:Markdown2Pdf:2.0.1")
 
-
     // Testing
     testImplementation(kotlin("test"))
     testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.6.0")
 
     compileOnly(parent!!.childProjects["selenium"]!!)
     compileOnly(parent!!.childProjects["spiderAjax"]!!)
+    compileOnly(parent!!.childProjects["bruteforce"]!!)
 }
 
 tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().all {

@@ -6,9 +6,12 @@ import androidx.compose.runtime.mutableStateOf
 import com.arkivanov.decompose.ComponentContext
 import me.d3s34.nuclei.NucleiTemplate
 import me.d3s34.nuclei.NucleiTemplateDir
+import org.parosproxy.paros.control.Control
 import org.zaproxy.addon.naf.NafScanner
 import org.zaproxy.addon.naf.model.*
+import org.zaproxy.zap.extension.bruteforce.ExtensionBruteForce
 import org.zaproxy.zap.model.Tech
+import java.io.File
 
 class WizardComponent(
     componentContext: ComponentContext,
@@ -16,6 +19,15 @@ class WizardComponent(
     val onCancel: () -> Unit,
     val onWizardStart: (ScanTemplate) -> Unit
 ): ComponentContext by componentContext {
+
+    val listBruteForceFile by lazy {
+        Control.getSingleton()
+            .extensionLoader
+            .getExtension(ExtensionBruteForce::class.java)
+            .fileList
+            .map { it.file }
+    }
+
     val url = mutableStateOf("")
     val crawlSiteMap = mutableStateOf(true)
     val crawlAjax = mutableStateOf(true)
@@ -28,6 +40,9 @@ class WizardComponent(
     )
     val includeTech = mutableStateListOf(*Tech.getAll().toTypedArray())
     val excludeTech = mutableStateListOf<Tech>()
+
+    val useBruteForce = mutableStateOf(false)
+    val files = mutableStateListOf<File>()
 
     val nafPlugin: List<MutableState<NafPlugin>> = nafScanner.defaultPolicy
         .pluginFactory
@@ -54,6 +69,10 @@ class WizardComponent(
             excludesRegex = exludesRegex,
             includeTech = includeTech.toSet(),
             excludeTech = excludeTech.toSet(),
+            fuzzOptions = FuzzOptions(
+                useBruteForce = useBruteForce.value,
+                files = files
+            ),
             crawlOptions = CrawlOptions(
                 crawl = crawlSiteMap.value,
                 ajaxCrawl = crawlAjax.value

@@ -22,6 +22,11 @@ class NafScan(
                         it.start(target)
                     }
 
+                    is NafFuzzPipeline -> {
+                        _phase.value = NafPhase.FUZZ
+                        it.start(target)
+                    }
+
                     is NafCrawlPipeline -> {
                         _phase.value = NafPhase.CRAWL
                         it.start(target)

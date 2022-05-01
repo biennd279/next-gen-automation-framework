@@ -33,6 +33,11 @@ class NafScanner(
 
             listPipeline.add(InitContextPipeline(scanTemplate, coroutineContext))
 
+
+            if (fuzzOptions.useBruteForce) {
+                listPipeline.add(BruteForcePipeline(fuzzOptions.files, coroutineContext))
+            }
+
             if (crawlOptions.crawl) {
                 listPipeline.add(SpiderCrawlPipeline(coroutineContext))
             }

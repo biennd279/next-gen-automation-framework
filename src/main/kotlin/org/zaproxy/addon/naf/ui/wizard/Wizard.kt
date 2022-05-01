@@ -2,6 +2,8 @@ package org.zaproxy.addon.naf.ui.wizard
 
 import androidx.compose.desktop.ui.tooling.preview.Preview
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.*
@@ -24,6 +26,7 @@ import me.d3s34.nuclei.NucleiTemplate
 import org.zaproxy.addon.naf.component.WizardComponent
 import org.zaproxy.addon.naf.model.NafPlugin
 import org.zaproxy.zap.model.Tech
+import java.io.File
 
 @Preview
 @Composable
@@ -105,9 +108,14 @@ fun Wizard(
                     component.useNuclei,
                     component.templates
                 )
-                WizardTab.TechSet -> TechSetOptions(
+                WizardTab.TECH_SET -> TechSetOptions(
                     component.includeTech,
                     component.excludeTech
+                )
+                WizardTab.FUZZ -> Fuzz(
+                    component.useBruteForce,
+                    component.files,
+                    component.listBruteForceFile
                 )
                 else -> {}
             }
@@ -292,4 +300,36 @@ val techGroup = Tech.getAll()
     .groupBy { it.parent }
 
 val topTechs: Set<Tech> = Tech.getTopLevel()
+
+@Composable
+fun Fuzz(
+    useBruteForce: MutableState<Boolean>,
+    files: SnapshotStateList<File>,
+    listBruteForceFile: List<File>
+) {
+    Column {
+        LabelCheckBox(useBruteForce) {
+            Text("Fuzzing")
+        }
+
+        if (useBruteForce.value) {
+            LazyColumn {
+                items(listBruteForceFile) { file ->
+                    LabelCheckBox(
+                        files.contains(file),
+                        onCheckedChange = {
+                            if (it) {
+                                files.add(file)
+                            } else {
+                                files.remove(file)
+                            }
+                        }
+                    ) {
+                        Text(file.nameWithoutExtension)
+                    }
+                }
+            }
+        }
+    }
+}
 
