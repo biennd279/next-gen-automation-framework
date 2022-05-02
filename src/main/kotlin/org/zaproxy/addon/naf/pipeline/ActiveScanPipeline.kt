@@ -2,15 +2,13 @@ package org.zaproxy.addon.naf.pipeline
 
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
+import org.zaproxy.addon.naf.model.NafScanContext
 import org.zaproxy.zap.extension.ascan.ExtensionActiveScan
-import org.zaproxy.zap.extension.ascan.ScanPolicy
-import org.zaproxy.zap.model.Target
 import kotlin.coroutines.CoroutineContext
 
 class ActiveScanPipeline(
-    val policy: ScanPolicy,
     override val coroutineContext: CoroutineContext,
-) : NafPipeline<Target, Any>(NafPhase.SCAN) {
+) : NafPipeline<Any>(NafPhase.SCAN) {
 
     val refreshTime = 500L
 
@@ -19,18 +17,19 @@ class ActiveScanPipeline(
             .getExtension(ExtensionActiveScan::class.java)
     }
 
-    override suspend fun start(input: Target): Any {
+    override suspend fun start(nafScanContext: NafScanContext): Any {
         
-        val context = mutableListOf<Any>()
+        val activeScanContext = mutableListOf<Any>()
 
-        val session = model.session
-        val techSet = session.getContext("NAF")
-            .techSet
+        nafScanContext.policy?.let {
+            activeScanContext.add(it)
+        }
 
-        context.add(policy)
-        context.add(techSet)
+        nafScanContext.context?.let {
+            activeScanContext.add(it.techSet)
+        }
 
-        val scanId = extensionActiveScan.startScan(input, null, context.toTypedArray())
+        val scanId = extensionActiveScan.startScan(nafScanContext.target, nafScanContext.user, activeScanContext.toTypedArray())
         val scan = extensionActiveScan.getScan(scanId)
 
         do {

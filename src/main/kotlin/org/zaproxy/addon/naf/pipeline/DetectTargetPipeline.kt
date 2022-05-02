@@ -1,11 +1,15 @@
 package org.zaproxy.addon.naf.pipeline
 
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
 import org.apache.commons.httpclient.URI
+import org.parosproxy.paros.control.Control
+import org.parosproxy.paros.extension.ExtensionLoader
 import org.parosproxy.paros.extension.history.ExtensionHistory
 import org.parosproxy.paros.model.HistoryReference
+import org.parosproxy.paros.model.Model
 import org.parosproxy.paros.model.SiteNode
 import org.parosproxy.paros.network.HttpMessage
 import org.parosproxy.paros.network.HttpSender
@@ -13,13 +17,18 @@ import org.parosproxy.paros.network.HttpStatusCode
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.zaproxy.zap.model.Target
-import java.net.URL
 import javax.swing.SwingUtilities
 import kotlin.coroutines.CoroutineContext
 
 class DetectTargetPipeline(
     override val coroutineContext: CoroutineContext
-): NafPipeline<URL, Target>(NafPhase.INIT) {
+): CoroutineScope {
+
+    val extensionLoader: ExtensionLoader = Control
+        .getSingleton()
+        .extensionLoader
+
+    val model: Model = Model.getSingleton()
 
     private val extHistory: ExtensionHistory by lazy {
         extensionLoader
@@ -34,9 +43,9 @@ class DetectTargetPipeline(
         )
     }
 
-    override suspend fun start(input: URL): Target {
+    suspend fun start(startUrl: String): Target {
         return kotlin.runCatching {
-            Target(getStartNode(input.toString()))
+            Target(getStartNode(startUrl))
                 .apply {
                     isRecurse = true
                 }

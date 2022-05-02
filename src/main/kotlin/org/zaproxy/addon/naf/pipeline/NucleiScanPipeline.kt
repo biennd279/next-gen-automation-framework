@@ -8,6 +8,7 @@ import org.parosproxy.paros.core.scanner.Alert
 import org.parosproxy.paros.extension.history.ExtensionHistory
 import org.parosproxy.paros.model.HistoryReference
 import org.parosproxy.paros.network.HttpMessage
+import org.zaproxy.addon.naf.model.NafScanContext
 import org.zaproxy.zap.extension.alert.ExtensionAlert
 import org.zaproxy.zap.network.HttpRequestBody
 import org.zaproxy.zap.network.HttpResponseBody
@@ -18,7 +19,7 @@ class NucleiScanPipeline(
     val nucleiEngine: NucleiEngine,
     val templates: List<NucleiTemplate>,
     override val coroutineContext: CoroutineContext,
-): NafPipeline<org.zaproxy.zap.model.Target, List<NucleiResponse>>(NafPhase.SCAN) {
+): NafPipeline<List<NucleiResponse>>(NafPhase.SCAN) {
 
     private val extensionAlert: ExtensionAlert by lazy {
         extensionLoader
@@ -32,13 +33,14 @@ class NucleiScanPipeline(
 
     private val session by lazy { model.session!! }
 
-    override suspend fun start(input: org.zaproxy.zap.model.Target): List<NucleiResponse> {
+    override suspend fun start(nafScanContext: NafScanContext): List<NucleiResponse> {
 
         val list: MutableList<NucleiResponse> = mutableListOf()
 
-        val target = input
+        val target = nafScanContext
 
         val uri = target
+            .target
             .startNode
             .historyReference
             .uri

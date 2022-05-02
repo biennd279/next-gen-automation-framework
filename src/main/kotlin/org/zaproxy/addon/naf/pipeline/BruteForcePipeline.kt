@@ -2,8 +2,8 @@ package org.zaproxy.addon.naf.pipeline
 
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
+import org.zaproxy.addon.naf.model.NafScanContext
 import org.zaproxy.zap.extension.bruteforce.ExtensionBruteForce
-import org.zaproxy.zap.model.Target
 import java.io.File
 import kotlin.coroutines.CoroutineContext
 
@@ -19,9 +19,9 @@ class BruteForcePipeline(
             .getExtension(ExtensionBruteForce::class.java)
     }
 
-    override suspend fun start(input: Target): List<String> {
+    override suspend fun start(nafScanContext: NafScanContext): List<String> {
 
-        val startNode = input.startNode
+        val startNode = nafScanContext.target.startNode
 
         val listFuzzId = files.map {
             extensionBruteForce

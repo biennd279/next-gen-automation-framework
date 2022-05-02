@@ -4,11 +4,11 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import org.parosproxy.paros.model.HistoryReference
+import org.zaproxy.addon.naf.model.NafScanContext
 import org.zaproxy.zap.extension.spiderAjax.AjaxSpiderParam
 import org.zaproxy.zap.extension.spiderAjax.AjaxSpiderTarget
 import org.zaproxy.zap.extension.spiderAjax.ExtensionAjax
 import org.zaproxy.zap.extension.spiderAjax.SpiderListener
-import org.zaproxy.zap.model.Target
 import java.net.URI
 import java.util.concurrent.Executors
 import kotlin.coroutines.CoroutineContext
@@ -22,8 +22,8 @@ class AjaxSpiderCrawlPipeline(override val coroutineContext: CoroutineContext) :
             .getExtension(ExtensionAjax::class.java)
     }
 
-    override suspend fun start(input: Target): Set<String> {
-        val uri = URI(input.startNode.historyReference.uri.uri)
+    override suspend fun start(nafScanContext: NafScanContext): Set<String> {
+        val uri = URI(nafScanContext.target.startNode.historyReference.uri.uri)
 
         extensionAjax?.let {
             val targetBuilder = AjaxSpiderTarget.newBuilder(model.session)

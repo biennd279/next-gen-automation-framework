@@ -3,8 +3,8 @@ package org.zaproxy.addon.naf.pipeline
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
+import org.zaproxy.addon.naf.model.NafScanContext
 import org.zaproxy.zap.extension.spider.ExtensionSpider
-import org.zaproxy.zap.model.Target
 import kotlin.coroutines.CoroutineContext
 
 class SpiderCrawlPipeline(
@@ -18,12 +18,12 @@ class SpiderCrawlPipeline(
             .getExtension(ExtensionSpider::class.java)
     }
 
-    override suspend fun start(input: Target): Set<String> {
+    override suspend fun start(nafScanContext: NafScanContext): Set<String> {
         val scanId = kotlin.runCatching {
             extensionSpider.startScan(
-                input.displayName,
-                input,
-                null,
+                nafScanContext.target.displayName,
+                nafScanContext.target,
+                nafScanContext.user,
                 null
             )
         }
