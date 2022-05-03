@@ -94,6 +94,8 @@ dependencies {
     implementation("com.mikepenz:multiplatform-markdown-renderer:0.4.0")
     implementation("eu.de-swaef.pdf:Markdown2Pdf:2.0.1")
 
+    implementation("org.jetbrains.kotlin:kotlin-reflect:1.6.21")
+
     // Testing
     testImplementation(kotlin("test"))
     testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.6.0")

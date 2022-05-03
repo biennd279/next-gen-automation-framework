@@ -61,7 +61,7 @@ class DetectTargetPipeline(
         httpSender.sendAndReceive(msg)
 
         if (!HttpStatusCode.isSuccess(msg.responseHeader.statusCode)) {
-            throw Throwable("Site return code ${msg.responseHeader.statusCode}")
+//            throw Throwable("Site return code ${msg.responseHeader.statusCode}")
         }
 
         extHistory.addHistory(msg, HistoryReference.TYPE_PROXIED)

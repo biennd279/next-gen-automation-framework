@@ -31,10 +31,10 @@ class WizardComponent(
     val url = mutableStateOf("")
     val crawlSiteMap = mutableStateOf(true)
     val crawlAjax = mutableStateOf(true)
-    val activeScan = mutableStateOf(true)
+    val activeScan = mutableStateOf(false)
     val includesRegex = mutableStateListOf<String>()
     val exludesRegex = mutableStateListOf<String>()
-    val useNuclei = mutableStateOf(true)
+    val useNuclei = mutableStateOf(false)
     val templates = mutableStateListOf<NucleiTemplate>(
         NucleiTemplateDir(nafScanner.nafService.nucleiRootTemplatePath)
     )
@@ -58,6 +58,8 @@ class WizardComponent(
                 )
             )
         }
+
+    val nafAuthenticationMethod: MutableState<NafAuthenticationMethod> = mutableStateOf(NafAuthenticationMethod.None)
 
     private fun buildTemplate(): ScanTemplate {
 
@@ -84,6 +86,9 @@ class WizardComponent(
             systemOptions = SystemOptions(
                 useNuclei = useNuclei.value,
                 templates = templates
+            ),
+            authenticationOptions = AuthenticationOptions(
+                method = nafAuthenticationMethod.value
             )
         )
     }

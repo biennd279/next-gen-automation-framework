@@ -65,9 +65,9 @@ fun Crawl(
     LazyColumn {
         items(
             listHistory.value.size,
-            key = {
-                listHistory.value[it].historyId
-            }
+//            key = {
+//                listHistory.value[it].historyId
+//            }
         ) { index ->
             Row {
                 Text(text = listHistory.value[index].historyId.toString())

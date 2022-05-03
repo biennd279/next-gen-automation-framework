@@ -14,6 +14,7 @@ data class ScanTemplate(
     val fuzzOptions: FuzzOptions = FuzzOptions(),
     val crawlOptions: CrawlOptions = CrawlOptions(),
     val systemOptions: SystemOptions = SystemOptions(),
+    val authenticationOptions: AuthenticationOptions = AuthenticationOptions(),
     val scanOptions: ActiveScanOptions,
 )
 
@@ -35,4 +36,38 @@ data class SystemOptions(
 data class FuzzOptions(
     val useBruteForce: Boolean = false,
     val files: List<File> = emptyList()
+)
+
+data class AuthenticationOptions(
+    val method: NafAuthenticationMethod = NafAuthenticationMethod.None,
+)
+
+sealed class NafAuthenticationMethod(
+    open val username: String,
+    open val password: String
+) {
+    object None: NafAuthenticationMethod("", "")
+    data class FormBased(
+        override val username: String,
+        override val password: String,
+        val loginUrl: String,
+        val loginPage: String,
+        val loginField: Pair<String ,String>,
+        val loginPattern: String,
+        val logoutPattern: String
+    ): NafAuthenticationMethod(username, password)
+}
+
+enum class NafAuthMethodType {
+    NONE, FORM_BASED
+}
+
+fun emptyFormBased() = NafAuthenticationMethod.FormBased(
+    "",
+    "",
+    "",
+    "",
+    Pair("username", "password"),
+    "",
+    ""
 )
