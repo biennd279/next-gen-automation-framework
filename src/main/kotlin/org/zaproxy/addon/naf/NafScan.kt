@@ -1,5 +1,6 @@
 package org.zaproxy.addon.naf
 
+import androidx.compose.runtime.toMutableStateMap
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import org.zaproxy.addon.naf.model.NafScanContext
@@ -9,6 +10,11 @@ class NafScan(
     val listPipeline: MutableList<NafPipeline<*>>,
     var nafScanContext: NafScanContext
 ) {
+
+    val pipelineState = listPipeline
+            .map { Pair(it, PipelineState.NOT_STARTED) }
+            .toMutableStateMap()
+
     private val _phase = MutableStateFlow(NafPhase.INIT)
     val phase: StateFlow<NafPhase> = _phase
 
@@ -16,7 +22,8 @@ class NafScan(
         listPipeline.sortBy { it.phase.priority }
 
         listPipeline.forEach {
-            runCatching<Unit> {
+            runCatching {
+                pipelineState[it] = PipelineState.RUNNING
                 when (it) {
                     is InitContextPipeline -> {
                         _phase.value = NafPhase.INIT
@@ -44,10 +51,15 @@ class NafScan(
                         it.start(nafScanContext)
                     }
                 }
+                pipelineState[it] = PipelineState.DONE
+            }.onFailure { t ->
+                pipelineState[it] = PipelineState.ERROR
+                println(it)
             }
-                .onFailure {
-                    println(it)
-                }
         }
+    }
+
+    enum class PipelineState {
+        NOT_STARTED, RUNNING, DONE, ERROR
     }
 }

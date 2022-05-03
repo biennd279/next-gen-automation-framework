@@ -67,7 +67,7 @@ class HomeComponent(
         config: Config,
         componentContext: ComponentContext
     ): Child = when (config) {
-        Config.Dashboard -> Child.Dashboard(DashboardComponent(componentContext, nafState))
+        Config.Dashboard -> Child.Dashboard(DashboardComponent(componentContext, nafState, currentScan))
         Config.Project -> Child.Project(ProjectComponent(componentContext), onCallWizard)
         Config.Setting -> Child.Setting(SettingComponent(componentContext, nafService))
         Config.Exploit -> Child.Exploit(ExploitComponent(

@@ -19,6 +19,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import org.parosproxy.paros.model.HistoryReference
 import org.parosproxy.paros.model.SiteNode
+import org.zaproxy.addon.naf.NafScan
 import org.zaproxy.addon.naf.component.DashboardComponent
 import org.zaproxy.addon.naf.model.NafAlert
 import org.zaproxy.addon.naf.ui.MainColors
@@ -51,7 +52,7 @@ fun Dashboard(
             DashboardTab.CRAWL -> Crawl(component.historyRefSate.collectAsState())
             DashboardTab.SITEMAP -> SiteMap(component.siteNodes.collectAsState())
             DashboardTab.ALERT -> Alert(component.alerts.collectAsState())
-            DashboardTab.PROCESS -> Processing()
+            DashboardTab.PROCESS -> Processing(component.currentScan)
         }
     }
 }
@@ -126,6 +127,8 @@ fun Alert(
                 currentAlert.value = it
             }
         }
+
+        Spacer(modifier = Modifier.width(20.dp))
 
         Column(
             modifier = Modifier.weight(.6f)
@@ -331,6 +334,64 @@ fun AlertTextField(
     }
 }
 @Composable
-fun Processing() {
+fun Processing(
+    nafScan: State<NafScan?>
+) {
+    if (nafScan.value == null) {
+        Box(
+            contentAlignment = Alignment.Center,
+            modifier = Modifier
+                .fillMaxSize()
+        ) {
+            Text(
+                text = "Not scan started",
+                style = typography.h3
+            )
+        }
+    } else {
 
+        Spacer(modifier = Modifier.height(20.dp))
+
+        Column{
+            Row {
+                Text(
+                    text = "Pipeline",
+                    style = typography.subtitle1,
+                    modifier = Modifier.weight(.7f)
+                )
+
+                Spacer(modifier = Modifier.width(10.dp))
+
+                Text(
+                    text = "Status",
+                    style = typography.subtitle1,
+                    modifier = Modifier.weight(.3f)
+                )
+            }
+
+            Divider()
+
+            LazyColumn {
+                nafScan.value!!.pipelineState.forEach { (pipeline, status) ->
+                    item {
+                        Row {
+                            Text(
+                                text = pipeline::class.simpleName ?: "",
+                                style = typography.subtitle2,
+                                modifier = Modifier.weight(.7f)
+                            )
+
+                            Spacer(modifier = Modifier.width(10.dp))
+
+                            Text(
+                                text = status.name,
+                                style = typography.subtitle1,
+                                modifier = Modifier.weight(.3f)
+                            )
+                        }
+                    }
+                }
+            }
+        }
+    }
 }
