@@ -35,9 +35,10 @@ class WizardComponent(
     val includesRegex = mutableStateListOf<String>()
     val exludesRegex = mutableStateListOf<String>()
     val useNuclei = mutableStateOf(false)
-    val templates = mutableStateListOf<NucleiTemplate>(
-        NucleiTemplateDir(nafScanner.nafService.nucleiRootTemplatePath)
-    )
+    val templates = mutableStateListOf<NucleiTemplate>()
+
+    val rootDir = NucleiTemplateDir(nafScanner.nafService.nucleiRootTemplatePath)
+
     val includeTech = mutableStateListOf(*Tech.getAll().toTypedArray())
     val excludeTech = mutableStateListOf<Tech>()
 

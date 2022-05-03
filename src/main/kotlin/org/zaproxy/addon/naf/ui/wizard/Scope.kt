@@ -21,96 +21,117 @@ fun Scope(
     excludeRegex: SnapshotStateList<String>,
     isValidRegex: (String) -> Boolean
 ) {
-    val isExclude = remember { mutableStateOf(true) }
-    val isInclude = derivedStateOf { !isExclude.value }
-    val currentRegex= remember { mutableStateOf("") }
-    var hasError by remember { mutableStateOf(false) }
-
-    Column {
-        Row {
-            LabelCheckBox(isExclude) {
-                Text("Exclude from scope")
-            }
-            Spacer(Modifier.padding(10.dp))
-
-            LabelCheckBox(
-                checkedState = isInclude,
-                onCheckedChange = {
-                    isExclude.value = false
-                }
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+    ) {
+        Column(
+            modifier = Modifier
+                .weight(1f)
+                .padding(5.dp)
+        ) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.Center,
+                modifier = Modifier
+                    .padding(10.dp)
             ) {
-                Text("Include to scope")
+                Text(
+                    text = "Include to scope",
+                    style = typography.subtitle1
+                )
             }
+
+            Divider()
+
+            RegexColumn(includesRegex, isValidRegex)
         }
 
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.padding(10.dp)
+        Spacer(Modifier.width(10.dp))
+
+        Column(
+            modifier = Modifier
+                .weight(1f)
+                .padding(5.dp)
         ) {
-            OutlinedTextField(
-                value = currentRegex.value,
-                onValueChange = {
-                    currentRegex.value = it
-                },
-                singleLine = true,
-                isError = hasError,
-                modifier = Modifier.fillMaxWidth(),
-                label = {
-                    Text(
-                        text = "Regex: ",
-                        style = typography.subtitle2
-                    )
-                },
-                trailingIcon = {
-                    IconButton(
-                        onClick = {
-                            if (currentRegex.value.isEmpty()) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.Center,
+                modifier = Modifier
+                    .padding(10.dp)
+            ) {
+                Text(
+                    text = "Exclude from scope",
+                    style = typography.subtitle1
+                )
+            }
+
+            Divider()
+
+            RegexColumn(excludeRegex, isValidRegex)
+        }
+    }
+}
+
+@Composable
+fun RegexColumn(
+    listRegex: SnapshotStateList<String>,
+    isValidRegex: (String) -> Boolean
+) {
+    var hasError by remember { mutableStateOf(false) }
+    val currentRegex= remember { mutableStateOf("") }
+
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = Modifier.padding(10.dp)
+    ) {
+        OutlinedTextField(
+            value = currentRegex.value,
+            onValueChange = {
+                currentRegex.value = it
+            },
+            singleLine = true,
+            isError = hasError,
+            modifier = Modifier.fillMaxWidth(),
+            label = {
+                Text(
+                    text = "Regex: ",
+                    style = typography.subtitle2
+                )
+            },
+            trailingIcon = {
+                IconButton(
+                    onClick = {
+                        if (currentRegex.value.isEmpty()) {
+                            hasError = false
+                        } else {
+                            if (isValidRegex(currentRegex.value)) {
+                                listRegex.add(currentRegex.value)
+                                currentRegex.value = ""
                                 hasError = false
                             } else {
-                                if (isValidRegex(currentRegex.value)) {
-                                    if (isInclude.value) {
-                                        includesRegex.add(currentRegex.value)
-                                    } else {
-                                        excludeRegex.add(currentRegex.value)
-                                    }
-                                    currentRegex.value = ""
-                                    hasError = false
-                                } else {
-                                    hasError = true
-                                }
+                                hasError = true
                             }
                         }
-                    ) {
-                        Icon(Icons.Default.Add, "Add regex")
                     }
-                },
+                ) {
+                    Icon(Icons.Default.Add, "Add regex")
+                }
+            },
+        )
+    }
+
+    Divider(Modifier.padding(10.dp))
+
+    LazyColumn {
+        items(listRegex.size) { index ->
+            RegexItem(
+                regex = listRegex[index],
+                index = index,
+                onRemoveRegex = {
+                    listRegex.removeAt(it)
+                }
             )
-        }
-
-        Divider(Modifier.padding(10.dp))
-
-        LazyColumn {
-            if (isInclude.value) {
-                items(includesRegex.size) { index ->
-                    RegexItem(
-                        regex = includesRegex[index],
-                        index = index,
-                        onRemoveRegex = {
-                            includesRegex.removeAt(it)
-                        }
-                    )
-                }
-            } else {
-                items(excludeRegex.size) { index ->
-                    RegexItem(
-                        regex = excludeRegex[index],
-                        index = index,
-                        onRemoveRegex = {
-                            excludeRegex.removeAt(it)
-                        }
-                    )
-                }
-            }
         }
     }
 }
