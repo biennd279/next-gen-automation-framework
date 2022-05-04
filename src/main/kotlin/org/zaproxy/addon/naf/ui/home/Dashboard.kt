@@ -52,7 +52,8 @@ fun Dashboard(
             DashboardTab.ALERT -> Alert(
                 component.alerts.collectAsState(),
                 component.addIssue,
-                component.sendToSqlmap
+                component.sendToSqlmap,
+                component.sendToCommix
             )
             DashboardTab.CRAWL -> Crawl(component.historyRefSate.collectAsState())
             DashboardTab.SITEMAP -> SiteMap(component.siteNodes.collectAsState())
@@ -105,7 +106,8 @@ fun SiteMap(
 fun Alert(
     alerts: State<List<NafAlert>>,
     sendAlert: (NafAlert) -> Unit,
-    sendToSqlmap: (NafAlert) -> Unit
+    sendToSqlmap: (NafAlert) -> Unit,
+    sendToCommix: (NafAlert) -> Unit
 ) {
 
     val currentAlert: MutableState<NafAlert?> = remember { mutableStateOf(null) }
@@ -134,7 +136,8 @@ fun Alert(
                     currentAlert.value = it
                 },
                 sendAlert,
-                sendToSqlmap
+                sendToSqlmap,
+                sendToCommix
             )
         }
 
@@ -169,7 +172,8 @@ fun AlertList(
     alerts: State<List<NafAlert>>,
     onClickAlert: (NafAlert) -> Unit,
     sendAlert: (NafAlert) -> Unit,
-    sendToSqlmap: (NafAlert) -> Unit
+    sendToSqlmap: (NafAlert) -> Unit,
+    sendToCommix: (NafAlert) -> Unit
 ) {
     val alertsByGroup = derivedStateOf { alerts.value.groupBy { it.name } }
 
@@ -271,7 +275,10 @@ fun AlertList(
                                         }
 
                                         DropdownMenuItem(
-                                            onClick = {}
+                                            onClick = {
+                                                expandedMenu.value = false
+                                                sendToCommix(it)
+                                            }
                                         ) {
                                             Text("Send to Commix")
                                         }

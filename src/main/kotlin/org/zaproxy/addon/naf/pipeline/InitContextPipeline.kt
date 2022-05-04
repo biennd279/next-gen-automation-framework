@@ -236,8 +236,7 @@ class InitContextPipeline(
         return model.session.siteTree.findNode(uri)
     }
 }
-
-private fun String.urlEncode() = URLEncoder.encode(this, StandardCharsets.UTF_8.name())
+fun String.urlEncode() = URLEncoder.encode(this, StandardCharsets.UTF_8.name())
 
 private fun <T : Any> T.setAndReturnPrivateProperty(variableName: String, data: Any): Any? {
     return javaClass.superclass.getDeclaredField(variableName).let { field ->
