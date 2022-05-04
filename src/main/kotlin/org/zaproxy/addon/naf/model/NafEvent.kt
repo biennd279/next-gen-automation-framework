@@ -1,19 +1,24 @@
 package org.zaproxy.addon.naf.model
 
-abstract class NafEvent()
+sealed class NafEvent()
 
 object NopEvent: NafEvent()
 
-sealed class ExploitEvent: NafEvent()
+sealed class ExploitEvent(
+    open val alert: NafAlert
+): NafEvent()
 
-//TODO: Use nafTarget
 class SqlInjectionEvent(
-    val alert: NafAlert
-): ExploitEvent()
+    alert: NafAlert
+): ExploitEvent(alert)
 
 class CommandInjectionEvent(
-    val alert: NafAlert
-): ExploitEvent()
+    alert: NafAlert
+): ExploitEvent(alert)
+
+class TemplateInjectionEvent(
+    alert: NafAlert
+): ExploitEvent(alert)
 
 class AlertEvent(
     val nafAlert: NafAlert

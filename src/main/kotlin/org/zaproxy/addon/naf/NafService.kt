@@ -4,6 +4,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import me.d3s34.commix.CommixDockerEngine
 import me.d3s34.nuclei.NucleiEngine
 import me.d3s34.sqlmap.SqlmapApiEngine
+import me.d3s34.tplmap.TplmapDockerEngine
 import org.zaproxy.addon.naf.model.NafConfig
 
 interface NafService {
@@ -17,6 +18,8 @@ interface NafService {
     val sqlmapUrl: String
 
     val commixDockerEngine: CommixDockerEngine?
+
+    val tplmapDockerEngine: TplmapDockerEngine?
 
     val saveConfig: () -> Unit
 }

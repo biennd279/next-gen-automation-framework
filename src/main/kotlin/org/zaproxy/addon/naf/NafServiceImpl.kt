@@ -5,10 +5,8 @@ import me.d3s34.commix.CommixDockerEngine
 import me.d3s34.nuclei.NucleiEngine
 import me.d3s34.nuclei.NucleiNativeEngine
 import me.d3s34.sqlmap.SqlmapApiEngine
-import org.zaproxy.addon.naf.model.CommixEngineType
-import org.zaproxy.addon.naf.model.NafConfig
-import org.zaproxy.addon.naf.model.NucleiEngineType
-import org.zaproxy.addon.naf.model.SqlmapEngineType
+import me.d3s34.tplmap.TplmapDockerEngine
+import org.zaproxy.addon.naf.model.*
 import kotlin.coroutines.CoroutineContext
 
 class NafServiceImpl(
@@ -48,6 +46,12 @@ class NafServiceImpl(
     override val commixDockerEngine: CommixDockerEngine?
         get() = when (nafConfig.value.commixEngineType) {
             CommixEngineType.DOCKER -> CommixDockerEngine(coroutineContext)
+            else -> null
+        }
+
+    override val tplmapDockerEngine: TplmapDockerEngine?
+        get() = when (nafConfig.value.tplmapEngineType) {
+            TplmapEngineType.DOCKER -> TplmapDockerEngine(coroutineContext)
             else -> null
         }
 }

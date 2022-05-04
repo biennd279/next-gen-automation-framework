@@ -7,7 +7,8 @@ data class NafConfig(
     val sqlmapEngineType: SqlmapEngineType,
     val sqlmapApiUrl: String?,
 
-    val commixEngineType: CommixEngineType
+    val commixEngineType: CommixEngineType,
+    val tplmapEngineType: TplmapEngineType
 )
 
 val home: String = System.getProperty("user.home")
@@ -17,7 +18,8 @@ internal val emptyConfig = NafConfig(
     "${home}/nuclei-templates/dns/",
     SqlmapEngineType.API,
     "http://127.0.0.1:8775/",
-    CommixEngineType.DOCKER
+    CommixEngineType.DOCKER,
+    TplmapEngineType.DOCKER
 )
 
 fun emptyConfig() = emptyConfig

@@ -3,10 +3,7 @@ package org.zaproxy.addon.naf.database
 import org.jetbrains.exposed.sql.ResultRow
 import org.jetbrains.exposed.sql.insert
 import org.jetbrains.exposed.sql.update
-import org.zaproxy.addon.naf.model.CommixEngineType
-import org.zaproxy.addon.naf.model.NafConfig
-import org.zaproxy.addon.naf.model.NucleiEngineType
-import org.zaproxy.addon.naf.model.SqlmapEngineType
+import org.zaproxy.addon.naf.model.*
 
 fun ConfigTable.insert(nafConfig: NafConfig) = kotlin.run {
     insert {
@@ -16,7 +13,8 @@ fun ConfigTable.insert(nafConfig: NafConfig) = kotlin.run {
         it[sqlmapEngineType] = nafConfig.sqlmapEngineType.name
         it[sqlmapApiUrl] = nafConfig.sqlmapApiUrl
 
-        it[commixEngineType] = nafConfig.commixEngineType.name
+//        it[commixEngineType] = nafConfig.commixEngineType.name
+//        it[tplmapEngineType] = nafConfig.tplmapEngineType.name
     }
 }
 
@@ -28,7 +26,8 @@ fun ConfigTable.update(nafConfig: NafConfig) = kotlin.run {
         it[sqlmapEngineType] = nafConfig.sqlmapEngineType.name
         it[sqlmapApiUrl] = nafConfig.sqlmapApiUrl ?: ""
 
-        it[commixEngineType] = nafConfig.commixEngineType.name
+//        it[commixEngineType] = nafConfig.commixEngineType.name
+//        it[tplmapEngineType] = nafConfig.tplmapEngineType.name
     }
 }
 
@@ -39,5 +38,6 @@ fun ResultRow.toNafConfig() = NafConfig(
     sqlmapEngineType = SqlmapEngineType.valueOf(this[ConfigTable.sqlmapEngineType]),
     sqlmapApiUrl = this[ConfigTable.sqlmapApiUrl],
 
-    commixEngineType = CommixEngineType.valueOf(this[ConfigTable.commixEngineType])
+    commixEngineType = CommixEngineType.DOCKER,
+    tplmapEngineType = TplmapEngineType.DOCKER
 )
