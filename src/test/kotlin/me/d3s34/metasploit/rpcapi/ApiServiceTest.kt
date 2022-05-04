@@ -265,6 +265,6 @@ internal class ApiServiceTest {
 
 
 
-        println(options.map)
+        println(options.map.values.filter { it["required"] == true }.filter { it["advanced"] == false }.filter { it["default"] == null})
     }
 }
