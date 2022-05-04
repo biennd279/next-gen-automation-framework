@@ -18,8 +18,6 @@ import org.zaproxy.zap.extension.spider.ExtensionSpider
 import org.zaproxy.zap.extension.users.ContextUserAuthManager
 import org.zaproxy.zap.model.TechSet
 import org.zaproxy.zap.users.User
-import java.net.URLEncoder
-import java.nio.charset.StandardCharsets
 import javax.swing.SwingUtilities
 import kotlin.coroutines.CoroutineContext
 
@@ -236,7 +234,6 @@ class InitContextPipeline(
         return model.session.siteTree.findNode(uri)
     }
 }
-fun String.urlEncode() = URLEncoder.encode(this, StandardCharsets.UTF_8.name())
 
 private fun <T : Any> T.setAndReturnPrivateProperty(variableName: String, data: Any): Any? {
     return javaClass.superclass.getDeclaredField(variableName).let { field ->
