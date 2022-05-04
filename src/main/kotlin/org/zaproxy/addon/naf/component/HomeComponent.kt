@@ -49,7 +49,7 @@ class HomeComponent(
         }
     }
 
-    fun sendEvent(nafEvent: NafEvent) {
+    private fun sendEvent(nafEvent: NafEvent) {
         when (nafEvent) {
             is NopEvent -> {}
             is ExploitEvent -> {
@@ -75,7 +75,9 @@ class HomeComponent(
             componentContext,
             nafState,
             currentScan,
-            sendAlert = { sendEvent(AlertEvent(it)) }
+            addIssue = { sendEvent(AlertEvent(it)) },
+            sendToSqlmap = { sendEvent(SqlInjectionEvent(it)) },
+            sendToCommix = { sendEvent(CommandInjectionEvent(it)) }
         ))
         Config.Project -> Child.Project(ProjectComponent(componentContext), onCallWizard)
         Config.Setting -> Child.Setting(SettingComponent(componentContext, nafService))

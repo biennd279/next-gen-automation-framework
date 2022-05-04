@@ -8,7 +8,11 @@ sealed class ExploitEvent: NafEvent()
 
 //TODO: Use nafTarget
 class SqlInjectionEvent(
-    alert: NafAlert
+    val alert: NafAlert
+): ExploitEvent()
+
+class CommandInjectionEvent(
+    val alert: NafAlert
 ): ExploitEvent()
 
 class AlertEvent(
