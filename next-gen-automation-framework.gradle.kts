@@ -27,7 +27,7 @@ zapAddOn {
                             version.set(">= 23.0.0")
                         }
                         register("bruteforce") {
-                            version.set(">= 12.0.0")
+                            version.set(">= 11.0.0")
                         }
                     }
                 }

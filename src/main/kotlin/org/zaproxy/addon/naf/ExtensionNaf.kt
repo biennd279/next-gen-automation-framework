@@ -19,10 +19,10 @@ import org.parosproxy.paros.extension.history.ExtensionHistory
 import org.parosproxy.paros.model.HistoryReference
 import org.parosproxy.paros.model.HistoryReferenceEventPublisher
 import org.parosproxy.paros.model.SiteMapEventPublisher
-import org.parosproxy.paros.model.SiteNode
 import org.zaproxy.addon.naf.component.RootComponent
 import org.zaproxy.addon.naf.database.NafDatabase
 import org.zaproxy.addon.naf.model.NafAlert
+import org.zaproxy.addon.naf.model.NafNode
 import org.zaproxy.addon.naf.ui.Root
 import org.zaproxy.zap.ZAP
 import org.zaproxy.zap.extension.alert.AlertEventPublisher
@@ -74,7 +74,7 @@ class ExtensionNaf: ExtensionAdaptor(NAME), CoroutineScope, NafState {
 
     override val historyRefSate: MutableStateFlow<List<HistoryReference>> = MutableStateFlow(emptyList())
 
-    override val siteNodes: MutableStateFlow<List<SiteNode>> = MutableStateFlow(emptyList())
+    override val siteNodes: MutableStateFlow<List<NafNode>> = MutableStateFlow(emptyList())
 
     private val eventsBus = ZAP.getEventBus()!!
 

@@ -18,10 +18,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import org.parosproxy.paros.model.HistoryReference
-import org.parosproxy.paros.model.SiteNode
 import org.zaproxy.addon.naf.NafScan
 import org.zaproxy.addon.naf.component.DashboardComponent
 import org.zaproxy.addon.naf.model.NafAlert
+import org.zaproxy.addon.naf.model.NafNode
 import org.zaproxy.addon.naf.ui.MainColors
 
 @Composable
@@ -29,7 +29,7 @@ fun Dashboard(
     component: DashboardComponent
 ) {
 
-    val subTab = remember { mutableStateOf(DashboardTab.CRAWL) }
+    val subTab = remember { mutableStateOf(DashboardTab.PROCESS) }
     Scaffold(
         topBar = {
             TabRow(
@@ -49,10 +49,10 @@ fun Dashboard(
         },
     ) {
         when (subTab.value) {
+            DashboardTab.PROCESS -> Processing(component.currentScan)
+            DashboardTab.ALERT -> Alert(component.alerts.collectAsState())
             DashboardTab.CRAWL -> Crawl(component.historyRefSate.collectAsState())
             DashboardTab.SITEMAP -> SiteMap(component.siteNodes.collectAsState())
-            DashboardTab.ALERT -> Alert(component.alerts.collectAsState())
-            DashboardTab.PROCESS -> Processing(component.currentScan)
         }
     }
 }
@@ -85,7 +85,7 @@ fun Crawl(
 
 @Composable
 fun SiteMap(
-    siteNodes: State<List<SiteNode>>
+    siteNodes: State<List<NafNode>>
 ) {
     LazyColumn {
         items(siteNodes.value) {
