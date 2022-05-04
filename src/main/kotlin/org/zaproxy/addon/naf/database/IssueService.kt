@@ -1,9 +1,6 @@
 package org.zaproxy.addon.naf.database
 
-import org.jetbrains.exposed.sql.SqlLogger
-import org.jetbrains.exposed.sql.StdOutSqlLogger
-import org.jetbrains.exposed.sql.addLogger
-import org.jetbrains.exposed.sql.selectAll
+import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.transactions.transaction
 import org.slf4j.LoggerFactory
 import org.zaproxy.addon.naf.model.NafIssue
@@ -37,5 +34,11 @@ class IssueService {
         addLogger(sqlLogger)
 
         IssueTable.findById(id)
+    }
+
+    fun removeIssue(id: Int) = transaction {
+        addLogger(sqlLogger)
+
+        IssueTable.deleteWhere { IssueTable.id eq id }
     }
 }

@@ -1,13 +1,10 @@
 package org.zaproxy.addon.naf.ui.home
 
 import androidx.compose.desktop.ui.tooling.preview.Preview
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.*
 import androidx.compose.material.MaterialTheme.typography
 import androidx.compose.material.icons.Icons
@@ -16,6 +13,11 @@ import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.pointer.PointerEventType
+import androidx.compose.ui.input.pointer.isPrimaryPressed
+import androidx.compose.ui.input.pointer.isSecondaryPressed
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.unit.dp
 import org.parosproxy.paros.model.HistoryReference
 import org.zaproxy.addon.naf.NafScan
@@ -50,7 +52,10 @@ fun Dashboard(
     ) {
         when (subTab.value) {
             DashboardTab.PROCESS -> Processing(component.currentScan)
-            DashboardTab.ALERT -> Alert(component.alerts.collectAsState())
+            DashboardTab.ALERT -> Alert(
+                component.alerts.collectAsState(),
+                component.sendAlert
+            )
             DashboardTab.CRAWL -> Crawl(component.historyRefSate.collectAsState())
             DashboardTab.SITEMAP -> SiteMap(component.siteNodes.collectAsState())
         }
@@ -100,7 +105,8 @@ fun SiteMap(
 
 @Composable
 fun Alert(
-    alerts: State<List<NafAlert>>
+    alerts: State<List<NafAlert>>,
+    sendAlert: (NafAlert) -> Unit
 ) {
 
     val currentAlert: MutableState<NafAlert?> = remember { mutableStateOf(null) }
@@ -123,9 +129,13 @@ fun Alert(
 
             Divider()
 
-            AlertList(alerts) {
-                currentAlert.value = it
-            }
+            AlertList(
+                alerts,
+                onClickAlert = {
+                    currentAlert.value = it
+                },
+                sendAlert
+            )
         }
 
         Spacer(modifier = Modifier.width(20.dp))
@@ -153,10 +163,12 @@ fun Alert(
     }
 }
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun AlertList(
     alerts: State<List<NafAlert>>,
-    onClickAlert: (NafAlert) -> Unit
+    onClickAlert: (NafAlert) -> Unit,
+    sendAlert: (NafAlert) -> Unit
 ) {
     val alertsByGroup = derivedStateOf { alerts.value.groupBy { it.name } }
 
@@ -207,18 +219,52 @@ fun AlertList(
 
                 if (!collapsed) {
                     items(alerts) {
+
+                        val expandedMenu = remember { mutableStateOf(false) }
+
                         Row(
                             modifier = Modifier
-                                .clickable {
-                                    onClickAlert(it)
+                                .mouseClickable {
+                                    if (buttons.isPrimaryPressed) {
+                                        onClickAlert(it)
+                                    } else if (buttons.isSecondaryPressed) {
+                                        expandedMenu.value = true
+                                    }
                                 }
                         ) {
                             Text(
                                 text = it.uri,
-                                maxLines = 1
+                                maxLines = 1,
                             )
+
                             Spacer(modifier = Modifier.padding(5.dp))
+
+                            if (expandedMenu.value) {
+                                Row(
+                                    modifier = Modifier
+                                        .fillMaxWidth(),
+                                    horizontalArrangement = Arrangement.Center
+                                ) {
+                                    DropdownMenu(
+                                        expanded = expandedMenu.value,
+                                        onDismissRequest = {
+                                            expandedMenu.value = false
+                                        }
+                                    ) {
+                                        DropdownMenuItem(
+                                            onClick = {
+                                                expandedMenu.value = false
+                                                sendAlert(it)
+                                            }
+                                        ) {
+                                            Text("Add to Issue")
+                                        }
+                                    }
+                                }
+                            }
                         }
+
+                        Divider()
                     }
                 }
             }

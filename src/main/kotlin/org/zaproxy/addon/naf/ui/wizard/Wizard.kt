@@ -241,7 +241,8 @@ fun TechSetOptions(
                     checkedState = includeTech.contains(topTech) || techGroup[topTech]?.let { includeTech.containsAll(it) } ?: false,
                     onCheckedChange = {
                         onTechChange(it, topTech)
-                    }
+                    },
+                    modifier = Modifier
                 ) {
                     Text(
                         text = topTech.uiName,

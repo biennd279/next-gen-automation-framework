@@ -10,3 +10,7 @@ sealed class ExploitEvent: NafEvent()
 class SqlInjectionEvent(
     alert: NafAlert
 ): ExploitEvent()
+
+class AlertEvent(
+    val nafAlert: NafAlert
+): NafEvent()

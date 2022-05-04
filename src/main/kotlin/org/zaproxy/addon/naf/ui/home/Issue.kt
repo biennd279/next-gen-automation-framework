@@ -8,6 +8,7 @@ import androidx.compose.material.*
 import androidx.compose.material.MaterialTheme.typography
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -19,9 +20,12 @@ import org.zaproxy.addon.naf.component.IssueComponent
 import org.zaproxy.addon.naf.model.NafIssue
 import org.zaproxy.addon.naf.model.Severity
 import org.zaproxy.addon.naf.model.emptyIssue
+import org.zaproxy.addon.naf.ui.collectAsMutableState
 
 @Composable
-fun Issue(component: IssueComponent) {
+fun Issue(
+    component: IssueComponent,
+) {
     Column(
         modifier = Modifier
             .fillMaxHeight()
@@ -36,7 +40,7 @@ fun Issue(component: IssueComponent) {
         Spacer(Modifier.height(20.dp))
 
         val issues = component.issues.collectAsState()
-        val selectedIssue = remember { mutableStateOf<NafIssue?>(null) }
+        val selectedIssue = component.currentIssue.collectAsMutableState()
 
         LazyColumn(modifier = Modifier.weight(1f)) {
             items(issues.value) {issue ->
@@ -48,6 +52,16 @@ fun Issue(component: IssueComponent) {
                         },
                     verticalAlignment = Alignment.CenterVertically
                 ) {
+
+                    IconButton(
+                        onClick = {
+                            component.removeIssue(issue)
+                        }
+                    ) {
+                        Icon(Icons.Default.Delete, "remove issue")
+                    }
+
+                    Spacer(Modifier.width(10.dp))
 
                     Text(
                         text = issue.severity.name,
@@ -63,7 +77,10 @@ fun Issue(component: IssueComponent) {
 
                     Spacer(Modifier.padding(10.dp))
 
-                    Text(text = issue.description.replace("\n", " "))
+                    Text(
+                        text = issue.description.replace("\n", " "),
+                        maxLines = 3
+                    )
                 }
 
                 Divider()
@@ -80,13 +97,16 @@ fun Issue(component: IssueComponent) {
 
         selectedIssue.value?.also {
             val issueState = mutableStateOf(it)
-            EditIssueDialog(issueState) {
-                if (issueState.value != it) {
+            EditIssueDialog(
+                issueState,
+                onSaveClick = {
                     component.saveIssue(issueState.value)
+                    selectedIssue.value = null
+                },
+                onCancelClick = {
+                    selectedIssue.value = null
                 }
-
-                selectedIssue.value = null
-            }
+            )
         }
     }
 }
@@ -94,7 +114,8 @@ fun Issue(component: IssueComponent) {
 @Composable
 fun EditIssueDialog(
     issue: MutableState<NafIssue>,
-    onClosedClick: () -> Unit,
+    onSaveClick: () -> Unit,
+    onCancelClick: () -> Unit
 ) {
 
     //TODO: fix lost focus
@@ -106,7 +127,7 @@ fun EditIssueDialog(
     Dialog(
         title = "Issue",
         state = dialogState,
-        onCloseRequest = onClosedClick
+        onCloseRequest = onSaveClick
     ) {
         Column(
             modifier = Modifier
@@ -198,6 +219,27 @@ fun EditIssueDialog(
             )
 
             Divider()
+
+            Row(
+                horizontalArrangement = Arrangement.End,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(10.dp)
+            ) {
+                Button(
+                    onClick = { onSaveClick() }
+                ) {
+                    Text("Save")
+                }
+
+                Spacer(modifier = Modifier.width(10.dp))
+
+                Button(
+                    onClick = { onCancelClick() }
+                ) {
+                    Text("Cancel")
+                }
+            }
         }
     }
 }

@@ -14,9 +14,7 @@ import org.zaproxy.addon.naf.NafScan
 import org.zaproxy.addon.naf.NafService
 import org.zaproxy.addon.naf.NafState
 import org.zaproxy.addon.naf.database.NafDatabase
-import org.zaproxy.addon.naf.model.ExploitEvent
-import org.zaproxy.addon.naf.model.NafEvent
-import org.zaproxy.addon.naf.model.NopEvent
+import org.zaproxy.addon.naf.model.*
 import org.zaproxy.addon.naf.ui.NafTab
 import kotlin.coroutines.CoroutineContext
 
@@ -60,6 +58,12 @@ class HomeComponent(
                 require(child is Child.Exploit)
                 child.exploitComponent.handleExploitEvent(nafEvent)
             }
+            is AlertEvent -> {
+                router.replaceCurrent(Config.Issue)
+                val child = routerState.value.activeChild.instance
+                require(child is Child.Issue)
+                child.issueComponent.handleAlertEvent(nafEvent)
+            }
         }
     }
 
@@ -67,7 +71,12 @@ class HomeComponent(
         config: Config,
         componentContext: ComponentContext
     ): Child = when (config) {
-        Config.Dashboard -> Child.Dashboard(DashboardComponent(componentContext, nafState, currentScan))
+        Config.Dashboard -> Child.Dashboard(DashboardComponent(
+            componentContext,
+            nafState,
+            currentScan,
+            sendAlert = { sendEvent(AlertEvent(it)) }
+        ))
         Config.Project -> Child.Project(ProjectComponent(componentContext), onCallWizard)
         Config.Setting -> Child.Setting(SettingComponent(componentContext, nafService))
         Config.Exploit -> Child.Exploit(ExploitComponent(

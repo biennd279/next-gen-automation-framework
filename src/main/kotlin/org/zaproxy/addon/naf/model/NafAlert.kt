@@ -35,3 +35,24 @@ fun Alert.toNafAlert(): NafAlert {
         solution = this.solution
     )
 }
+
+@Suppress("Deprecation")
+fun NafAlert.mapToIssue(): NafIssue {
+    return NafIssue(
+        null,
+        name = this.name,
+        severity = when (this.risk) {
+            0 -> Severity.INFO
+            1 -> Severity.LOW
+            2 -> Severity.MEDIUM
+            3 -> Severity.HIGH
+            else -> Severity.UNKNOWN
+        },
+        description = this.description,
+        reproduce = """
+            Send query to ${this.uri} with ${this.param} is vulnerability value.
+        """.trimIndent(),
+        solution = this.solution,
+        note = this.otherInfo
+    )
+}
