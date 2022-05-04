@@ -8,7 +8,6 @@ import org.parosproxy.paros.control.Control
 import org.parosproxy.paros.model.HistoryReferenceEventPublisher
 import org.parosproxy.paros.model.SiteMapEventPublisher
 import org.zaproxy.addon.naf.model.toNafAlert
-import org.zaproxy.addon.naf.model.toNafTarget
 import org.zaproxy.zap.eventBus.Event
 import org.zaproxy.zap.eventBus.EventConsumer
 import org.zaproxy.zap.extension.alert.AlertEventPublisher
@@ -49,9 +48,9 @@ internal class EventConsumerImpl(
             SiteMapEventPublisher.SITE_NODE_ADDED_EVENT -> {
                 event.target?.let { it ->
                     if (it.isValid) {
-                        nafState.siteNodes.update {siteNodes ->
-                            siteNodes + it.toNafTarget().startNode
-                        }
+//                        nafState.siteNodes.update {siteNodes ->
+//                            siteNodes + it.toNafTarget().startNode
+//                        }
                     }
                 }
             }
@@ -112,12 +111,12 @@ internal class EventConsumerImpl(
             SiteMapEventPublisher.SITE_REMOVED_EVENT,
             SiteMapEventPublisher.SITE_NODE_REMOVED_EVENT -> {
                 event.target?.let { target ->
-                    if (target.isValid) {
-                        nafState.siteNodes.update { siteNodes ->
-                            val nafNode = target.toNafTarget().startNode
-                            siteNodes.filter { it != nafNode }
-                        }
-                    }
+//                    if (target.isValid) {
+//                        nafState.siteNodes.update { siteNodes ->
+//                            val nafNode = target.toNafTarget().startNode
+//                            siteNodes.filter { it != nafNode }
+//                        }
+//                    }
                 }
             }
 
