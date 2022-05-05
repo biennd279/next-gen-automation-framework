@@ -17,10 +17,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import org.zaproxy.addon.naf.component.SettingComponent
-import org.zaproxy.addon.naf.model.CommixEngineType
-import org.zaproxy.addon.naf.model.NafConfig
-import org.zaproxy.addon.naf.model.NucleiEngineType
-import org.zaproxy.addon.naf.model.SqlmapEngineType
+import org.zaproxy.addon.naf.model.*
 import org.zaproxy.addon.naf.ui.MainColors
 import org.zaproxy.addon.naf.ui.collectAsMutableState
 
@@ -73,8 +70,20 @@ fun Setting(
 
             when (currentTab.value) {
                 SettingTab.NUCLEI -> NucleiSetting(configState)
-                SettingTab.SQLMAP -> SqlmapSetting(configState)
-                SettingTab.COMMIX -> CommixSetting(configState)
+                SettingTab.SQLMAP -> SqlmapSetting(
+                    configState,
+                    settingComponent.dockerManager::createSqlmapImage,
+                    settingComponent.dockerManager::createSqlmapApiContainer,
+                    settingComponent.dockerManager::startSqlmapApiContainer
+                )
+                SettingTab.COMMIX -> CommixSetting(
+                    configState,
+                    settingComponent.dockerManager::createCommixImage
+                )
+                SettingTab.TPLMAP -> TplmapSetting(
+                    configState,
+                    settingComponent.dockerManager::createTplmapImage
+                )
                 SettingTab.METASPLOIT -> MetasploitSetting()
             }
         }
@@ -84,7 +93,10 @@ fun Setting(
 
 @Composable
 fun SqlmapSetting(
-    nafConfig: MutableState<NafConfig>
+    nafConfig: MutableState<NafConfig>,
+    createImage: () -> Unit,
+    createContainer: () -> Unit,
+    startSqlmapApi: () -> Unit,
 ) {
     val isValidUri = remember { mutableStateOf<Boolean?>(null) }
 
@@ -123,7 +135,9 @@ fun SqlmapSetting(
         }
 
         when (nafConfig.value.sqlmapEngineType) {
-            SqlmapEngineType.API,
+            SqlmapEngineType.API -> {
+
+            }
             SqlmapEngineType.API_WITH_DOCKER -> {
                 OutlinedTextField(
                     value = nafConfig.value.sqlmapApiUrl ?: "",
@@ -164,6 +178,24 @@ fun SqlmapSetting(
                     },
                     modifier = Modifier.fillMaxWidth()
                 )
+
+                Button(
+                    onClick = createImage
+                ) {
+                    Text("Create sqlmap image")
+                }
+
+                Button(
+                    onClick = createContainer
+                ) {
+                    Text("Create container")
+                }
+
+                Button(
+                    onClick = startSqlmapApi
+                ) {
+                    Text("Start sqlmap api server")
+                }
             }
             SqlmapEngineType.NONE -> {}
         }
@@ -266,7 +298,8 @@ fun NucleiSetting(
 
 @Composable
 fun CommixSetting(
-    nafConfig: MutableState<NafConfig>
+    nafConfig: MutableState<NafConfig>,
+    createImage: () -> Unit
 ) {
     Row(
         modifier = Modifier.padding(10.dp)
@@ -300,9 +333,78 @@ fun CommixSetting(
             }
         }
     }
+
+    when (nafConfig.value.commixEngineType) {
+        CommixEngineType.NONE -> {
+
+        }
+
+        CommixEngineType.DOCKER -> {
+            Button(
+                onClick = createImage
+            ) {
+                Text("Create commix image")
+            }
+        }
+        else -> {}
+    }
 }
 
 @Composable
 fun MetasploitSetting() {
 
+}
+
+@Composable
+fun TplmapSetting(
+    nafConfig: MutableState<NafConfig>,
+    createImage: () -> Unit
+) {
+
+    Row(
+        modifier = Modifier.padding(10.dp)
+    ) {
+        Text(
+            text = "Engine",
+            style = typography.subtitle2,
+            fontWeight = FontWeight.Bold
+        )
+    }
+
+    Spacer(Modifier.padding(10.dp))
+
+    Row(
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        TplmapEngineType.values().forEach { engineType ->
+            Row(
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                RadioButton(
+                    selected = nafConfig.value.tplmapEngineType == engineType,
+                    onClick = {
+                        nafConfig.value = nafConfig.value.copy(tplmapEngineType = engineType)
+                    },
+                    colors = RadioButtonDefaults.colors()
+                )
+                Text(
+                    text = engineType.name
+                )
+            }
+        }
+    }
+
+    when (nafConfig.value.tplmapEngineType) {
+        TplmapEngineType.NONE -> {
+
+        }
+
+        TplmapEngineType.DOCKER -> {
+            Button(
+                onClick = createImage
+            ) {
+                Text("Create tpl setting")
+            }
+        }
+    }
 }
