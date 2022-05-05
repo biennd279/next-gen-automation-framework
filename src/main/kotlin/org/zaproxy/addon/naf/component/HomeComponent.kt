@@ -13,6 +13,8 @@ import kotlinx.coroutines.CoroutineScope
 import org.zaproxy.addon.naf.NafScan
 import org.zaproxy.addon.naf.NafService
 import org.zaproxy.addon.naf.NafState
+import org.zaproxy.addon.naf.component.tab.ExploitTabComponent
+import org.zaproxy.addon.naf.component.tab.StartTabComponent
 import org.zaproxy.addon.naf.database.NafDatabase
 import org.zaproxy.addon.naf.model.*
 import org.zaproxy.addon.naf.ui.NafTab
