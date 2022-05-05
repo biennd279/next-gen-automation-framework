@@ -93,7 +93,8 @@ fun Wizard(
                 )
                 WizardTab.SCAN -> ScanOptions(
                     component.activeScan,
-                    component.nafPlugin
+                    component.nafPlugin,
+                    component.validate
                 )
                 WizardTab.SCOPE -> Scope(
                     component.includesRegex,
@@ -162,12 +163,21 @@ fun CrawlOptions(
 @Composable
 fun ScanOptions(
     activeScan: MutableState<Boolean>,
-    policies: List<MutableState<NafPlugin>>
+    policies: List<MutableState<NafPlugin>>,
+    validate: MutableState<Boolean>
 ) {
     Column {
         LabelCheckBox(activeScan) {
             Text(
                 text = "Run Active Scan",
+                modifier = Modifier.padding(10.dp),
+                fontWeight = FontWeight.Bold
+            )
+        }
+
+        LabelCheckBox(validate) {
+            Text(
+                text = "Validate after scan",
                 modifier = Modifier.padding(10.dp),
                 fontWeight = FontWeight.Bold
             )

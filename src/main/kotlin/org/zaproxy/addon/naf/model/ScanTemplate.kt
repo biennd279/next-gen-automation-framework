@@ -16,6 +16,7 @@ data class ScanTemplate(
     val systemOptions: SystemOptions = SystemOptions(),
     val authenticationOptions: AuthenticationOptions = AuthenticationOptions(),
     val scanOptions: ActiveScanOptions,
+    val isValidate: Boolean = false,
 )
 
 data class CrawlOptions(

@@ -131,7 +131,7 @@ class ExtensionNaf: ExtensionAdaptor(NAME), CoroutineScope, NafState {
                     database.saveConfig(nafConfig = nafConfig.value)
                 }
 
-                val nafScanner = NafScanner(nafService, defaultPolicy, coroutineContext)
+                val nafScanner = NafScanner(nafService, defaultPolicy, eventConsumerImpl.nafState, coroutineContext)
 
                 val lifecycle = LifecycleRegistry()
                 val rootComponent = RootComponent(

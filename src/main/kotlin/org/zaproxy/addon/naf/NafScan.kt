@@ -50,6 +50,10 @@ class NafScan(
                         _phase.value = NafPhase.SCAN
                         it.start(nafScanContext)
                     }
+                    is ValidatePipeline -> {
+                        _phase.value = NafPhase.ATTACK
+                        it.start(nafScanContext)
+                    }
                 }
                 pipelineState[it] = PipelineState.DONE
             }.onFailure { t ->

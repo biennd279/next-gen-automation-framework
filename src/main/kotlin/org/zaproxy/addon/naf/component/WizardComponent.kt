@@ -44,6 +44,7 @@ class WizardComponent(
 
     val useBruteForce = mutableStateOf(false)
     val files = mutableStateListOf<File>()
+    val validate = mutableStateOf(false)
 
     val nafPlugin: List<MutableState<NafPlugin>> = nafScanner.defaultPolicy
         .pluginFactory
@@ -90,7 +91,8 @@ class WizardComponent(
             ),
             authenticationOptions = AuthenticationOptions(
                 method = nafAuthenticationMethod.value
-            )
+            ),
+            isValidate = validate.value
         )
     }
 

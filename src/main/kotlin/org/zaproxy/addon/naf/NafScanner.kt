@@ -12,6 +12,7 @@ import kotlin.coroutines.CoroutineContext
 class NafScanner(
     val nafService: NafService,
     val defaultPolicy: ScanPolicy,
+    val nafState: NafState,
     override val coroutineContext: CoroutineContext = Dispatchers.Default
 ): CoroutineScope {
     private suspend fun detectTarget(url: String): org.zaproxy.zap.model.Target {
@@ -57,6 +58,13 @@ class NafScanner(
                 nafService.nucleiEngine?.let {
                     listPipeline.add(NucleiScanPipeline(it, systemOptions.templates,coroutineContext))
                 }
+            }
+
+            if (isValidate) {
+                listPipeline.add(ValidatePipeline(
+                    nafState = nafState,
+                    coroutineContext
+                ))
             }
         }
 
