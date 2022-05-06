@@ -2,6 +2,9 @@ package org.zaproxy.addon.naf.pipeline
 
 import kotlinx.coroutines.flow.update
 import me.d3s34.rfi.RfiExploiter
+import me.d3s34.sqlmap.restapi.request.StartTaskRequest
+import me.d3s34.sqlmap.transformParam
+import org.zaproxy.addon.naf.NafService
 import org.zaproxy.addon.naf.NafState
 import org.zaproxy.addon.naf.database.NafDatabase
 import org.zaproxy.addon.naf.model.NafScanContext
@@ -14,6 +17,7 @@ import kotlin.coroutines.CoroutineContext
 
 class ValidatePipeline(
     val nafState: NafState,
+    val nafService: NafService,
     override val coroutineContext: CoroutineContext
 ): NafPipeline<Unit>(NafPhase.ATTACK) {
 
@@ -38,7 +42,20 @@ class ValidatePipeline(
 
             when (alert.cweId) {
                 89 -> {
-                    // SQL Injection
+                    val sqlmapEngine = nafService.sqlmapEngine
+                    val isValid = sqlmapEngine?.verifySqlInjection(
+                        StartTaskRequest(
+                            url = alert.uri.toString(),
+                            data = alert.postData,
+                            cookie = historyReference.httpMessage.cookieParamsAsString,
+                        ).transformParam(alert.param)
+                    ) ?: false
+
+                    if (isValid) {
+                        nafDatabase
+                            .issueService
+                            .saveNewIssue(alert.toNafAlert().mapToIssue())
+                    }
                 }
                 94, 78, 97 -> {
                     // Code injection, template injection

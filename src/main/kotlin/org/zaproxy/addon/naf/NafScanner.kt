@@ -63,6 +63,7 @@ class NafScanner(
             if (isValidate) {
                 listPipeline.add(ValidatePipeline(
                     nafState = nafState,
+                    nafService = nafService,
                     coroutineContext
                 ))
             }

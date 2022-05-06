@@ -1,11 +1,13 @@
 package me.d3s34.sqlmap
 
+import io.ktor.http.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 import me.d3s34.sqlmap.restapi.ApiService
 import me.d3s34.sqlmap.restapi.request.StartTaskRequest
 import me.d3s34.sqlmap.restapi.response.TaskDataResponse
+import java.net.URL
 import kotlin.coroutines.CoroutineContext
 
 class SqlmapApiEngine(
@@ -110,4 +112,53 @@ class SqlmapApiEngine(
 
 suspend fun SqlmapApiEngine.attack(lambda: SqlmapRequestBuilder.() -> Unit): TaskDataResponse? {
     return attack(startTaskRequest { lambda() })
+}
+
+fun StartTaskRequest.transformParam(param: String): StartTaskRequest {
+    val url = URL(this.url)
+
+    val query = parseQueryString(url.query)
+
+    val attackQuery = query
+        .entries()
+        .associate {
+            if (it.key != param)  {
+                it.toPair()
+            } else {
+                val (key, value) = it
+                val attackValue = value.map { "*" }
+                Pair(key, attackValue)
+            }
+        }
+
+    val attackParameters = parametersOf(attackQuery)
+
+    val attackUrl = URLBuilder(
+        protocol = URLProtocol(url.protocol, url.port),
+        host = "${url.host}:${url.port}",
+        port = url.port,
+        pathSegments = url.path.split("/"),
+        parameters = attackParameters
+    ).build()
+
+    val bodyParsed = this.data?.let { parseQueryString(it) }
+
+    val attackBody = bodyParsed
+        ?.entries()
+        ?.associate {
+            if (it.key == param) {
+                val (key, value) = it
+                val attackValue = value.map { "*" }
+                Pair(key, attackValue)
+            } else {
+                it.toPair()
+            }
+        }
+
+    val bodyAttackParameters = attackBody?.let { parametersOf(it) }
+
+    return this.copy(
+        url = attackUrl.toString(),
+        data = bodyAttackParameters?.formUrlEncode()
+    )
 }
