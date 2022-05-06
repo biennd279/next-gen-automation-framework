@@ -19,4 +19,19 @@ class TplmapDockerEngine(
 
         return ContainerAttachClient(containerId, dockerClient, this)
     }
+
+    fun validate(tplmapRequest: TplmapRequest): Boolean {
+        val containerId = dockerClientManager.createTplmapValidateContainer(
+            tplmapRequest.copy(
+                osShell = false,
+                osCmd = "echo naftestnaftest"
+            )
+        )!!
+
+        dockerClient.startContainerCmd(containerId).exec()
+
+        val result = dockerClientManager.getContainerLog(containerId)
+
+        return result.contains("naftestnaftest")
+    }
 }

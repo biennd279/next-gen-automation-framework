@@ -190,6 +190,21 @@ class DockerClientManager() {
             .id
     }
 
+    fun createTplmapValidateContainer(tplmapRequest: TplmapRequest): String? {
+        val comandline = buildList {
+            val command = tplmapRequest.toCommand()
+            addAll(command.escapedArgs)
+        }
+
+        @Suppress("Deprecation")
+        return dockerClient
+            .createContainerCmd(TPLMAP_IMAGE_TAG)
+            .withNetworkMode("host")
+            .withCmd(comandline)
+            .exec()
+            .id
+    }
+
     companion object {
         const val SQLMAP_API_DOCKER_URI = "me/d3s34/sqlmap/Dockerfile"
         const val SQLMAP_API_CONTAINER_NAME = "naf-sqlmap-api"

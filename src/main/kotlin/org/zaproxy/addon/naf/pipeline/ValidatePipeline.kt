@@ -5,6 +5,7 @@ import me.d3s34.commix.CommixValidateRequest
 import me.d3s34.rfi.RfiExploiter
 import me.d3s34.sqlmap.restapi.request.StartTaskRequest
 import me.d3s34.sqlmap.transformParam
+import me.d3s34.tplmap.TplmapRequest
 import org.zaproxy.addon.naf.NafService
 import org.zaproxy.addon.naf.NafState
 import org.zaproxy.addon.naf.database.NafDatabase
@@ -61,18 +62,35 @@ class ValidatePipeline(
                 94, 78, 97 -> {
                     val commixEngine = nafService.commixDockerEngine
 
-                    val isValid = commixEngine?.validate(CommixValidateRequest(
+                    val isCommixExploitable = commixEngine?.validate(CommixValidateRequest(
                         url = alert.uri.toString(),
                         data = alert.postData,
                         cookies = historyReference.httpMessage.cookieParamsAsString
                     )) ?: false
 
-                    if (isValid) {
+                    if (isCommixExploitable) {
                         nafDatabase
                             .issueService
                             .saveNewIssue(alert.toNafAlert().mapToIssue())
+                        return@forEach
                     }
 
+                    val tplmapDockerEngine = nafService.tplmapDockerEngine
+                    val isTplmapExploitable = tplmapDockerEngine?.validate(
+                        TplmapRequest(
+                            url = alert.uri.toString(),
+                            data = alert.postData,
+                            cookies = historyReference.httpMessage.cookieParamsAsString
+                        )
+                    ) ?: false
+
+
+                    if (isTplmapExploitable) {
+                        nafDatabase
+                            .issueService
+                            .saveNewIssue(alert.toNafAlert().mapToIssue())
+                        return@forEach
+                    }
                 }
                 98 -> {
                     val isValid = rfiExploiter.validate(
