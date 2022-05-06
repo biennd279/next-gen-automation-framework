@@ -1,6 +1,7 @@
 package org.zaproxy.addon.naf.pipeline
 
 import kotlinx.coroutines.flow.update
+import me.d3s34.commix.CommixValidateRequest
 import me.d3s34.rfi.RfiExploiter
 import me.d3s34.sqlmap.restapi.request.StartTaskRequest
 import me.d3s34.sqlmap.transformParam
@@ -58,7 +59,20 @@ class ValidatePipeline(
                     }
                 }
                 94, 78, 97 -> {
-                    // Code injection, template injection
+                    val commixEngine = nafService.commixDockerEngine
+
+                    val isValid = commixEngine?.validate(CommixValidateRequest(
+                        url = alert.uri.toString(),
+                        data = alert.postData,
+                        cookies = historyReference.httpMessage.cookieParamsAsString
+                    )) ?: false
+
+                    if (isValid) {
+                        nafDatabase
+                            .issueService
+                            .saveNewIssue(alert.toNafAlert().mapToIssue())
+                    }
+
                 }
                 98 -> {
                     val isValid = rfiExploiter.validate(

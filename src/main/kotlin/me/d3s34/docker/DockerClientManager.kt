@@ -1,14 +1,18 @@
 package me.d3s34.docker
 
+import com.github.dockerjava.api.model.Frame
 import com.github.dockerjava.core.DefaultDockerClientConfig
 import com.github.dockerjava.core.DockerClientImpl
+import com.github.dockerjava.core.command.LogContainerResultCallback
 import com.github.dockerjava.httpclient5.ApacheDockerHttpClient
 import me.d3s34.commix.CommixRequest
+import me.d3s34.commix.CommixValidateRequest
 import me.d3s34.commix.toCommand
 import me.d3s34.tplmap.TplmapRequest
 import me.d3s34.tplmap.toCommand
 import org.parosproxy.paros.Constant
 import java.io.File
+import java.nio.charset.Charset
 import java.time.Duration
 
 
@@ -98,6 +102,26 @@ class DockerClientManager() {
         return image.awaitImageId()
     }
 
+    fun getContainerLog(containerId: String): String {
+        val result = StringBuilder()
+
+        dockerClient
+            .logContainerCmd(containerId)
+            .withStdOut(true)
+            .withStdErr(true)
+            .withFollowStream(true)
+            .exec(object : LogContainerResultCallback() {
+                override fun onNext(item: Frame?) {
+                    item?.let {
+                        result.append(it.payload.toString(Charset.defaultCharset()))
+                    }
+                }
+            })
+            .awaitCompletion()
+
+        return result.toString()
+    }
+
     fun createCommixContainer(commixRequest: CommixRequest): String? {
         val commandline = buildList {
             val command =  commixRequest.toCommand()
@@ -115,6 +139,22 @@ class DockerClientManager() {
             .withAttachStderr(true)
             .withTty(true)
             .withStdinOpen(true)
+            .exec()
+            .id
+    }
+
+    fun createCommixValidateContainer(validateRequest: CommixValidateRequest): String? {
+        val commandline = buildList {
+            val command = validateRequest.toCommand()
+            add(command.path)
+            addAll(command.escapedArgs)
+        }
+
+        @Suppress("Deprecation")
+        return dockerClient
+            .createContainerCmd(COMMIX_IMAGE_TAG)
+            .withNetworkMode("host")
+            .withCmd(commandline)
             .exec()
             .id
     }

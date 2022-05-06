@@ -19,4 +19,16 @@ class CommixDockerEngine(
 
         return ContainerAttachClient(containerId, dockerClient, this)
     }
+
+    fun validate(validateRequest: CommixValidateRequest): Boolean {
+        val containerId = dockerClientManager.createCommixValidateContainer(validateRequest)!!
+
+        dockerClient
+            .startContainerCmd(containerId)
+            .exec()
+
+        val result = dockerClientManager.getContainerLog(containerId)
+
+        return result.contains("naftestnaftest")
+    }
 }
