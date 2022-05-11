@@ -25,19 +25,17 @@ import org.zaproxy.addon.naf.ui.collectAsMutableState
 fun Setting(
     settingComponent: SettingComponent
 ) {
-    val currentTab = remember { mutableStateOf(SettingTab.NUCLEI) }
-
     Scaffold(
         topBar = {
             TabRow(
-                selectedTabIndex = currentTab.value.ordinal,
+                selectedTabIndex = settingComponent.currentTab.value.ordinal,
                 modifier = Modifier.height(30.dp),
                 backgroundColor = MainColors.secondary
             ) {
                 SettingTab.values().forEachIndexed { index, tab ->
                     Tab(
-                        selected = currentTab.value.ordinal == index,
-                        onClick = { currentTab.value = tab }
+                        selected = settingComponent.currentTab.value.ordinal == index,
+                        onClick = { settingComponent.currentTab.value = tab }
                     ) {
                         Text(
                             text = tab.title,
@@ -68,23 +66,22 @@ fun Setting(
 
             val configState =  settingComponent.nafService.nafConfig.collectAsMutableState()
 
-            when (currentTab.value) {
+            when (settingComponent.currentTab.value) {
                 SettingTab.NUCLEI -> NucleiSetting(configState)
                 SettingTab.SQLMAP -> SqlmapSetting(
                     configState,
-                    settingComponent.dockerManager::createSqlmapImage,
-                    settingComponent.dockerManager::createSqlmapApiContainer,
-                    settingComponent.dockerManager::startSqlmapApiContainer
+                    settingComponent::createSqlImage,
+                    settingComponent::createSqlmapApiContainer,
+                    settingComponent::startSqlmapApiContainer
                 )
                 SettingTab.COMMIX -> CommixSetting(
                     configState,
-                    settingComponent.dockerManager::createCommixImage
+                    settingComponent::createCommixImage
                 )
                 SettingTab.TPLMAP -> TplmapSetting(
                     configState,
-                    settingComponent.dockerManager::createTplmapImage
+                    settingComponent::createTplmapImage
                 )
-                SettingTab.METASPLOIT -> MetasploitSetting()
             }
         }
     }
@@ -179,10 +176,14 @@ fun SqlmapSetting(
                     modifier = Modifier.fillMaxWidth()
                 )
 
-                Button(
-                    onClick = createImage
+                Row (
+                    modifier = Modifier.fillMaxWidth()
                 ) {
-                    Text("Create sqlmap image")
+                    Button(
+                        onClick = createImage
+                    ) {
+                        Text("Create sqlmap image")
+                    }
                 }
 
                 Button(
@@ -207,7 +208,6 @@ fun SqlmapSetting(
 fun NucleiSetting(
     nafConfig: MutableState<NafConfig>
 ) {
-    val isValidPath = remember { mutableStateOf<Boolean?>(null) }
 
     Column {
 
@@ -348,11 +348,6 @@ fun CommixSetting(
         }
         else -> {}
     }
-}
-
-@Composable
-fun MetasploitSetting() {
-
 }
 
 @Composable

@@ -18,7 +18,8 @@ class IssueComponent(
     val issues = MutableStateFlow(issueService.getAllIssue())
 
     fun handleAlertEvent(alertEvent: AlertEvent) {
-        val newIssue = alertEvent.nafAlert.mapToIssue()
+        val newIssue = alertEvent.nafAlert
+            .mapToIssue()
         currentIssue.update { newIssue }
     }
 

@@ -15,6 +15,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.isPrimaryPressed
 import androidx.compose.ui.input.pointer.isSecondaryPressed
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import org.parosproxy.paros.model.HistoryReference
 import org.zaproxy.addon.naf.NafScan
@@ -27,19 +28,17 @@ import org.zaproxy.addon.naf.ui.MainColors
 fun Dashboard(
     component: DashboardComponent
 ) {
-
-    val subTab = remember { mutableStateOf(DashboardTab.PROCESS) }
     Scaffold(
         topBar = {
             TabRow(
-                selectedTabIndex = subTab.value.ordinal,
+                selectedTabIndex = component.subTab.value.ordinal,
                 modifier = Modifier.height(30.dp),
                 backgroundColor = MainColors.secondary,
             ) {
                 DashboardTab.values().forEachIndexed { index, tab ->
                     Tab(
-                        selected = subTab.value.ordinal == index,
-                        onClick = { subTab.value = tab },
+                        selected = component.subTab.value.ordinal == index,
+                        onClick = { component.subTab.value = tab },
                     ) {
                         Text(tab.title)
                     }
@@ -47,7 +46,7 @@ fun Dashboard(
             }
         },
     ) {
-        when (subTab.value) {
+        when (component.subTab.value) {
             DashboardTab.PROCESS -> Processing(component.currentScan)
             DashboardTab.ALERT -> Alert(
                 component.alerts.collectAsState(),
@@ -236,6 +235,7 @@ fun AlertList(
                         val expandedMenu = remember { mutableStateOf(false) }
 
                         Row(
+                            horizontalArrangement = Arrangement.Center,
                             modifier = Modifier
                                 .mouseClickable {
                                     if (buttons.isPrimaryPressed) {
@@ -243,75 +243,77 @@ fun AlertList(
                                     } else if (buttons.isSecondaryPressed) {
                                         expandedMenu.value = true
                                     }
-                                }
+                                },
                         ) {
                             Text(
                                 text = it.uri,
                                 maxLines = 1,
+                                overflow = TextOverflow.Ellipsis
                             )
 
                             Spacer(modifier = Modifier.padding(5.dp))
+                        }
 
-                            if (expandedMenu.value) {
-                                Row(
-                                    modifier = Modifier
-                                        .fillMaxWidth(),
-                                    horizontalArrangement = Arrangement.Center
+                        if (expandedMenu.value) {
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth(),
+                                horizontalArrangement = Arrangement.Center
+                            ) {
+                                DropdownMenu(
+                                    expanded = expandedMenu.value,
+                                    onDismissRequest = {
+                                        expandedMenu.value = false
+                                    }
                                 ) {
-                                    DropdownMenu(
-                                        expanded = expandedMenu.value,
-                                        onDismissRequest = {
+                                    DropdownMenuItem(
+                                        onClick = {
                                             expandedMenu.value = false
+                                            sendAlert(it)
                                         }
                                     ) {
-                                        DropdownMenuItem(
-                                            onClick = {
-                                                expandedMenu.value = false
-                                                sendAlert(it)
-                                            }
-                                        ) {
-                                            Text("Add to Issue")
-                                        }
+                                        Text("Add to Issue")
+                                    }
 
-                                        DropdownMenuItem(
-                                            onClick = {
-                                                expandedMenu.value = false
-                                                sendToSqlmap(it)
-                                            }
-                                        ) {
-                                            Text("Send to SQLMap")
+                                    DropdownMenuItem(
+                                        onClick = {
+                                            expandedMenu.value = false
+                                            sendToSqlmap(it)
                                         }
+                                    ) {
+                                        Text("Send to SQLMap")
+                                    }
 
-                                        DropdownMenuItem(
-                                            onClick = {
-                                                expandedMenu.value = false
-                                                sendToCommix(it)
-                                            }
-                                        ) {
-                                            Text("Send to Commix")
+                                    DropdownMenuItem(
+                                        onClick = {
+                                            expandedMenu.value = false
+                                            sendToCommix(it)
                                         }
+                                    ) {
+                                        Text("Send to Commix")
+                                    }
 
-                                        DropdownMenuItem(
-                                            onClick = {
-                                                expandedMenu.value = false
-                                                sendToLFI(it)
-                                            }
-                                        ) {
-                                            Text("Send to LFI exploiter")
+                                    DropdownMenuItem(
+                                        onClick = {
+                                            expandedMenu.value = false
+                                            sendToLFI(it)
                                         }
+                                    ) {
+                                        Text("Send to LFI exploiter")
+                                    }
 
-                                        DropdownMenuItem(
-                                            onClick = {
-                                                expandedMenu.value = false
-                                                sendToRFI(it)
-                                            }
-                                        ) {
-                                            Text("Send to RFI Exploiter")
+                                    DropdownMenuItem(
+                                        onClick = {
+                                            expandedMenu.value = false
+                                            sendToRFI(it)
                                         }
+                                    ) {
+                                        Text("Send to RFI Exploiter")
                                     }
                                 }
                             }
                         }
+
 
                         Divider()
                     }
