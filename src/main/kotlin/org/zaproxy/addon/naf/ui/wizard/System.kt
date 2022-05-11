@@ -5,7 +5,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.Divider
-import androidx.compose.material.MaterialTheme.typography
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
@@ -18,7 +17,7 @@ import me.d3s34.nuclei.NucleiTemplateDir
 
 
 @Composable
-fun ComponentScan(
+fun System(
     useNuclei: MutableState<Boolean>,
     templates: SnapshotStateList<NucleiTemplate>,
     rootDir: NucleiTemplateDir
@@ -49,10 +48,7 @@ fun ComponentScan(
                         },
                         modifier = Modifier
                     ) {
-                        Text(
-                            text = template.path.split("/").last(),
-                            style = typography.subtitle1
-                        )
+                        Text(template.path.split("/").last())
                     }
                 }
             }

@@ -15,7 +15,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.isPrimaryPressed
 import androidx.compose.ui.input.pointer.isSecondaryPressed
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import org.parosproxy.paros.model.HistoryReference
 import org.zaproxy.addon.naf.NafScan
@@ -28,17 +27,19 @@ import org.zaproxy.addon.naf.ui.MainColors
 fun Dashboard(
     component: DashboardComponent
 ) {
+
+    val subTab = remember { mutableStateOf(DashboardTab.PROCESS) }
     Scaffold(
         topBar = {
             TabRow(
-                selectedTabIndex = component.subTab.value.ordinal,
+                selectedTabIndex = subTab.value.ordinal,
                 modifier = Modifier.height(30.dp),
                 backgroundColor = MainColors.secondary,
             ) {
                 DashboardTab.values().forEachIndexed { index, tab ->
                     Tab(
-                        selected = component.subTab.value.ordinal == index,
-                        onClick = { component.subTab.value = tab },
+                        selected = subTab.value.ordinal == index,
+                        onClick = { subTab.value = tab },
                     ) {
                         Text(tab.title)
                     }
@@ -46,15 +47,13 @@ fun Dashboard(
             }
         },
     ) {
-        when (component.subTab.value) {
+        when (subTab.value) {
             DashboardTab.PROCESS -> Processing(component.currentScan)
             DashboardTab.ALERT -> Alert(
                 component.alerts.collectAsState(),
                 component.addIssue,
                 component.sendToSqlmap,
-                component.sendToCommix,
-                component.sendToRFI,
-                component.sendToLFI
+                component.sendToCommix
             )
             DashboardTab.CRAWL -> Crawl(component.historyRefSate.collectAsState())
             DashboardTab.SITEMAP -> SiteMap(component.siteNodes.collectAsState())
@@ -108,9 +107,7 @@ fun Alert(
     alerts: State<List<NafAlert>>,
     sendAlert: (NafAlert) -> Unit,
     sendToSqlmap: (NafAlert) -> Unit,
-    sendToCommix: (NafAlert) -> Unit,
-    sendToRFI: (NafAlert) -> Unit,
-    sendToLFI: (NafAlert) -> Unit
+    sendToCommix: (NafAlert) -> Unit
 ) {
 
     val currentAlert: MutableState<NafAlert?> = remember { mutableStateOf(null) }
@@ -140,9 +137,7 @@ fun Alert(
                 },
                 sendAlert,
                 sendToSqlmap,
-                sendToCommix,
-                sendToRFI,
-                sendToLFI
+                sendToCommix
             )
         }
 
@@ -178,9 +173,7 @@ fun AlertList(
     onClickAlert: (NafAlert) -> Unit,
     sendAlert: (NafAlert) -> Unit,
     sendToSqlmap: (NafAlert) -> Unit,
-    sendToCommix: (NafAlert) -> Unit,
-    sendToRFI: (NafAlert) -> Unit,
-    sendToLFI: (NafAlert) -> Unit
+    sendToCommix: (NafAlert) -> Unit
 ) {
     val alertsByGroup = derivedStateOf { alerts.value.groupBy { it.name } }
 
@@ -235,7 +228,6 @@ fun AlertList(
                         val expandedMenu = remember { mutableStateOf(false) }
 
                         Row(
-                            horizontalArrangement = Arrangement.Center,
                             modifier = Modifier
                                 .mouseClickable {
                                     if (buttons.isPrimaryPressed) {
@@ -243,77 +235,57 @@ fun AlertList(
                                     } else if (buttons.isSecondaryPressed) {
                                         expandedMenu.value = true
                                     }
-                                },
+                                }
                         ) {
                             Text(
                                 text = it.uri,
                                 maxLines = 1,
-                                overflow = TextOverflow.Ellipsis
                             )
 
                             Spacer(modifier = Modifier.padding(5.dp))
-                        }
 
-                        if (expandedMenu.value) {
-                            Row(
-                                modifier = Modifier
-                                    .fillMaxWidth(),
-                                horizontalArrangement = Arrangement.Center
-                            ) {
-                                DropdownMenu(
-                                    expanded = expandedMenu.value,
-                                    onDismissRequest = {
-                                        expandedMenu.value = false
-                                    }
+                            if (expandedMenu.value) {
+                                Row(
+                                    modifier = Modifier
+                                        .fillMaxWidth(),
+                                    horizontalArrangement = Arrangement.Center
                                 ) {
-                                    DropdownMenuItem(
-                                        onClick = {
+                                    DropdownMenu(
+                                        expanded = expandedMenu.value,
+                                        onDismissRequest = {
                                             expandedMenu.value = false
-                                            sendAlert(it)
                                         }
                                     ) {
-                                        Text("Add to Issue")
-                                    }
+                                        DropdownMenuItem(
+                                            onClick = {
+                                                expandedMenu.value = false
+                                                sendAlert(it)
+                                            }
+                                        ) {
+                                            Text("Add to Issue")
+                                        }
 
-                                    DropdownMenuItem(
-                                        onClick = {
-                                            expandedMenu.value = false
-                                            sendToSqlmap(it)
+                                        DropdownMenuItem(
+                                            onClick = {
+                                                expandedMenu.value = false
+                                                sendToSqlmap(it)
+                                            }
+                                        ) {
+                                            Text("Send to SQLMap")
                                         }
-                                    ) {
-                                        Text("Send to SQLMap")
-                                    }
 
-                                    DropdownMenuItem(
-                                        onClick = {
-                                            expandedMenu.value = false
-                                            sendToCommix(it)
+                                        DropdownMenuItem(
+                                            onClick = {
+                                                expandedMenu.value = false
+                                                sendToCommix(it)
+                                            }
+                                        ) {
+                                            Text("Send to Commix")
                                         }
-                                    ) {
-                                        Text("Send to Commix")
-                                    }
-
-                                    DropdownMenuItem(
-                                        onClick = {
-                                            expandedMenu.value = false
-                                            sendToLFI(it)
-                                        }
-                                    ) {
-                                        Text("Send to LFI exploiter")
-                                    }
-
-                                    DropdownMenuItem(
-                                        onClick = {
-                                            expandedMenu.value = false
-                                            sendToRFI(it)
-                                        }
-                                    ) {
-                                        Text("Send to RFI Exploiter")
                                     }
                                 }
                             }
                         }
-
 
                         Divider()
                     }

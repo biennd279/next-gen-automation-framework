@@ -5,5 +5,5 @@ import org.zaproxy.addon.naf.ui.Tab
 enum class SettingTab(
     override val title: String
 ): Tab {
-     SQLMAP("Sqlmap"), COMMIX("Commix"), TPLMAP("Tplmap"), NUCLEI("Nuclei"),
+     SQLMAP("Sqlmap"), COMMIX("Commix"), TPLMAP("Tplmap"), METASPLOIT("Metasploit"), NUCLEI("Nuclei"),
 }

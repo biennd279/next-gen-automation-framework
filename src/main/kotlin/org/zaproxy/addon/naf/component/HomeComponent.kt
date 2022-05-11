@@ -2,7 +2,6 @@ package org.zaproxy.addon.naf.component
 
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateListOf
-import androidx.compose.runtime.mutableStateOf
 import com.arkivanov.decompose.ComponentContext
 import com.arkivanov.decompose.router.RouterState
 import com.arkivanov.decompose.router.replaceCurrent
@@ -19,7 +18,6 @@ import org.zaproxy.addon.naf.component.exploit.StartTabComponent
 import org.zaproxy.addon.naf.database.NafDatabase
 import org.zaproxy.addon.naf.model.*
 import org.zaproxy.addon.naf.ui.NafTab
-import org.zaproxy.addon.naf.ui.home.DashboardTab
 import kotlin.coroutines.CoroutineContext
 
 class HomeComponent(
@@ -31,8 +29,6 @@ class HomeComponent(
     private val onCallWizard: () -> Unit,
     override val coroutineContext: CoroutineContext
 ): ComponentContext by componentContext, CoroutineScope {
-
-    val lastDashboardTab = mutableStateOf(DashboardTab.PROCESS)
 
     private val listExploitTabComponent = mutableStateListOf<ExploitTabComponent>(StartTabComponent())
 
@@ -80,16 +76,13 @@ class HomeComponent(
         Config.Dashboard -> Child.Dashboard(DashboardComponent(
             componentContext,
             nafState,
-            lastDashboardTab,
             currentScan,
             addIssue = { sendEvent(AlertEvent(it)) },
             sendToSqlmap = { sendEvent(SqlInjectionEvent(it)) },
-            sendToCommix = { sendEvent(CommandInjectionEvent(it)) },
-            sendToLFI = { sendEvent(LFIInjectionEvent(it)) },
-            sendToRFI = { sendEvent(RFIInjectionEvent(it)) }
+            sendToCommix = { sendEvent(CommandInjectionEvent(it)) }
         ))
         Config.Project -> Child.Project(ProjectComponent(componentContext), onCallWizard)
-        Config.Setting -> Child.Setting(SettingComponent(componentContext, nafService, this))
+        Config.Setting -> Child.Setting(SettingComponent(componentContext, nafService))
         Config.Exploit -> Child.Exploit(ExploitComponent(
             componentContext,
             nafService,

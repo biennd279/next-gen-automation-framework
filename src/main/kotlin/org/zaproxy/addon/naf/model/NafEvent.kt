@@ -20,14 +20,6 @@ class TemplateInjectionEvent(
     alert: NafAlert
 ): ExploitEvent(alert)
 
-class LFIInjectionEvent(
-    alert: NafAlert
-): ExploitEvent(alert)
-
-class RFIInjectionEvent(
-    alert: NafAlert
-): ExploitEvent(alert)
-
 class AlertEvent(
     val nafAlert: NafAlert
 ): NafEvent()

@@ -50,7 +50,7 @@ fun NafAlert.mapToIssue(): NafIssue {
         },
         description = this.description,
         reproduce = """
-            Send query to ${this.uri} with `${this.param}` is vulnerability value.
+            Send query to ${this.uri} with ${this.param} is vulnerability value.
         """.trimIndent(),
         solution = this.solution,
         note = this.otherInfo

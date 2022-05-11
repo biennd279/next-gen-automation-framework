@@ -30,8 +30,8 @@ class WizardComponent(
 
     val url = mutableStateOf("")
     val crawlSiteMap = mutableStateOf(true)
-    val crawlAjax = mutableStateOf(false)
-    val activeScan = mutableStateOf(true)
+    val crawlAjax = mutableStateOf(true)
+    val activeScan = mutableStateOf(false)
     val includesRegex = mutableStateListOf<String>()
     val exludesRegex = mutableStateListOf<String>()
     val useNuclei = mutableStateOf(false)
@@ -44,7 +44,7 @@ class WizardComponent(
 
     val useBruteForce = mutableStateOf(false)
     val files = mutableStateListOf<File>()
-    val validate = mutableStateOf(true)
+    val validate = mutableStateOf(false)
 
     val nafPlugin: List<MutableState<NafPlugin>> = nafScanner.defaultPolicy
         .pluginFactory

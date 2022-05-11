@@ -117,11 +117,11 @@ suspend fun SqlmapApiEngine.attack(lambda: SqlmapRequestBuilder.() -> Unit): Tas
 fun StartTaskRequest.transformParam(param: String): StartTaskRequest {
     val url = URL(this.url)
 
-    val query = url.query?.let { parseQueryString(it) }
+    val query = parseQueryString(url.query)
 
     val attackQuery = query
-        ?.entries()
-        ?.associate {
+        .entries()
+        .associate {
             if (it.key != param)  {
                 it.toPair()
             } else {
@@ -131,7 +131,7 @@ fun StartTaskRequest.transformParam(param: String): StartTaskRequest {
             }
         }
 
-    val attackParameters = attackQuery?.let { parametersOf(it) } ?: Parameters.Empty
+    val attackParameters = parametersOf(attackQuery)
 
     val attackUrl = URLBuilder(
         protocol = URLProtocol(url.protocol, url.port),
