@@ -53,7 +53,9 @@ fun Dashboard(
                 component.alerts.collectAsState(),
                 component.addIssue,
                 component.sendToSqlmap,
-                component.sendToCommix
+                component.sendToCommix,
+                component.sendToRFI,
+                component.sendToLFI
             )
             DashboardTab.CRAWL -> Crawl(component.historyRefSate.collectAsState())
             DashboardTab.SITEMAP -> SiteMap(component.siteNodes.collectAsState())
@@ -107,7 +109,9 @@ fun Alert(
     alerts: State<List<NafAlert>>,
     sendAlert: (NafAlert) -> Unit,
     sendToSqlmap: (NafAlert) -> Unit,
-    sendToCommix: (NafAlert) -> Unit
+    sendToCommix: (NafAlert) -> Unit,
+    sendToRFI: (NafAlert) -> Unit,
+    sendToLFI: (NafAlert) -> Unit
 ) {
 
     val currentAlert: MutableState<NafAlert?> = remember { mutableStateOf(null) }
@@ -137,7 +141,9 @@ fun Alert(
                 },
                 sendAlert,
                 sendToSqlmap,
-                sendToCommix
+                sendToCommix,
+                sendToRFI,
+                sendToLFI
             )
         }
 
@@ -173,7 +179,9 @@ fun AlertList(
     onClickAlert: (NafAlert) -> Unit,
     sendAlert: (NafAlert) -> Unit,
     sendToSqlmap: (NafAlert) -> Unit,
-    sendToCommix: (NafAlert) -> Unit
+    sendToCommix: (NafAlert) -> Unit,
+    sendToRFI: (NafAlert) -> Unit,
+    sendToLFI: (NafAlert) -> Unit
 ) {
     val alertsByGroup = derivedStateOf { alerts.value.groupBy { it.name } }
 
@@ -281,6 +289,24 @@ fun AlertList(
                                             }
                                         ) {
                                             Text("Send to Commix")
+                                        }
+
+                                        DropdownMenuItem(
+                                            onClick = {
+                                                expandedMenu.value = false
+                                                sendToLFI(it)
+                                            }
+                                        ) {
+                                            Text("Send to LFI exploiter")
+                                        }
+
+                                        DropdownMenuItem(
+                                            onClick = {
+                                                expandedMenu.value = false
+                                                sendToRFI(it)
+                                            }
+                                        ) {
+                                            Text("Send to RFI Exploiter")
                                         }
                                     }
                                 }

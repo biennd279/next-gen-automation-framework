@@ -79,7 +79,9 @@ class HomeComponent(
             currentScan,
             addIssue = { sendEvent(AlertEvent(it)) },
             sendToSqlmap = { sendEvent(SqlInjectionEvent(it)) },
-            sendToCommix = { sendEvent(CommandInjectionEvent(it)) }
+            sendToCommix = { sendEvent(CommandInjectionEvent(it)) },
+            sendToLFI = { sendEvent(LFIInjectionEvent(it)) },
+            sendToRFI = { sendEvent(RFIInjectionEvent(it)) }
         ))
         Config.Project -> Child.Project(ProjectComponent(componentContext), onCallWizard)
         Config.Setting -> Child.Setting(SettingComponent(componentContext, nafService))

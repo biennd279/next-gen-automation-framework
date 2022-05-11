@@ -12,7 +12,9 @@ class DashboardComponent(
     val currentScan: State<NafScan?>,
     val addIssue: (NafAlert) -> Unit,
     val sendToSqlmap: (NafAlert) -> Unit,
-    val sendToCommix: (NafAlert) -> Unit
+    val sendToCommix: (NafAlert) -> Unit,
+    val sendToRFI: (NafAlert) -> Unit,
+    val sendToLFI: (NafAlert) -> Unit
 ): ComponentContext by componentContext, NafState by nafState {
 
 }
