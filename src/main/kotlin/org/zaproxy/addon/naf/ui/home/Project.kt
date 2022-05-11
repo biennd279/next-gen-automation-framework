@@ -1,15 +1,12 @@
 package org.zaproxy.addon.naf.ui.home
 
-import androidx.compose.foundation.border
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.Divider
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
-import androidx.compose.material.TextButton
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import org.zaproxy.addon.naf.component.ProjectComponent
 
@@ -21,10 +18,14 @@ fun Project(
     Column {
         Divider(Modifier.padding(10.dp))
 
-        TextButton(
+        OutlinedButton(
             onClick = onCallWizard,
-            modifier = Modifier
-                .border(1.dp, Color.LightGray)
+            border = BorderStroke(1.dp, MaterialTheme.colors.primary),
+            shape = RoundedCornerShape(50),
+            colors = ButtonDefaults
+                .outlinedButtonColors(
+                    contentColor = MaterialTheme.colors.primary,
+                )
         ) {
             Text(
                 text = "Create new scan",

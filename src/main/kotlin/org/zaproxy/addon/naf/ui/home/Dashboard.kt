@@ -10,13 +10,14 @@ import androidx.compose.material.MaterialTheme.typography
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
+import androidx.compose.material.icons.filled.Send
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.input.pointer.isPrimaryPressed
-import androidx.compose.ui.input.pointer.isSecondaryPressed
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import com.mikepenz.markdown.Markdown
 import org.parosproxy.paros.model.HistoryReference
 import org.zaproxy.addon.naf.NafScan
 import org.zaproxy.addon.naf.component.DashboardComponent
@@ -194,7 +195,9 @@ fun AlertList(
     val stateVertical = rememberScrollState(0)
 
     LazyColumn(
-        modifier = Modifier.horizontalScroll(stateVertical)
+        modifier = Modifier
+            .horizontalScroll(stateVertical)
+            .fillMaxWidth()
     ) {
         alertsByGroup.value.forEach { (name, alerts) ->
 
@@ -235,36 +238,28 @@ fun AlertList(
                         val expandedMenu = remember { mutableStateOf(false) }
 
                         Row(
-                            horizontalArrangement = Arrangement.Center,
                             modifier = Modifier
-                                .mouseClickable {
-                                    if (buttons.isPrimaryPressed) {
-                                        onClickAlert(it)
-                                    } else if (buttons.isSecondaryPressed) {
+                                .clickable {
+                                    onClickAlert(it)
+                                }
+                                .fillMaxWidth(),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.SpaceBetween
+                        ) {
+                            Column {
+                                IconButton(
+                                    onClick = {
                                         expandedMenu.value = true
                                     }
-                                },
-                        ) {
-                            Text(
-                                text = it.uri,
-                                maxLines = 1,
-                                overflow = TextOverflow.Ellipsis
-                            )
+                                ) {
+                                    Icon(Icons.Default.Send, "More")
+                                }
 
-                            Spacer(modifier = Modifier.padding(5.dp))
-                        }
-
-                        if (expandedMenu.value) {
-                            Row(
-                                modifier = Modifier
-                                    .fillMaxWidth(),
-                                horizontalArrangement = Arrangement.Center
-                            ) {
                                 DropdownMenu(
                                     expanded = expandedMenu.value,
                                     onDismissRequest = {
                                         expandedMenu.value = false
-                                    }
+                                    },
                                 ) {
                                     DropdownMenuItem(
                                         onClick = {
@@ -312,8 +307,15 @@ fun AlertList(
                                     }
                                 }
                             }
-                        }
 
+                            Spacer(modifier = Modifier.width(5.dp))
+
+                            Text(
+                                text = it.uri,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis,
+                            )
+                        }
 
                         Divider()
                     }
@@ -395,7 +397,8 @@ fun AlertField(
     ) {
         Text(
             text = title,
-            style = typography.subtitle2
+            style = typography.subtitle1,
+            fontWeight = FontWeight.Bold
         )
 
         Spacer(Modifier.padding(5.dp, 0.dp, 20.dp, 0.dp))
@@ -418,16 +421,13 @@ fun AlertTextField(
     ) {
         Text(
             text = title,
-            style = typography.subtitle2
+            style = typography.subtitle1,
+            fontWeight = FontWeight.Bold
         )
 
         Spacer(Modifier.padding(5.dp, 0.dp, 20.dp, 0.dp))
 
-        OutlinedTextField(
-            value = text,
-            onValueChange = {},
-            readOnly = true
-        )
+        Markdown(content = text)
     }
 }
 @Composable

@@ -4,53 +4,80 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.*
 import androidx.compose.material.MaterialTheme.typography
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogState
+import com.mikepenz.markdown.Markdown
 import org.zaproxy.addon.naf.component.IssueComponent
 import org.zaproxy.addon.naf.model.NafIssue
 import org.zaproxy.addon.naf.model.Severity
 import org.zaproxy.addon.naf.model.emptyIssue
+import org.zaproxy.addon.naf.model.toMarkdown
 import org.zaproxy.addon.naf.ui.collectAsMutableState
 
+@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun Issue(
     component: IssueComponent,
 ) {
+
+
+    val issues = component.issues.collectAsState()
+    val selectedIssue = component.currentIssue.collectAsMutableState()
+
+
     Column(
         modifier = Modifier
             .fillMaxHeight()
     ) {
-        Text(
-            text = "List Issue",
-            style = typography.h4
-        )
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween,
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Text(
+                text = "List Issue",
+                style = typography.h4
+            )
+
+            Button(
+                onClick = {
+                    selectedIssue.value = emptyIssue()
+                }
+            ) {
+                Text("New Issue")
+            }
+        }
 
         Divider()
 
         Spacer(Modifier.height(20.dp))
 
-        val issues = component.issues.collectAsState()
-        val selectedIssue = component.currentIssue.collectAsMutableState()
-
         LazyColumn(modifier = Modifier.weight(1f)) {
             items(issues.value) {issue ->
+
+                val showPreview = remember { mutableStateOf(false) }
+
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
                         .clickable {
                             selectedIssue.value = issue
                         },
-                    verticalAlignment = Alignment.CenterVertically
+                    verticalAlignment = Alignment.CenterVertically,
                 ) {
 
                     IconButton(
@@ -63,19 +90,29 @@ fun Issue(
 
                     Spacer(Modifier.width(10.dp))
 
+                    IconButton(
+                        onClick = {
+                            showPreview.value = true
+                        }
+                    ) {
+                        Icon(Icons.Default.Search, "Preview")
+                    }
+
+                    Spacer(Modifier.width(10.dp))
+
                     Text(
                         text = issue.severity.name,
                         style = typography.subtitle1
                     )
 
-                    Spacer(Modifier.padding(10.dp))
+                    Spacer(Modifier.width(10.dp))
 
                     Text(
                         text = issue.name,
                         style = typography.subtitle1
                     )
 
-                    Spacer(Modifier.padding(10.dp))
+                    Spacer(Modifier.width(10.dp))
 
                     Text(
                         text = issue.description.replace("\n", " "),
@@ -83,16 +120,31 @@ fun Issue(
                     )
                 }
 
+                val dialogState = DialogState(
+                    size = DpSize(768.dp, 768.dp)
+                )
+
+                if (showPreview.value) {
+                    Dialog(
+                        title = "Preview",
+                        state = dialogState,
+                        onCloseRequest = {
+                            showPreview.value = false
+                        }
+                    ) {
+                        val scrollState = rememberScrollState(0)
+
+                        Markdown(
+                            issue.toMarkdown(),
+                            modifier = Modifier
+                                .verticalScroll(scrollState)
+                                .padding(5.dp)
+                        )
+                    }
+                }
+
                 Divider()
             }
-        }
-
-        Button(
-            onClick = {
-                selectedIssue.value = emptyIssue()
-            }
-        ) {
-            Text("New Issue")
         }
 
         selectedIssue.value?.also {

@@ -20,3 +20,17 @@ fun emptyIssue() = NafIssue(
     ""
 )
 
+
+fun NafIssue.toMarkdown() = buildString {
+    appendLine("### ${name.replace("\n", " ").trimIndent()}")
+    appendLine("**Severity**: ${severity.name}")
+    appendLine("**Description**")
+    appendLine(description.trim('\n', ' ', '\t'))
+    appendLine("**Reproduce**")
+    appendLine(reproduce.trim('\n', ' ', '\t'))
+    appendLine("**Solution**")
+    appendLine(solution.trim('\n', ' ', '\t'))
+    appendLine("**Note**")
+    appendLine(note.trim('\n', ' ', '\t'))
+    appendLine("---")
+}
