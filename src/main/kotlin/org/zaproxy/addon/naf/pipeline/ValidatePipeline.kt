@@ -40,103 +40,110 @@ class ValidatePipeline(
         val nafAlerts = nafState.alerts.value
 
         alerts.forEach {alert ->
-            val historyReference = alert.historyRef
+            kotlin.runCatching {
+                val historyReference = alert.historyRef
 
-            when (alert.cweId) {
-                89 -> {
-                    val sqlmapEngine = nafService.sqlmapEngine
-                    val isValid = sqlmapEngine?.verifySqlInjection(
-                        StartTaskRequest(
-                            url = alert.uri.toString(),
-                            data = alert.postData,
-                            cookie = historyReference.httpMessage.cookieParamsAsString,
-                        ).transformParam(alert.param)
-                    ) ?: false
+                when (alert.cweId) {
+                    89 -> {
+                        val sqlmapEngine = nafService.sqlmapEngine
+                        val isValid = sqlmapEngine?.verifySqlInjection(
+                            StartTaskRequest(
+                                url = alert.uri.toString(),
+                                data = alert.postData,
+                                cookie = historyReference.httpMessage.cookieParamsAsString,
+                            ).transformParam(alert.param)
+                        ) ?: false
 
-                    if (isValid) {
-                        nafDatabase
-                            .issueService
-                            .saveNewIssue(alert.toNafAlert().mapToIssue())
+                        if (isValid) {
+                            nafDatabase
+                                .issueService
+                                .saveNewIssue(alert.toNafAlert().mapToIssue())
+                        }
                     }
-                }
-                94, 78, 97 -> {
-                    val commixEngine = nafService.commixDockerEngine
+                    94, 78, 97 -> {
+                        val commixEngine = nafService.commixDockerEngine
 
-                    val isCommixExploitable = commixEngine?.validate(CommixValidateRequest(
-                        url = alert.uri.toString(),
-                        data = alert.postData,
-                        cookies = historyReference.httpMessage.cookieParamsAsString
-                    )) ?: false
-
-                    if (isCommixExploitable) {
-                        nafDatabase
-                            .issueService
-                            .saveNewIssue(alert.toNafAlert().mapToIssue())
-                        return@forEach
-                    }
-
-                    val tplmapDockerEngine = nafService.tplmapDockerEngine
-                    val isTplmapExploitable = tplmapDockerEngine?.validate(
-                        TplmapRequest(
+                        val isCommixExploitable = commixEngine?.validate(CommixValidateRequest(
                             url = alert.uri.toString(),
                             data = alert.postData,
                             cookies = historyReference.httpMessage.cookieParamsAsString
-                        )
-                    ) ?: false
+                        )) ?: false
+
+                        if (isCommixExploitable) {
+                            nafDatabase
+                                .issueService
+                                .saveNewIssue(alert.toNafAlert().mapToIssue())
+                            return@forEach
+                        }
+
+                        val tplmapDockerEngine = nafService.tplmapDockerEngine
+                        val isTplmapExploitable = tplmapDockerEngine?.validate(
+                            TplmapRequest(
+                                url = alert.uri.toString(),
+                                data = alert.postData,
+                                cookies = historyReference.httpMessage.cookieParamsAsString
+                            )
+                        ) ?: false
 
 
-                    if (isTplmapExploitable) {
-                        nafDatabase
-                            .issueService
-                            .saveNewIssue(alert.toNafAlert().mapToIssue())
-                        return@forEach
+                        if (isTplmapExploitable) {
+                            nafDatabase
+                                .issueService
+                                .saveNewIssue(alert.toNafAlert().mapToIssue())
+                            return@forEach
+                        }
                     }
-                }
-                98 -> {
-                    val isValid = rfiExploiter.validate(
-                        RfiRequest(
-                            URL(historyReference.uri.toString()),
-                            alert.param,
-                            data = alert.postData,
-                            cookie = historyReference.httpMessage.cookieParamsAsString,
-                            remoteFileInclude = RfiExploiter.nessusRfiCheck
+                    98 -> {
+                        val isValid = rfiExploiter.validate(
+                            RfiRequest(
+                                URL(historyReference.uri.toString()),
+                                alert.param,
+                                data = alert.postData,
+                                cookie = historyReference.httpMessage.cookieParamsAsString,
+                                remoteFileInclude = RfiExploiter.nessusRfiCheck
+                            )
                         )
-                    )
 
-                    if (isValid) {
+                        if (isValid) {
 
+                            val nafAlert = nafAlerts.firstOrNull { it.id == alert.alertId.toString() }
+
+                            if (nafAlert != null) {
+                                nafDatabase
+                                    .issueService
+                                    .saveNewIssue(nafAlert.mapToIssue())
+                            } else {
+
+                                val newNafAlert = alert.toNafAlert()
+
+                                nafState.alerts.update {
+                                    it + newNafAlert
+                                }
+
+                                nafDatabase
+                                    .issueService
+                                    .saveNewIssue(newNafAlert.mapToIssue())
+                            }
+                        }
+                    }
+                    22 -> {
+                        // Path traversal, LFI
+                        // No need validate
                         val nafAlert = nafAlerts.firstOrNull { it.id == alert.alertId.toString() }
-
                         if (nafAlert != null) {
                             nafDatabase
                                 .issueService
                                 .saveNewIssue(nafAlert.mapToIssue())
-                        } else {
-
-                            val newNafAlert = alert.toNafAlert()
-
-                            nafState.alerts.update {
-                                it + newNafAlert
-                            }
-
-                            nafDatabase
-                                .issueService
-                                .saveNewIssue(newNafAlert.mapToIssue())
                         }
                     }
+                    else -> {}
                 }
-                22 -> {
-                    // Path traversal, LFI
-                    // No need validate
-                    val nafAlert = nafAlerts.firstOrNull { it.id == alert.alertId.toString() }
-                    if (nafAlert != null) {
-                        nafDatabase
-                            .issueService
-                            .saveNewIssue(nafAlert.mapToIssue())
-                    }
-                }
-                else -> {}
+            }.onFailure {
+                println(it.message)
             }
         }
     }
+
+
+
 }
