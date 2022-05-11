@@ -10,7 +10,7 @@ enum class WizardTab(
     FUZZ("Fuzzing"),
     CRAWL("Crawl"),
     SCAN("Scan"),
-    SYSTEM("System"),
+    COMPONENT("Component Scan"),
     AUTH("Authentication"),
     SCRIPT("Script")
 }

@@ -29,7 +29,7 @@ class NafServiceImpl(
         }
 
     override val nucleiRootTemplatePath: String
-        get() = nafConfig.value.templateRootDir ?: "${home}/nuclei-templates/dns/"
+        get() = nafConfig.value.templateRootDir ?: "${home}/nuclei-templates/vulnerabilities"
 
     override val sqlmapUrl: String
         get() = nafConfig.value.sqlmapApiUrl ?: "http://127.0.0.1:8775/"

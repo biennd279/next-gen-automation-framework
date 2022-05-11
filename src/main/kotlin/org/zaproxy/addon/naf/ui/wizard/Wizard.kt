@@ -101,7 +101,7 @@ fun Wizard(
                     component.exludesRegex,
                     WizardComponent::isValidRegex
                 )
-                WizardTab.SYSTEM -> System(
+                WizardTab.COMPONENT -> ComponentScan(
                     component.useNuclei,
                     component.templates,
                     component.rootDir

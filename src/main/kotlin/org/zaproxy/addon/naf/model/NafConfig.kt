@@ -15,7 +15,7 @@ val home: String = System.getProperty("user.home")
 
 internal val emptyConfig = NafConfig(
     NucleiEngineType.Native,
-    "${home}/nuclei-templates/dns/",
+    "${home}/nuclei-templates/vulnerabilities",
     SqlmapEngineType.API,
     "http://127.0.0.1:8775/",
     CommixEngineType.DOCKER,
